@@ -8,7 +8,7 @@ public class Car {
     private long id;
     private Motor motor;
     private Body body;
-    private Wheel[] wheels;
+    private Wheel[] wheels = new Wheel[4];
     //Add id of the worker which produced the car;
     
     //Getter / Setter

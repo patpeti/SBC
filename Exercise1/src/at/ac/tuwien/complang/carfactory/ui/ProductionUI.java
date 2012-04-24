@@ -36,7 +36,7 @@ public class ProductionUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            e.getActionCommand();
         }
         
     }
