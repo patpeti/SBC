@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.carfactory.domain;
 
-public class Motor {
+import java.io.Serializable;
+
+public class Motor implements Serializable {
 
 }

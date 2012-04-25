@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.carfactory.domain;
 
-public class Body {
+import java.io.Serializable;
+
+public class Body implements Serializable {
 
 }

@@ -1,8 +1,9 @@
 package at.ac.tuwien.complang.carfactory.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Car {
+public class Car implements Serializable {
     private Color color;
     private boolean isComplete;
     private long id;

@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.carfactory.domain;
 
-public class Wheel {
+import java.io.Serializable;
+
+public class Wheel implements Serializable {
 
 }
