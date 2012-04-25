@@ -1,3 +1,4 @@
+package at.ac.tuwien.complang.carfactory.ui;
 
 public class StartUpAssembler {
 	public static void main(String[] args) {
