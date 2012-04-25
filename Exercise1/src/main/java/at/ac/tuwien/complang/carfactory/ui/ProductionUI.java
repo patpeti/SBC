@@ -10,8 +10,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.ProducerType;
+
 public class ProductionUI extends JFrame {
 	private static final long serialVersionUID = -6151830798597607052L;
+	
+	//Fields
+	JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 
 	public ProductionUI() {
         showUI();
@@ -38,11 +44,11 @@ public class ProductionUI extends JFrame {
         createMotorFactoryButton.setActionCommand("motor");
         createMotorFactoryButton.addActionListener(listener);
         
-        JSpinner bodyCountSpinner = new JSpinner();
+        bodyCountSpinner = new JSpinner();
         bodyCountSpinner.setValue(50);
-        JSpinner wheelCountSpinner = new JSpinner();
+        wheelCountSpinner = new JSpinner();
         wheelCountSpinner.setValue(50);
-        JSpinner motorCountSpinner = new JSpinner();
+        motorCountSpinner = new JSpinner();
         motorCountSpinner.setValue(50);
 
         JPanel producerPanel = new JPanel(new GridLayout(3,2));
@@ -58,7 +64,25 @@ public class ProductionUI extends JFrame {
     class CreationListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            System.out.println(e.getActionCommand());
+            String command = e.getActionCommand();
+            if(command.equals("body")) {
+            	int value = (Integer) bodyCountSpinner.getValue();
+            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY);
+            	bodyFactory.init(value);
+            	bodyFactory.start();
+            } else if(command.equals("wheel")) {
+            	int value = (Integer) wheelCountSpinner.getValue();
+            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL);
+            	wheelFactory.init(value);
+            	wheelFactory.start();
+            } else if(command.equals("motor")) {
+            	int value = (Integer) motorCountSpinner.getValue();
+            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR);
+            	motorFactory.init(value);
+            	motorFactory.start();
+            	
+            }
+            
         }
         
     }
