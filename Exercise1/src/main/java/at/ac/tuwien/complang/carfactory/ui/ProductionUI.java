@@ -21,6 +21,7 @@ import org.mozartspaces.core.ContainerReference;
 
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
+import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 public class ProductionUI extends JFrame {
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -42,11 +43,13 @@ public class ProductionUI extends JFrame {
 	JPanel tableContainer;
 	Capi capi;
 	ContainerReference cref;
+	ISpaceListener listener;
 
-	public ProductionUI(Capi capi, ContainerReference cref) {
+	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener) {
 		this.capi = capi;
 		this.cref = cref;
 		tableContainer = new JPanel(new GridLayout(1, 2));
+		this.listener = listener;
         showUI();
     }
 
@@ -140,6 +143,10 @@ public class ProductionUI extends JFrame {
         padding.add(container);
         this.add(padding, BorderLayout.CENTER);
 	}
+	
+	public void onNewSpaceObject (ICarPart carPart){
+		System.out.println("#GUI# : CarPart is created");
+	}
     
     class CreationListener implements ActionListener {
 
@@ -147,25 +154,27 @@ public class ProductionUI extends JFrame {
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref);
+            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref, listener);
             	if(!bodyFactory.isRunning()) {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
             	}
+
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref);
+            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref, listener);
             	if(!wheelFactory.isRunning()) {
             		wheelFactory.init(value);
             		wheelFactory.start();
             	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref);
+            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref, listener);
             	if(!motorFactory.isRunning()) {
 	            	motorFactory.init(value);
 	            	motorFactory.start();
             	}
+
             }
             
         }
