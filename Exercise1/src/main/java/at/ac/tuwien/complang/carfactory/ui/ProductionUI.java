@@ -5,10 +5,18 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
+
+import org.apache.commons.logging.impl.Jdk13LumberjackLogger;
+
+import ch.qos.logback.core.pattern.SpacePadder;
 
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.ProducerType;
@@ -25,10 +33,33 @@ public class ProductionUI extends JFrame {
 
     private void showUI() {
     	buildCreationPanel();
+    	buildSpaceTable();
+    	
         
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
+    }
+    
+    /**
+     * Show the Table for the content of the space
+     */
+    private void buildSpaceTable() {
+    	JPanel container = new JPanel();
+    	JPanel spaceTablePanel = new JPanel();
+    	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
+    	spaceTablePanel.setLayout(layout);
+    	JLabel label = new JLabel("Current Content of the Space");
+    	label.setAlignmentX(CENTER_ALIGNMENT);
+    	String[] columns = {"ID", "PartName", "PID"};
+    	Object[][] data = {{1, "test", "PID"}, {2, "test2", "PID"}};
+    	JTable table = new JTable(data, columns);
+    	JScrollPane scrollPane = new JScrollPane(table);
+    	table.setFillsViewportHeight(true);
+    	spaceTablePanel.add(label);
+    	spaceTablePanel.add(scrollPane);
+    	container.add(spaceTablePanel);
+    	this.add(container, BorderLayout.SOUTH);
     }
 
 	private void buildCreationPanel() {
