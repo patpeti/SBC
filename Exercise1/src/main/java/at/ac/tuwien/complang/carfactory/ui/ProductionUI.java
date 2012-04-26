@@ -15,6 +15,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 
 import org.apache.commons.logging.impl.Jdk13LumberjackLogger;
+import org.mozartspaces.core.Capi;
+import org.mozartspaces.core.ContainerReference;
 
 import ch.qos.logback.core.pattern.SpacePadder;
 
@@ -27,8 +29,12 @@ public class ProductionUI extends JFrame {
 	//Fields
 	JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	JPanel tableContainer;
+	Capi capi;
+	ContainerReference cref;
 
-	public ProductionUI() {
+	public ProductionUI(Capi capi, ContainerReference cref) {
+		this.capi = capi;
+		this.cref = cref;
 		tableContainer = new JPanel();
         showUI();
     }
@@ -136,20 +142,19 @@ public class ProductionUI extends JFrame {
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY);
+            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref);
             	bodyFactory.init(value);
             	bodyFactory.start();
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL);
+            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref);
             	wheelFactory.init(value);
             	wheelFactory.start();
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR);
+            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref);
             	motorFactory.init(value);
             	motorFactory.start();
-            	
             }
             
         }

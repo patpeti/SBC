@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.mozartspaces.core.Capi;
+
+import org.mozartspaces.core.ContainerReference;
+
 public class FactoryFacade {
 	
 	//Static Fields
@@ -20,20 +24,20 @@ public class FactoryFacade {
 	private Thread thread;
 	private IProducer producer;
 	
-	private FactoryFacade(ProducerType type) {
+	private FactoryFacade(ProducerType type, Capi capi, ContainerReference cref) {
 		switch(type) {
-			case BODY: producer = new BodyFactory(); break;
-			case WHEEL: producer = new WheelFactory(); break;
-			case MOTOR: producer = new MotorFactory(); break;
+			case BODY: producer = new BodyFactory(capi, cref); break;
+			case WHEEL: producer = new WheelFactory(capi, cref); break;
+			case MOTOR: producer = new MotorFactory(capi, cref); break;
 			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
 		}
 	}
 	
-	public static FactoryFacade getInstance(ProducerType type) {
+	public static FactoryFacade getInstance(ProducerType type, Capi capi, ContainerReference cref) {
 		if(factories.get(type) == null) {
 			synchronized(FactoryFacade.class) {
 				if(factories.get(type) == null) {
-					FactoryFacade.factories.put(type, new FactoryFacade(type));
+					FactoryFacade.factories.put(type, new FactoryFacade(type, capi, cref));
 				}
 			}
 		}

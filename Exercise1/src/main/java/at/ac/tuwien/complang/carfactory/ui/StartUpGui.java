@@ -17,15 +17,14 @@ public class StartUpGui {
 	//Static fields
 	public static final String CONTAINER_URI = "xvsm://localhost:9876";
 	public static final String CONTAINER_NAME = "factory";
-	public static final int SPACE_PORT = 9876;
-
+	public static final int SPACE_PORT = 9876;	
+	
 	public static void main(String[] args) {
-		//1. Start the User interface
-		new ProductionUI();
+		ContainerReference container;
 		//2. Create an embedded instance of mozard spaces and initialize a container on port 9876
 		MzsCore core = DefaultMzsCore.newInstance(SPACE_PORT);
 		Capi capi = new Capi(core);
-		ContainerReference container = null;
+		container = null;
 		try {
 			List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
 			try {
@@ -39,5 +38,8 @@ public class StartUpGui {
 			System.out.println("Error: Could not initialize Space");
 			System.exit(1);
 		}
+		
+		//1. Start the User interface
+		new ProductionUI(capi, container);
 	}
 }
