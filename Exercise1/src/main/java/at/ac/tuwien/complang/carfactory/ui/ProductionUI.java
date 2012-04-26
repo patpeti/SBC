@@ -14,17 +14,27 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 
-import org.apache.commons.logging.impl.Jdk13LumberjackLogger;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 
-import ch.qos.logback.core.pattern.SpacePadder;
 
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 
 public class ProductionUI extends JFrame {
 	private static final long serialVersionUID = -6151830798597607052L;
+	private static final String[] FINISHED_GOODS_COLUMNS = {"Car ID", "PID",
+		"Body ID", "Body PID",
+		"Motor ID", "Motor PID",
+		"WHEEL 1 ID",
+		"WHEEL 1 PID",
+		"WHEEL 2 ID",
+		"WHEEL 2 PID",
+		"WHEEL 3 ID",
+		"WHEEL 3 PID",
+		"WHEEL 4 ID",
+		"WHEEL 4 PID"};
+	private static final String[] SPACE_CONTENT_COLUMNS = {"ID", "PartName", "PID"};
 	
 	//Fields
 	JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
@@ -67,9 +77,8 @@ public class ProductionUI extends JFrame {
     	spaceTablePanel.setLayout(layout);
     	JLabel label = new JLabel("Current Content of the Space");
     	label.setAlignmentX(CENTER_ALIGNMENT);
-    	String[] columns = {"ID", "PartName", "PID"};
     	Object[][] data = {{1, "test", "PID"}, {2, "test2", "PID"}};
-    	JTable table = new JTable(data, columns);
+    	JTable table = new JTable(data, SPACE_CONTENT_COLUMNS);
     	JScrollPane scrollPane = new JScrollPane(table);
     	table.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
@@ -85,9 +94,8 @@ public class ProductionUI extends JFrame {
     	spaceTablePanel.setLayout(layout);
     	JLabel label = new JLabel("Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
-    	String[] columns = {"Car ID", "Motor ID", "PID", "..."};
-    	Object[][] data = {{1, "test", "PID", "..."}, {2, "test2", "PID", "..."}};
-    	JTable table = new JTable(data, columns);
+    	Object[][] data = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+    	JTable table = new JTable(data, FINISHED_GOODS_COLUMNS);
     	JScrollPane scrollPane = new JScrollPane(table);
     	table.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
