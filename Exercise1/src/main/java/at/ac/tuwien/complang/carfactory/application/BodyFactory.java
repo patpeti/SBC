@@ -3,6 +3,8 @@ package at.ac.tuwien.complang.carfactory.application;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 
+import at.ac.tuwien.complang.carfactory.domain.Body;
+
 public class BodyFactory implements IProducer {
 
 	public BodyFactory(Capi capi, ContainerReference cref) {
@@ -10,8 +12,8 @@ public class BodyFactory implements IProducer {
 	}
 
 	public void produce() {
-		// TODO Auto-generated method stub
-		System.out.println("Produced a body.");
+		Body body = new Body();
+		System.out.println("Produced a body with ID: " + body.getId());
 	}
 
 }
