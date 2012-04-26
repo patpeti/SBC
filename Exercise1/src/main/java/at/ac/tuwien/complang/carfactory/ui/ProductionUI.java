@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -45,7 +46,7 @@ public class ProductionUI extends JFrame {
 	public ProductionUI(Capi capi, ContainerReference cref) {
 		this.capi = capi;
 		this.cref = cref;
-		tableContainer = new JPanel();
+		tableContainer = new JPanel(new GridLayout(1, 2));
         showUI();
     }
 
@@ -71,7 +72,6 @@ public class ProductionUI extends JFrame {
      * Show the Table for the content of the space
      */
     private JPanel buildSpaceTable() {
-    	JPanel container = new JPanel();
     	JPanel spaceTablePanel = new JPanel();
     	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
     	spaceTablePanel.setLayout(layout);
@@ -83,12 +83,10 @@ public class ProductionUI extends JFrame {
     	table.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
     	spaceTablePanel.add(scrollPane);
-    	container.add(spaceTablePanel);
-    	return container;
+    	return spaceTablePanel;
     }
 
     private JPanel buildFinishedGoodsTable() {
-    	JPanel container = new JPanel();
     	JPanel spaceTablePanel = new JPanel();
     	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
     	spaceTablePanel.setLayout(layout);
@@ -100,8 +98,7 @@ public class ProductionUI extends JFrame {
     	table.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
     	spaceTablePanel.add(scrollPane);
-    	container.add(spaceTablePanel);
-    	return container;
+    	return spaceTablePanel;
     }
     
 	private void buildCreationPanel() {
