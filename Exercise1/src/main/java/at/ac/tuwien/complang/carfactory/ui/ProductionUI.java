@@ -21,7 +21,7 @@ import org.mozartspaces.core.ContainerReference;
 import ch.qos.logback.core.pattern.SpacePadder;
 
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
-import at.ac.tuwien.complang.carfactory.application.ProducerType;
+import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 
 public class ProductionUI extends JFrame {
 	private static final long serialVersionUID = -6151830798597607052L;

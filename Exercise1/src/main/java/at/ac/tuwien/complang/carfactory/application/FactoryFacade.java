@@ -9,6 +9,8 @@ import org.mozartspaces.core.Capi;
 
 import org.mozartspaces.core.ContainerReference;
 
+import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
+
 public class FactoryFacade {
 	
 	//Static Fields
