@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.io.Serializable;
 
 public class Car implements Serializable {
+	
+	//Static Fields
+	private static long next_id;
+	
+	//Fields
     private Color color;
     private boolean isComplete;
     private long id;
@@ -11,6 +16,12 @@ public class Car implements Serializable {
     private Body body;
     private Wheel[] wheels = new Wheel[4];
     //Add id of the worker which produced the car;
+    
+    //Constructors
+    public Car() {
+    	next_id++;
+    	this.id = Car.next_id;
+	}
     
     //Getter / Setter
     public Color getColor() {
@@ -27,9 +38,6 @@ public class Car implements Serializable {
     }
     public long getId() {
         return id;
-    }
-    public void setId(long id) {
-        this.id = id;
     }
     public boolean hasColor() {
         return color != null;
