@@ -1,7 +1,42 @@
 package at.ac.tuwien.complang.carfactory.ui;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.core.Capi;
+import org.mozartspaces.core.CapiUtil;
+import org.mozartspaces.core.ContainerReference;
+import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.core.MzsCore;
+import org.mozartspaces.core.MzsCoreException;
+
 public class StartUpGui {
-    public static void main(String[] args) {
-        new ProductionUI();
+	//Static fields
+	public static final String CONTAINER_NAME = "xvsm://localhost:9876";
+	public static final int SPACE_PORT = 9876;
+
+	public static void main(String[] args) {
+		//1. Start the User interface
+		new ProductionUI();
+		//2. Create an embedded instance of mozard spaces and initialize a container on port 9876
+		MzsCore core = DefaultMzsCore.newInstance(SPACE_PORT);
+		Capi capi = new Capi(core);
+		ContainerReference container = null;
+		try {
+			List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
+			try {
+				container = CapiUtil.lookupOrCreateContainer("factory", new URI(CONTAINER_NAME), coords, null, capi);
+			} catch (URISyntaxException e) {
+				System.out.println("Error: Invalid container name");
+				System.exit(1);
+			}
+			//container = capi.createContainer();
+		} catch (MzsCoreException e) {
+			System.out.println("Error: Could not initialize Space");
+			System.exit(1);
+		}
     }
 }
