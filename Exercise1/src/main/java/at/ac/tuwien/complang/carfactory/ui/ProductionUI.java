@@ -143,18 +143,24 @@ public class ProductionUI extends JFrame {
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
             	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref);
-            	bodyFactory.init(value);
-            	bodyFactory.start();
+            	if(!bodyFactory.isRunning()) {
+	            	bodyFactory.init(value);
+	            	bodyFactory.start();
+            	}
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
             	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref);
-            	wheelFactory.init(value);
-            	wheelFactory.start();
+            	if(!wheelFactory.isRunning()) {
+            		wheelFactory.init(value);
+            		wheelFactory.start();
+            	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
             	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref);
-            	motorFactory.init(value);
-            	motorFactory.start();
+            	if(!motorFactory.isRunning()) {
+	            	motorFactory.init(value);
+	            	motorFactory.start();
+            	}
             }
             
         }

@@ -97,4 +97,8 @@ public class FactoryFacade {
 
 	}
 
+	public boolean isRunning() {
+		return running;
+	}
+
 }
