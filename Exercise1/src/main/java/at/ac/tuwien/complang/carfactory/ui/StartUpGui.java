@@ -15,7 +15,8 @@ import org.mozartspaces.core.MzsCoreException;
 
 public class StartUpGui {
 	//Static fields
-	public static final String CONTAINER_NAME = "xvsm://localhost:9876";
+	public static final String CONTAINER_URI = "xvsm://localhost:9876";
+	public static final String CONTAINER_NAME = "factory";
 	public static final int SPACE_PORT = 9876;
 
 	public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class StartUpGui {
 		try {
 			List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
 			try {
-				container = CapiUtil.lookupOrCreateContainer("factory", new URI(CONTAINER_NAME), coords, null, capi);
+				container = CapiUtil.lookupOrCreateContainer(CONTAINER_NAME, new URI(CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
@@ -38,5 +39,5 @@ public class StartUpGui {
 			System.out.println("Error: Could not initialize Space");
 			System.exit(1);
 		}
-    }
+	}
 }
