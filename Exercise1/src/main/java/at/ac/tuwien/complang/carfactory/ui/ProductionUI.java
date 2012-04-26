@@ -26,14 +26,16 @@ public class ProductionUI extends JFrame {
 	
 	//Fields
 	JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
+	JPanel tableContainer;
 
 	public ProductionUI() {
+		tableContainer = new JPanel();
         showUI();
     }
 
     private void showUI() {
     	buildCreationPanel();
-    	buildSpaceTable();
+    	buildTables();
     	
         
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -41,10 +43,18 @@ public class ProductionUI extends JFrame {
         this.setVisible(true);
     }
     
+    private void buildTables() {
+    	JPanel spaceTable = buildSpaceTable();
+    	JPanel finishedGoodsTable = buildFinishedGoodsTable();
+    	tableContainer.add(spaceTable);
+    	tableContainer.add(finishedGoodsTable);
+    	this.add(tableContainer, BorderLayout.SOUTH);
+    }
+    
     /**
      * Show the Table for the content of the space
      */
-    private void buildSpaceTable() {
+    private JPanel buildSpaceTable() {
     	JPanel container = new JPanel();
     	JPanel spaceTablePanel = new JPanel();
     	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
@@ -59,12 +69,34 @@ public class ProductionUI extends JFrame {
     	spaceTablePanel.add(label);
     	spaceTablePanel.add(scrollPane);
     	container.add(spaceTablePanel);
-    	this.add(container, BorderLayout.SOUTH);
+    	return container;
     }
 
+    private JPanel buildFinishedGoodsTable() {
+    	JPanel container = new JPanel();
+    	JPanel spaceTablePanel = new JPanel();
+    	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
+    	spaceTablePanel.setLayout(layout);
+    	JLabel label = new JLabel("Finished Goods");
+    	label.setAlignmentX(CENTER_ALIGNMENT);
+    	String[] columns = {"Car ID", "Motor ID", "PID", "..."};
+    	Object[][] data = {{1, "test", "PID", "..."}, {2, "test2", "PID", "..."}};
+    	JTable table = new JTable(data, columns);
+    	JScrollPane scrollPane = new JScrollPane(table);
+    	table.setFillsViewportHeight(true);
+    	spaceTablePanel.add(label);
+    	spaceTablePanel.add(scrollPane);
+    	container.add(spaceTablePanel);
+    	return container;
+    }
+    
 	private void buildCreationPanel() {
 		CreationListener listener = new CreationListener();
-    	
+    	JPanel container = new JPanel();
+    	BoxLayout layout = new BoxLayout(container, BoxLayout.PAGE_AXIS);
+    	container.setLayout(layout);
+    	JPanel padding = new JPanel();
+		
         JButton createBodyFactoryButton = new JButton("Create Body Factory");
         createBodyFactoryButton.setActionCommand("body");
         createBodyFactoryButton.addActionListener(listener);
@@ -81,6 +113,9 @@ public class ProductionUI extends JFrame {
         wheelCountSpinner.setValue(50);
         motorCountSpinner = new JSpinner();
         motorCountSpinner.setValue(50);
+        
+        JLabel label = new JLabel("Create a worker");
+        label.setAlignmentX(CENTER_ALIGNMENT);
 
         JPanel producerPanel = new JPanel(new GridLayout(3,2));
         producerPanel.add(createBodyFactoryButton);
@@ -89,7 +124,10 @@ public class ProductionUI extends JFrame {
         producerPanel.add(wheelCountSpinner);
         producerPanel.add(createMotorFactoryButton);
         producerPanel.add(motorCountSpinner);
-        this.add(producerPanel, BorderLayout.CENTER);
+        container.add(label);
+        container.add(producerPanel);
+        padding.add(container);
+        this.add(padding, BorderLayout.CENTER);
 	}
     
     class CreationListener implements ActionListener {
