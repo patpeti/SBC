@@ -88,7 +88,7 @@ public class FactoryFacade {
 				producer.produce();
 				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
 			}
-			System.out.println("All done. Average time to produce: " + total / (double) originalCount);
+			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
 		}
 
 	}
