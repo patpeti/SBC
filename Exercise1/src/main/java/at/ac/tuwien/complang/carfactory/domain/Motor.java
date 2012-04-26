@@ -13,14 +13,20 @@ public class Motor implements Serializable {
 	
 	//Fields
 	private long id;
+	private long pid; //ID of the producer
 	
-	public Motor() {
+	public Motor(long pid) {
 		next_id++;
 		this.id = Motor.next_id;
+		this.pid = pid;
 	}
 
 	public long getId() {
 		return id;
 	};
+	
+	public long getPid() {
+		return pid;
+	}
 	
 }

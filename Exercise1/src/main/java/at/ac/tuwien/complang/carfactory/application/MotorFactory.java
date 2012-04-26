@@ -10,7 +10,7 @@ import at.ac.tuwien.complang.carfactory.domain.Motor;
 public class MotorFactory extends AbstractFactory implements IProducer {
 	
 	//Fields
-	private long id;
+	private long id; //The ID of this producer
 
 	public MotorFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
@@ -18,7 +18,7 @@ public class MotorFactory extends AbstractFactory implements IProducer {
 	}
 
 	public void produce() {
-		Motor motor = new Motor();
+		Motor motor = new Motor(id);
 		System.out.println("Produced a motor with id: " + motor.getId());
 		
 		System.out.println("writing Motor into space...");

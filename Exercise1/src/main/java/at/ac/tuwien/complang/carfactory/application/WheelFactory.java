@@ -10,7 +10,7 @@ import at.ac.tuwien.complang.carfactory.domain.Wheel;
 public class WheelFactory extends AbstractFactory implements IProducer {
 
 	//Fields
-		private long id;
+	private long id; //The ID of this producer
 
 	public WheelFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
@@ -18,7 +18,7 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 	}
 
 	public void produce() {
-		Wheel wheel = new Wheel();
+		Wheel wheel = new Wheel(id);
 		System.out.println("Produced a wheel with ID: " + wheel.getId());
 		
 		System.out.println("writing wheel into space...");

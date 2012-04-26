@@ -13,13 +13,19 @@ public class Wheel implements Serializable {
 	
 	//Fields
 	private long id;
+	private long pid;
 	
-	public Wheel() {
+	public Wheel(long pid) {
 		next_id++;
 		this.id = Wheel.next_id;
+		this.pid = pid;
 	}
 
 	public long getId() {
 		return id;
 	};
+	
+	public long getPid() {
+		return pid;
+	}
 }

@@ -69,7 +69,19 @@ public class Car implements Serializable {
 	}
 	
 	public Object[] getDetails() {
-		return new Object[] {id, };
+		//TODO: Add null checks
+		return new Object[] {id, pid,
+				body.getId(), body.getPid(),
+				motor.getId(), motor.getPid(),
+				wheels[0].getId(),
+				wheels[0].getPid(),
+				wheels[1].getId(),
+				wheels[1].getPid(),
+				wheels[2].getId(),
+				wheels[2].getPid(),
+				wheels[3].getId(),
+				wheels[3].getPid(),
+				};
 	}
 
 	public long getPainterId() {

@@ -10,7 +10,7 @@ import at.ac.tuwien.complang.carfactory.domain.Body;
 public class BodyFactory extends AbstractFactory implements IProducer {
 
 	//Fields
-	private long id;
+	private long id; //The ID of this producer
 
 	public BodyFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
@@ -18,7 +18,7 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 	}
 
 	public void produce() {
-		Body body = new Body();
+		Body body = new Body(id);
 		System.out.println("Produced a body with ID: " + body.getId());
 		
 		System.out.println("writing Body into space...");
