@@ -6,15 +6,17 @@ import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
+import at.ac.tuwien.complang.carfactory.ui.ISpaceListener;
 
 public class WheelFactory extends AbstractFactory implements IProducer {
 
 	//Fields
 		private long id;
 
-	public WheelFactory(long id, Capi capi, ContainerReference cref) {
+	public WheelFactory(long id, Capi capi, ContainerReference cref, ISpaceListener listener) {
 		super(capi,cref);
 		this.id = id;
+		setListener(listener);
 	}
 
 	public void produce() {
@@ -25,7 +27,8 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 		try {
 			getCapi().write(getCref(), new Entry(wheel));
 			System.out.println("wheel written in space sucessfully");
-			
+			//notify listener
+			getListener().onObjectWrittenInSpace(wheel);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

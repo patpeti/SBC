@@ -6,16 +6,20 @@ import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 
 import at.ac.tuwien.complang.carfactory.domain.Body;
+import at.ac.tuwien.complang.carfactory.ui.ISpaceListener;
 
 public class BodyFactory extends AbstractFactory implements IProducer {
 
 	//Fields
 	private long id;
 
-	public BodyFactory(long id, Capi capi, ContainerReference cref) {
+	public BodyFactory(long id, Capi capi, ContainerReference cref, ISpaceListener listener) {
 		super(capi,cref);
 		this.id = id;
+		setListener(listener);
 	}
+
+	
 
 	public void produce() {
 		Body body = new Body();
@@ -25,7 +29,8 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		try {
 			getCapi().write(getCref(), new Entry(body));
 			System.out.println("Body written in space sucessfully");
-			
+			//notify listener
+			getListener().onObjectWrittenInSpace(body);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

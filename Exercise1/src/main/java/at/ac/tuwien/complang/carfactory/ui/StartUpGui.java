@@ -39,7 +39,10 @@ public class StartUpGui {
 			System.exit(1);
 		}
 		
+		//insatnciate globale Listener
+		ISpaceListener listener = new SpaceListenerImpl();
 		//1. Start the User interface
-		new ProductionUI(capi, container);
+		ProductionUI gui = new ProductionUI(capi, container, listener);
+		listener.setGui(gui);
 	}
 }
