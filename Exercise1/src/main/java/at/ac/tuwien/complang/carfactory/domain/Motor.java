@@ -20,7 +20,6 @@ public class Motor implements Serializable {
 	}
 
 	public long getId() {
-		// TODO Auto-generated method stub
 		return id;
 	};
 	

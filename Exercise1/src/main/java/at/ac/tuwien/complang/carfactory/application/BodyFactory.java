@@ -9,8 +9,12 @@ import at.ac.tuwien.complang.carfactory.domain.Body;
 
 public class BodyFactory extends AbstractFactory implements IProducer {
 
-	public BodyFactory(Capi capi, ContainerReference cref) {
+	//Fields
+	private long id;
+
+	public BodyFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
+		this.id = id;
 	}
 
 	public void produce() {
@@ -27,4 +31,7 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		}
 	}
 
+	public long getId() {
+		return id;
+	}
 }

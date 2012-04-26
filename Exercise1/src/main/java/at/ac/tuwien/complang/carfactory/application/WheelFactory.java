@@ -9,10 +9,12 @@ import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
 public class WheelFactory extends AbstractFactory implements IProducer {
 
+	//Fields
+		private long id;
 
-	
-	public WheelFactory(Capi capi, ContainerReference cref) {
+	public WheelFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
+		this.id = id;
 	}
 
 	public void produce() {
@@ -29,4 +31,7 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 		}
 	}
 
+	public long getId() {
+		return id;
+	}
 }

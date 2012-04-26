@@ -8,10 +8,13 @@ import org.mozartspaces.core.MzsCoreException;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 
 public class MotorFactory extends AbstractFactory implements IProducer {
+	
+	//Fields
+	private long id;
 
-
-	public MotorFactory(Capi capi, ContainerReference cref) {
+	public MotorFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
+		this.id = id;
 	}
 
 	public void produce() {
@@ -27,6 +30,10 @@ public class MotorFactory extends AbstractFactory implements IProducer {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public long getId() {
+		return id;
 	}
 
 }

@@ -12,9 +12,10 @@ import org.mozartspaces.core.ContainerReference;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 
 public class FactoryFacade {
-	
+
 	//Static Fields
 	private static Map<ProducerType, FactoryFacade> factories;
+	private long next_id = 0;
 	
 	static {
 		factories = new Hashtable<ProducerType, FactoryFacade>();
@@ -27,10 +28,11 @@ public class FactoryFacade {
 	private IProducer producer;
 	
 	private FactoryFacade(ProducerType type, Capi capi, ContainerReference cref) {
+		next_id++;
 		switch(type) {
-			case BODY: producer = new BodyFactory(capi, cref); break;
-			case WHEEL: producer = new WheelFactory(capi, cref); break;
-			case MOTOR: producer = new MotorFactory(capi, cref); break;
+			case BODY: producer = new BodyFactory(next_id, capi, cref); break;
+			case WHEEL: producer = new WheelFactory(next_id, capi, cref); break;
+			case MOTOR: producer = new MotorFactory(next_id, capi, cref); break;
 			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
 		}
 	}
