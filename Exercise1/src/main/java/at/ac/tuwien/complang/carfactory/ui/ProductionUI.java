@@ -44,6 +44,7 @@ public class ProductionUI extends JFrame {
 	private ContainerReference cref;
 	private ISpaceListener listener;
 	private JTable spaceTable, finishedGoodsTable;
+	private SpaceDataTableModel spaceDataTableModel;
 
 	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener) {
 		this.capi = capi;
@@ -81,8 +82,8 @@ public class ProductionUI extends JFrame {
     	JLabel label = new JLabel("Current Content of the Space");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	Object[][] data = {{1, "test", "PID"}, {2, "test2", "PID"}};
-    	SpaceDataTableModel model = new SpaceDataTableModel(data);
-    	spaceTable = new JTable(model);
+    	spaceDataTableModel = new SpaceDataTableModel(data);
+    	spaceTable = new JTable(spaceDataTableModel);
     	JScrollPane scrollPane = new JScrollPane(spaceTable);
     	spaceTable.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
@@ -147,6 +148,7 @@ public class ProductionUI extends JFrame {
 	
 	public void onNewSpaceObject (ICarPart carPart){
 		System.out.println("#GUI# : CarPart is created");
+		spaceDataTableModel.addRow(carPart.getObjectData());
 	}
     
     class CreationListener implements ActionListener {

@@ -26,4 +26,7 @@ public class Motor implements Serializable, ICarPart {
 		return pid;
 	}
 	
+	public Object[] getObjectData() {
+		return new Object[] {id, this.getClass().getName(), pid};
+	}
 }

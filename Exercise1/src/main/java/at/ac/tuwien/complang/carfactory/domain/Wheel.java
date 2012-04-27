@@ -25,4 +25,8 @@ public class Wheel implements Serializable, ICarPart {
 	public long getPid() {
 		return pid;
 	}
+
+	public Object[] getObjectData() {
+		return new Object[] {id, this.getClass().getName(), pid};
+	}
 }
