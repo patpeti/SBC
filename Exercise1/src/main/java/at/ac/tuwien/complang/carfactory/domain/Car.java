@@ -4,18 +4,12 @@ import java.awt.Color;
 import java.io.Serializable;
 
 public class Car implements Serializable {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	//Static Fields
 	private static long next_id;
 	
 	//Fields
-    private Color color;
-    private long color_pid;
     private boolean isComplete; //Whether assembly is complete
     private long isComplete_pid; //ID of the supervisor
     private long id;  //ID of the Car
@@ -33,15 +27,8 @@ public class Car implements Serializable {
     	this.motor = motor;
     	this.wheels = wheels;
 	}
-    
+        
     //Getter / Setter
-    public Color getColor() {
-        return color;
-    }
-    public void setColor(long pid, Color color) {
-    	this.color_pid = pid;
-        this.color = color;
-    }
     public boolean isComplete() {
         return isComplete;
     }
@@ -49,11 +36,24 @@ public class Car implements Serializable {
     	this.isComplete_pid = pid;
         this.isComplete = isComplete;
     }
+    
+    public Color getColor() {
+        return this.body.getColor();
+    }
+    public void setColor(long pid, Color color) {
+    	this.body.setColor(pid, color);
+    }
+
+    public boolean hasColor() {
+        return body.getColor() != null;
+    }
+	
+	public long getPainterId() {
+		return body.getPainterId();
+	}
+    
     public long getId() {
         return id;
-    }
-    public boolean hasColor() {
-        return color != null;
     }
 
 	public Motor getMotor() {
@@ -84,10 +84,6 @@ public class Car implements Serializable {
 				};
 	}
 
-	public long getPainterId() {
-		return color_pid;
-	}
-	
 	public long getSupervisorId() {
 		return isComplete_pid;
 	}

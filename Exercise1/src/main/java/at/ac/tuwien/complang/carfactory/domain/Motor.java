@@ -3,9 +3,6 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.io.Serializable;
 
 public class Motor implements Serializable, ICarPart {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	//Static fields
