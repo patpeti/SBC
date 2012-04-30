@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 
-public class Car implements Serializable {
+public class Car implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
 	private static final CarPartType type = CarPartType.CAR;
 
@@ -93,5 +93,18 @@ public class Car implements Serializable {
 	
 	public long getAssemblerId() {
 		return pid;
+	}
+
+	public long getPid() {
+		return getAssemblerId();
+	}
+
+	public Object[] getObjectData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public CarPartType getType() {
+		return this.type;
 	}
 }

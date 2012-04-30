@@ -2,10 +2,13 @@ package at.ac.tuwien.complang.carfactory.ui;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.Coordinator;
+import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
@@ -13,22 +16,24 @@ import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 
+import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
+
 public class StartUpGui {
-	//Static fields
-	public static final String CONTAINER_URI = "xvsm://localhost:9876";
-	public static final String CONTAINER_NAME = "factory";
-	public static final int SPACE_PORT = 9876;	
+	
 	
 	public static void main(String[] args) {
 		ContainerReference container;
 		//2. Create an embedded instance of mozard spaces and initialize a container on port 9876
-		MzsCore core = DefaultMzsCore.newInstance(SPACE_PORT);
+		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
 		container = null;
 		try {
-			List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
+			//List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
+			List<Coordinator> coords = new ArrayList<Coordinator>();
+			coords.add(new AnyCoordinator());
+			coords.add(new LabelCoordinator());
 			try {
-				container = CapiUtil.lookupOrCreateContainer(CONTAINER_NAME, new URI(CONTAINER_URI), coords, null, capi);
+				container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
