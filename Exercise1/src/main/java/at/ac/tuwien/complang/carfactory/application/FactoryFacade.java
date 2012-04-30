@@ -94,6 +94,7 @@ public class FactoryFacade {
 				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
 			}
 			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
+			FactoryFacade.this.running = false;
 		}
 
 	}
