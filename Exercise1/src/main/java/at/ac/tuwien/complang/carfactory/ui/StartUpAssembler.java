@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.carfactory.ui;
 
+import java.io.IOException;
+
 import org.mozartspaces.core.Capi;
 
 import at.ac.tuwien.complang.carfactory.businesslogic.Assembler;
@@ -23,7 +25,14 @@ public class StartUpAssembler {
 		 */
 		
 		Assembler assembler = new Assembler();
+		assembler.setListener(new SpaceListenerImpl());
+		assembler.doAssemble();
 		
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 		
 	}
 	

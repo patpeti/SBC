@@ -25,9 +25,60 @@
 			<artifactId>mozartspaces-runtime</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mozartspaces</groupId>
+			<artifactId>mozartspaces-notifications</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
-	<plugins>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>package</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>project</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<!-- <plugins>
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-eclipse-plugin</artifactId>
@@ -36,6 +87,6 @@
 				<downloadJavadocs>true</downloadJavadocs>
 			</configuration>
 		</plugin>
-	</plugins>
+	</plugins> -->
 
 </project>

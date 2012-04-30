@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,13 +20,22 @@ import javax.swing.JTable;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
-
+import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
+import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
-public class ProductionUI extends JFrame implements ISpaceObserver {
+
+
+
+
+public class ProductionUI extends JFrame implements ISpaceObserver, NotificationListener{
 	private static final long serialVersionUID = -6151830798597607052L;
 	private static final String[] FINISHED_GOODS_COLUMNS = {"Car ID", "PID",
 		"Body ID", "Body PID",
@@ -45,10 +58,26 @@ public class ProductionUI extends JFrame implements ISpaceObserver {
 	private ISpaceListener listener;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
+	private NotificationManager notifMgr;
 
-	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener) {
+	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener, NotificationManager notifMgr) {
 		this.capi = capi;
 		this.cref = cref;
+		this.notifMgr = notifMgr;
+		Set<Operation> operations = new HashSet<Operation>();
+	    operations.add(Operation.DELETE);
+	    operations.add(Operation.TAKE);
+	    operations.add(Operation.WRITE);
+
+	    try {
+			notifMgr.createNotification(cref, this, operations, null, null);
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		tableContainer = new JPanel(new GridLayout(1, 2));
 		this.listener = listener;
         showUI();
@@ -146,10 +175,19 @@ public class ProductionUI extends JFrame implements ISpaceObserver {
         this.add(padding, BorderLayout.CENTER);
 	}
 	
-	public void onNewSpaceObject (ICarPart carPart){
+	 
+	
+	public void onSpaceChange (ICarPart carPart, SpaceChangeType type){
 		System.out.println("#GUI# : CarPart is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
 	}
+	
+//	@Override
+//	public void entryOperationFinished(Notification source,
+//			Operation operation, List<? extends Serializable> entries) {
+//		System.out.println("PRODUCTIONUI#######################################");
+//		
+//	}
     
     class CreationListener implements ActionListener {
 
@@ -183,4 +221,16 @@ public class ProductionUI extends JFrame implements ISpaceObserver {
         }
         
     }
+
+	@Override
+	public void entryOperationFinished(Notification source,
+			Operation operation, List<? extends Serializable> entries) {
+		System.out.println("#######################################################");
+		System.out.println("########################################################");
+		System.out.println("opname: "+ operation.name());
+		
+	}
+
+
+
 }

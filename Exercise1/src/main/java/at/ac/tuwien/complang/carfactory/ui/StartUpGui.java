@@ -15,6 +15,7 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.notifications.NotificationManager;
 
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
@@ -26,6 +27,7 @@ public class StartUpGui {
 		//2. Create an embedded instance of mozard spaces and initialize a container on port 9876
 		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
+		NotificationManager notifMgr = new NotificationManager(core);
 		container = null;
 		try {
 			//List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
@@ -47,7 +49,7 @@ public class StartUpGui {
 		//insatnciate globale Listener
 		ISpaceListener listener = new SpaceListenerImpl();
 		//1. Start the User interface
-		ProductionUI gui = new ProductionUI(capi, container, listener);
+		ProductionUI gui = new ProductionUI(capi, container, listener, notifMgr);
 		listener.setSpaceObserver(gui);
 	}
 }

@@ -1,11 +1,12 @@
 package at.ac.tuwien.complang.carfactory.businesslogic;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
@@ -23,18 +24,25 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.ui.SpaceListenerImpl;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
-public class Assembler {
+
+public class Assembler implements NotificationListener{
 	
 	private Capi capi;
 	private ContainerReference container;
-
-	public Assembler() {
+	private NotificationManager notifMgr;
+	
+	public Assembler(){
 		
 		/**
 		 * TODO:
@@ -52,33 +60,48 @@ public class Assembler {
 		//1
 		initSpace();
 		System.out.println("Space initialized");
-		//2
-		TransactionReference tx = null;
-		try {
-			tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
-		} catch (MzsCoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		List<ICarPart> body = this.takeCarPart(CarPartType.BODY, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-		System.out.println(body.size() + "Body retrieved: " );
-		System.out.println("id:" + body.get(0).getId() );
+		doAssemble();
+		
+		
 		
 		
 				
-		try {
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
+	
 	}
 	
+	public void doAssemble() {
+		//2
+				TransactionReference tx = null;
+				try {
+					tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
+				} catch (MzsCoreException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				List<ICarPart> body = this.takeCarPart(CarPartType.BODY, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
+				System.out.println(body.size() + "Body retrieved: " );
+				System.out.println("id:" + body.get(0).getId() );
+				
+				   try {
+					   Set<Operation> operations = new HashSet<Operation>();
+				        operations.add(Operation.DELETE);
+				        operations.add(Operation.TAKE);
+				        operations.add(Operation.WRITE);
+			            notifMgr.createNotification(container, this, operations, null, null);
+			        } catch (Exception e) {
+			            e.printStackTrace();
+			        }
+		
+	}
+
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
+		notifMgr = new NotificationManager(core);		
+	
 		this.container = null;
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
@@ -101,6 +124,8 @@ public class Assembler {
 		
 	}
 	
+	
+
 	private List<ICarPart> takeCarPart(CarPartType type, Integer amount, long timeout, TransactionReference tx){
 		
 		List<Selector> selectors = new ArrayList<Selector>();
@@ -148,6 +173,18 @@ public class Assembler {
 	            return null;
 	        }
 
+	}
+
+	public void setListener(SpaceListenerImpl spaceListenerImpl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void entryOperationFinished(Notification source,
+			Operation operation, List<? extends Serializable> entries) {
+		System.out.println("Assembler!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		
 	}
 
 	

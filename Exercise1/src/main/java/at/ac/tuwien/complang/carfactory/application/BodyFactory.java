@@ -37,6 +37,8 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
 		try {
 			getCapi().write(getCref(), new Entry(body, cordinator));
+			
+					
 			System.out.println("Body written in space sucessfully");
 			//notify listener
 			getListener().onObjectWrittenInSpace(body);
