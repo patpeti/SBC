@@ -24,7 +24,7 @@ public class StartUpGui {
 	
 	public static void main(String[] args) {
 		ContainerReference container;
-		//2. Create an embedded instance of mozard spaces and initialize a container on port 9876
+		//2. Create an embedded instance of mozart spaces and initialize a container on port 9876
 		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
 		NotificationManager notifMgr = new NotificationManager(core);

@@ -182,12 +182,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		spaceDataTableModel.addRow(carPart.getObjectData());
 	}
 	
-//	@Override
-//	public void entryOperationFinished(Notification source,
-//			Operation operation, List<? extends Serializable> entries) {
-//		System.out.println("PRODUCTIONUI#######################################");
-//		
-//	}
+
     
     class CreationListener implements ActionListener {
 

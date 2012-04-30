@@ -25,7 +25,6 @@ public class StartUpAssembler {
 		 */
 		
 		Assembler assembler = new Assembler();
-		assembler.setListener(new SpaceListenerImpl());
 		assembler.doAssemble();
 		
 		try {
