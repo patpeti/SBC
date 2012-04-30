@@ -22,7 +22,7 @@ import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
-public class ProductionUI extends JFrame {
+public class ProductionUI extends JFrame implements ISpaceObserver {
 	private static final long serialVersionUID = -6151830798597607052L;
 	private static final String[] FINISHED_GOODS_COLUMNS = {"Car ID", "PID",
 		"Body ID", "Body PID",

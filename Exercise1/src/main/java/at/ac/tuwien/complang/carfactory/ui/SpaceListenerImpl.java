@@ -3,7 +3,7 @@ package at.ac.tuwien.complang.carfactory.ui;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 public class SpaceListenerImpl implements ISpaceListener{
-	private ProductionUI gui;
+	private ISpaceObserver gui;
 
 	public void onObjectWrittenInSpace(ICarPart carPart) {
 		// TODO do something if new object added into the space
@@ -11,7 +11,7 @@ public class SpaceListenerImpl implements ISpaceListener{
 		gui.onNewSpaceObject(carPart);
 	}
 
-	public void setGui(ProductionUI gui) {
+	public void setSpaceObserver(ISpaceObserver gui) {
 		this.gui = gui;
 		
 	}

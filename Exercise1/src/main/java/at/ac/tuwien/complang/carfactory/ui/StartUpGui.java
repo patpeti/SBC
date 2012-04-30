@@ -43,6 +43,6 @@ public class StartUpGui {
 		ISpaceListener listener = new SpaceListenerImpl();
 		//1. Start the User interface
 		ProductionUI gui = new ProductionUI(capi, container, listener);
-		listener.setGui(gui);
+		listener.setSpaceObserver(gui);
 	}
 }
