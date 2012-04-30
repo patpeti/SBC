@@ -16,7 +16,7 @@ public class FactoryFacade {
 
 	//Static Fields
 	private static Map<ProducerType, FactoryFacade> factories;
-	private long next_id = 0;
+	private static long next_id = 0;
 	
 	static {
 		factories = new Hashtable<ProducerType, FactoryFacade>();
