@@ -3,11 +3,14 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.awt.Color;
 import java.io.Serializable;
 
+import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+
 public class Body implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
 
 	//Static fields
 	private static long next_id = 0;
+	private static final CarPartType type = CarPartType.BODY;
 	
 	//Fields
 	private long id;
@@ -47,6 +50,10 @@ public class Body implements Serializable, ICarPart {
 	}
 
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getClass().getName(), pid};
+		return new Object[] {id, this.getType(), pid};
+	}
+
+	public CarPartType getType() {
+			return this.type;
 	}
 }

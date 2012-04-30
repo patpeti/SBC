@@ -3,8 +3,11 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.awt.Color;
 import java.io.Serializable;
 
+import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+
 public class Car implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private static final CarPartType type = CarPartType.CAR;
 
 	//Static Fields
 	private static long next_id;
