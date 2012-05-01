@@ -39,6 +39,7 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
+import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 
@@ -120,7 +121,9 @@ public class Assembler implements NotificationListener, Runnable{
 		carId++;
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.CAR.toString()));
+			String label =  CarPartType.CAR.toString();
+			if(this.body.getColor() == null) label = SpaceLabels.UNPAINTEDCAR;
+			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			capi.write(container, new Entry(c,cordinator));
 			System.out.println("*************Car Created");
