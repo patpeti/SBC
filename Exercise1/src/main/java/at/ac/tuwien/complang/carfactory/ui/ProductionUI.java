@@ -20,6 +20,7 @@ import javax.swing.JTable;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
+import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
@@ -29,6 +30,7 @@ import org.mozartspaces.notifications.Operation;
 import at.ac.tuwien.complang.carfactory.application.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
+import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 
@@ -220,12 +222,18 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	@Override
 	public void entryOperationFinished(Notification source,
 			Operation operation, List<? extends Serializable> entries) {
-		System.out.println("#######################################################");
-		System.out.println("########################################################");
+		System.out.println("[GUI_Notification]#######################################################");
 		System.out.println("opname: "+ operation.name());
+		
+		for(Entry e : (List<Entry>) entries){
+			if (e.getValue() instanceof Car){
+				System.out.println("[GUI_Notification] New Car created by Assembler");
+			}
+		}
 		
 	}
 
+	
 
 
 }
