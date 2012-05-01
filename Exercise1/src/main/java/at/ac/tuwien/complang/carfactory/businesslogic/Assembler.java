@@ -12,6 +12,7 @@ import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.CountNotMetException;
+import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.Matchmaker;
@@ -131,6 +132,7 @@ public class Assembler implements NotificationListener, Runnable{
 			if(this.body.getColor() != null) label = SpaceLabels.PAINTEDCAR;
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+			cordinator.add(FifoCoordinator.newCoordinationData());
 			capi.write(container, new Entry(c,cordinator));
 			System.out.println("[Assembler]*Car Created");
 			notifMgr.createNotification(container, this, Operation.WRITE);
@@ -262,6 +264,7 @@ public class Assembler implements NotificationListener, Runnable{
 			coords.add(new LabelCoordinator());
 			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
+			coords.add(new FifoCoordinator());
 			try {
 				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {
