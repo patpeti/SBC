@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
+import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
@@ -17,6 +18,7 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.notifications.NotificationManager;
 
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
@@ -38,8 +40,11 @@ public class StartUpGui {
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new QueryCoordinator());
+			List<Coordinator> optionalCoords = new ArrayList<Coordinator>();
+			optionalCoords.add(new FifoCoordinator());
 			try {
-				container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				container = capi.createContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				//container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
