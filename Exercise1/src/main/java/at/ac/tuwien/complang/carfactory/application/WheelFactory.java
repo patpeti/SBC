@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozartspaces.capi3.CoordinationData;
+import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -32,6 +33,7 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 		System.out.println("writing wheel into space...");
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
+		cordinator.add(KeyCoordinator.newCoordinationData(""+wheel.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(wheel,cordinator));
 			System.out.println("wheel written in space sucessfully");

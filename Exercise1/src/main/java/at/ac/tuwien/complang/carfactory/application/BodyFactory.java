@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozartspaces.capi3.CoordinationData;
+import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -35,6 +36,7 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
+		cordinator.add(KeyCoordinator.newCoordinationData(""+body.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(body, cordinator));
 			

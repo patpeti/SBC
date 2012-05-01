@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.carfactory.domain;
 
 import java.io.Serializable;
 
+import at.ac.tuwien.complang.carfactory.application.AbstractFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 
 public class Motor implements Serializable, ICarPart {
@@ -9,15 +10,15 @@ public class Motor implements Serializable, ICarPart {
 	private static final CarPartType type = CarPartType.MOTOR;
 
 	//Static fields
-	private static long next_id = 0;
+//	private static long next_id = 0;
 	
 	//Fields
 	private long id;
 	private long pid; //ID of the producer
 	
 	public Motor(long pid) {
-		next_id++;
-		this.id = Motor.next_id;
+		this.id = AbstractFactory.carPartId;
+		AbstractFactory.carPartId++;
 		this.pid = pid;
 	}
 

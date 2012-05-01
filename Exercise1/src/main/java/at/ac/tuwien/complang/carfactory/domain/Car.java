@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.awt.Color;
 import java.io.Serializable;
 
+import at.ac.tuwien.complang.carfactory.application.AbstractFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 
 public class Car implements Serializable, ICarPart {
@@ -10,7 +11,7 @@ public class Car implements Serializable, ICarPart {
 	private static final CarPartType type = CarPartType.CAR;
 
 	//Static Fields
-	private static long next_id;
+	private static long next_id= 100000;
 	
 	//Fields
     private boolean isComplete; //Whether assembly is complete
@@ -23,8 +24,8 @@ public class Car implements Serializable, ICarPart {
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
-    	next_id++;
-    	this.id = Car.next_id;
+    	this.id = next_id;
+		next_id++;
     	this.pid = pid;
     	this.body = body;
     	this.motor = motor;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.KeyCoordinator;
@@ -81,27 +82,33 @@ public class Assembler implements NotificationListener{
 				
 	
 	}
-	public void doAssemble(){
-		while(true){
+	public synchronized void doAssemble(){
+		
 			
-			if(this.motor == null){
-				getOneMotor();
-				continue;
-			}
-			if(this.fourWheels[0] == null || this.fourWheels[1] == null || this.fourWheels[2] == null || this.fourWheels[3] == null){
-				getFourWheels();
-				continue;
-			}
-			if(this.body == null){
-				getOneBody();
-				continue;
-			}
+				System.out.println("[Assembler] New loop");
+				if(this.motor == null){
+					System.out.println("[Assembler] motor was null");
+					getOneMotor();
+				}
+				if(this.fourWheels[0] == null || this.fourWheels[1] == null || this.fourWheels[2] == null || this.fourWheels[3] == null){
+					System.out.println("[Assembler] wheel was null");
+					getFourWheels();
+					
+				}
+				if(this.body == null){
+					System.out.println("[Assembler] body was null");
+					getOneBody();
+					
+				}
+				if(this.motor != null && this.fourWheels[0] != null && this.body != null){
+					System.out.println("[Assembler] all field set");
+					//create Car
+					createCar();
+					deleteParts();
+					
+				}
 			
-			//create Car
-			createCar();
-			deleteParts();
-			
-		}
+	
 	}
 	
 	private void deleteParts() {
@@ -125,8 +132,13 @@ public class Assembler implements NotificationListener{
 				wheelSelector.add(KeyCoordinator.newSelector(""+this.fourWheels[i].getId(), 1));
 				capi.delete(container,wheelSelector,SpaceTimeout.INFINITE,tx);
 			}
-			
+			this.body = null;
+			this.motor = null;
+			this.fourWheels = new Wheel[4];
 			capi.commitTransaction(tx);
+			
+		
+			
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
@@ -134,17 +146,19 @@ public class Assembler implements NotificationListener{
 		}
 		
 		
-		this.body = null;
-		this.motor = null;
-		this.fourWheels = new Wheel[4];
+		
 		
 		
 	}
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
 		try {
-			capi.write(container, new Entry(c));
+			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
+			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+			capi.write(container, new Entry(c,cordinator));
 			System.out.println("*************Car Created");
+			deleteParts();
 			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -164,7 +178,7 @@ public class Assembler implements NotificationListener{
 					e1.printStackTrace();
 				}
 				List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-				System.out.println(motors.size() + "Body retrieved: " );
+				System.out.println(motors.size() + "Motor retrieved: " );
 				System.out.println("id:" + motors.get(0).getId() );
 				//set body
 				this.motor = (Motor) motors.get(0);
@@ -177,7 +191,7 @@ public class Assembler implements NotificationListener{
 			        } catch (Exception e) {
 			            e.printStackTrace();
 			        }
-				   System.out.println("*************Motor got");
+				   System.out.println("*************Motor taken");
 		
 	}
 	
@@ -185,13 +199,13 @@ public class Assembler implements NotificationListener{
 		//3
 		TransactionReference tx = null;
 		try {
-			tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
+		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, tx);
 		System.out.println(wheels.size() + "Wheels retrieved: " );
 		System.out.println("id:" + wheels.get(0).getId() );
 		System.out.println("id:" + wheels.get(1).getId() );
@@ -324,10 +338,23 @@ public class Assembler implements NotificationListener{
 
 
 	@Override
-	public void entryOperationFinished(Notification source,
+	public synchronized void entryOperationFinished(Notification source,
 			Operation operation, List<? extends Serializable> entries) {
-		System.out.println("Assembler Notification!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		System.out.println(""+operation.name());
+
+//		System.out.println("SpaceOperation " + operation.name());
+//		System.out.println("New enitry: " +  entries.get(0).getClass().toString());
+		if(entries.get(0) instanceof Body)	System.out.println("[Notification] Body written in the space");
+		if(entries.get(0) instanceof Wheel)	System.out.println("[Notification] Wheel written in the space");
+		if(entries.get(0) instanceof Motor)	System.out.println("[Notification] Motor written in the space");
+//		switch (operation) {
+//		case WRITE:
+//			
+//			doAssemble();
+//			break;
+//
+//		default:
+//			break;
+//		}
 	}
 
 

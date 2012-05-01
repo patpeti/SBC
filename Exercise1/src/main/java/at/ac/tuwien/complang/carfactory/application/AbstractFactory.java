@@ -10,6 +10,7 @@ public abstract class AbstractFactory implements IProducer{
 	private Capi capi;
 	private ContainerReference cref;
 	private ISpaceListener listener;
+	public static long carPartId = 1;
 	
 	public AbstractFactory(Capi capi, ContainerReference cref) {
 		super();
