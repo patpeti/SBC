@@ -4,7 +4,9 @@ import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 
 public class SpaceLabels {
 
-	//Label for unpainted car:
-	public static final String UNPAINTEDCAR = CarPartType.CAR + "UNPAINTED"; 
+	//Label for painted car:
+	public static final String PAINTEDCAR = CarPartType.CAR + "PAINTED"; 
+	//label for painted body
+	public static final String PAINTEDBODY = CarPartType.BODY + "PAINTED";
 	
 }

@@ -74,10 +74,8 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	    try {
 			notifMgr.createNotification(cref, this, operations, null, null);
 		} catch (MzsCoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		tableContainer = new JPanel(new GridLayout(1, 2));

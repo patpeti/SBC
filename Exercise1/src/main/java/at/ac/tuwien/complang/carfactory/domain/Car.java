@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import at.ac.tuwien.complang.carfactory.application.AbstractFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 
 public class Car implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
@@ -20,10 +21,12 @@ public class Car implements Serializable, ICarPart {
     private long pid; //ID of the worker which produced the car
     private Motor motor;
     private Body body;
+    private PaintState paintState;
     private Wheel[] wheels = new Wheel[4];
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
+    	this.paintState = PaintState.UNPAINTED;
     	this.id = AbstractFactory.carPartId;
 		AbstractFactory.carPartId++;
     	this.pid = pid;
@@ -45,6 +48,7 @@ public class Car implements Serializable, ICarPart {
         return this.body.getColor();
     }
     public void setColor(long pid, Color color) {
+    	this.paintState = PaintState.PAINTED;
     	this.body.setColor(pid, color);
     }
 
@@ -112,4 +116,13 @@ public class Car implements Serializable, ICarPart {
 	public CarPartType getType() {
 		return this.type;
 	}
+
+	public PaintState getPaintState() {
+		return this.body.getPaintState();
+	}
+
+	public void setPaintState(PaintState paintState) {
+		this.paintState = paintState;
+	}
+	
 }

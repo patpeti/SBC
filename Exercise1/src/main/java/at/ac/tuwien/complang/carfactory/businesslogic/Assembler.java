@@ -14,6 +14,11 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.Matchmaker;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
@@ -33,6 +38,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
@@ -122,11 +128,11 @@ public class Assembler implements NotificationListener, Runnable{
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 			String label =  CarPartType.CAR.toString();
-			if(this.body.getColor() == null) label = SpaceLabels.UNPAINTEDCAR;
+			if(this.body.getColor() != null) label = SpaceLabels.PAINTEDCAR;
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			capi.write(container, new Entry(c,cordinator));
-			System.out.println("*************Car Created");
+			System.out.println("[Assembler]*Car Created");
 			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -145,11 +151,12 @@ public class Assembler implements NotificationListener, Runnable{
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();
 				}
-				List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-				System.out.println(motors.size() + "Motor retrieved: " );
-				System.out.println("id:" + motors.get(0).getId() );
+				List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, tx);
 				//set body
+				if(motors != null)
 				this.motor = (Motor) motors.get(0);
+				else
+				this.motor = null;	
 				   try {
 					   Set<Operation> operations = new HashSet<Operation>();
 				        operations.add(Operation.DELETE);
@@ -159,7 +166,7 @@ public class Assembler implements NotificationListener, Runnable{
 			        } catch (Exception e) {
 			            e.printStackTrace();
 			        }
-				   System.out.println("*************Motor taken");
+				   System.out.println("[Assembler]*Motor taken");
 		
 	}
 	
@@ -174,11 +181,6 @@ public class Assembler implements NotificationListener, Runnable{
 			e1.printStackTrace();
 		}
 		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, tx);
-		System.out.println(wheels.size() + "Wheels retrieved: " );
-		System.out.println("id:" + wheels.get(0).getId() );
-		System.out.println("id:" + wheels.get(1).getId() );
-		System.out.println("id:" + wheels.get(2).getId() );
-		System.out.println("id:" + wheels.get(3).getId() );
 		//set wheels
 		int i = 0;
 		for(ICarPart w : wheels){
@@ -195,7 +197,7 @@ public class Assembler implements NotificationListener, Runnable{
 	            e.printStackTrace();
 	        }
 		   
-		   System.out.println("*************Four Wheel taken");
+		   System.out.println("[Assembler]*Four Wheel taken");
 	}
 	
 	public void getOneBody() {
@@ -203,26 +205,49 @@ public class Assembler implements NotificationListener, Runnable{
 				TransactionReference tx = null;
 				try {
 					tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
-				} catch (MzsCoreException e1) {
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
-				}
-				List<ICarPart> bodies = this.takeCarPart(CarPartType.BODY, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-				System.out.println(bodies.size() + "Body retrieved: " );
-				System.out.println("id:" + bodies.get(0).getId() );
+			
+				//List<ICarPart> bodies = this.takeCarPart(CarPartType.BODY, new Integer(1), SpaceTimeout.ZERO_WITHEXCEPTION, tx);
+
+				
+				List<Selector> selectors = new ArrayList<Selector>();
+				//selectors.add(LabelCoordinator.newSelector(CarPartType.BODY.toString(), MzsConstants.Selecting.COUNT_MAX));
+				
+				//selectors.add(AnyCoordinator.newSelector(1));
+				
+				Query query = null;
+				Property prop = null;
+			    List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
+			    Matchmaker[] array = new Matchmaker[2];
+			    prop = Property.forName("*", "paintState");
+			    matchmakers.add(prop.equalTo(PaintState.PAINTED));    
+			    matchmakers.add(prop.equalTo(PaintState.UNPAINTED));    
+			    query = new Query().filter(Matchmakers.or(matchmakers.toArray(array)));
+				
+				selectors.add(QueryCoordinator.newSelector(query));
+				List<ICarPart> bodies = null;
+				
+				bodies = capi.take(container, selectors, RequestTimeout.INFINITE, tx);
+				
+							
 				//set body
-				this.body = (Body) bodies.get(0);
-				   try {
-					   Set<Operation> operations = new HashSet<Operation>();
+				if(bodies != null)
+					this.body = (Body) bodies.get(0);
+				else
+				this.body = null;	
+				Set<Operation> operations = new HashSet<Operation>();
 				        operations.add(Operation.DELETE);
 				        operations.add(Operation.TAKE);
 				        operations.add(Operation.WRITE);
 			            notifMgr.createNotification(container, this, operations, null, null);
-			        } catch (Exception e) {
+			      
+				   System.out.println("[Assembler]*Body taken");
+				} catch (MzsCoreException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				} catch (Exception e) {
 			            e.printStackTrace();
-			        }
-				   System.out.println("*************Body taken");
+			    }
 	}
 
 	private void initSpace(){
@@ -235,6 +260,7 @@ public class Assembler implements NotificationListener, Runnable{
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
+			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
 			try {
 				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
@@ -295,7 +321,9 @@ public class Assembler implements NotificationListener, Runnable{
 	        } catch (MzsCoreException e) {
 	        	 e.printStackTrace();
 	        }
-
+		  
+		  	if(parts == null) return null;
+		  	
 	        if (!parts.isEmpty()) {
 	            return parts;
 	        } else {
@@ -310,35 +338,35 @@ public class Assembler implements NotificationListener, Runnable{
 			Operation operation, List<? extends Serializable> entries) {
 
 
-		System.out.println("[Notification]");
+		//System.out.println("[Notification]");
 	
 	}
 	@Override
 	public void run() {
 		while(true){
-			System.out.println("[Assembler] New loop");
+			//System.out.println("[Assembler] New loop");
 			if(this.motor == null){
-				System.out.println("[Assembler] motor was null");
+//				System.out.println("[Assembler] motor was null");
 				getOneMotor();
 			}
 			if(this.fourWheels[0] == null || this.fourWheels[1] == null || this.fourWheels[2] == null || this.fourWheels[3] == null){
-				System.out.println("[Assembler] wheel was null");
+//				System.out.println("[Assembler] wheel was null");
 				getFourWheels();
 				
 			}
 			if(this.body == null){
-				System.out.println("[Assembler] body was null");
+//				System.out.println("[Assembler] body was null");
 				getOneBody();
 				
 			}
 			if(this.motor != null && this.fourWheels[0] != null && this.body != null){
-				System.out.println("[Assembler] all field set");
+				System.out.println("[Assembler] all field set, creating car");
 				//create Car
 				createCar();
 				this.body = null;
 				this.motor = null;
 				this.fourWheels = new Wheel[4];
-				//deleteParts();
+				
 				
 			}
 		}

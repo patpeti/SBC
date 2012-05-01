@@ -10,6 +10,7 @@ import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
@@ -36,6 +37,7 @@ public class StartUpGui {
 			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
+			coords.add(new QueryCoordinator());
 			try {
 				container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {

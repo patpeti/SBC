@@ -17,23 +17,23 @@ import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsConstants;
+import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
-import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
-import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 public class SpaceUtil implements NotificationListener {
+	
 	
 	private Capi capi;
 	private ContainerReference container;
@@ -74,10 +74,10 @@ public class SpaceUtil implements NotificationListener {
 	
 	
 
-	private List<ICarPart> takeCarPart(CarPartType type, Integer amount, long timeout, TransactionReference tx){
+	public List<ICarPart> takeCarPart(String selectorLabel, Integer amount, long timeout, TransactionReference tx){
 		
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(LabelCoordinator.newSelector(type.toString(), MzsConstants.Selecting.COUNT_MAX));
+		selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		
 		List<ICarPart> parts = null;
@@ -129,7 +129,7 @@ public class SpaceUtil implements NotificationListener {
 			Operation operation, List<? extends Serializable> entries) {
 
 
-		System.out.println("[Notification]");
+		//System.out.println("[Notification]");
 	
 	}
 	
