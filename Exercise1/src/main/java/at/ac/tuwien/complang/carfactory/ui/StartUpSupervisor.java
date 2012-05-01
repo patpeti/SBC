@@ -1,6 +1,6 @@
 package at.ac.tuwien.complang.carfactory.ui;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.SuperVisor;
+import at.ac.tuwien.complang.carfactory.businesslogic.Supervisor;
 
 public class StartUpSupervisor {
 	public static void main(String[] args) {
@@ -12,7 +12,7 @@ public class StartUpSupervisor {
 		 * 4. write it back into the space 		
 		 */
 		
-		SuperVisor s = new SuperVisor();
+		Supervisor s = new Supervisor();
 		
 //		MzsCore core = DefaultMzsCore.newInstance(0);
 //		Capi capi = new Capi(core);

@@ -20,7 +20,7 @@ import org.mozartspaces.notifications.NotificationManager;
 
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
-public class SuperVisor {
+public class Supervisor {
 
 	
 	/**
@@ -35,7 +35,7 @@ public class SuperVisor {
 	private ContainerReference container;
 	private NotificationManager notifMgr;
 	
-	public SuperVisor() {
+	public Supervisor() {
 		initSpace();
 	}
 
