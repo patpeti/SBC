@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.carfactory.ui;
+package at.ac.tuwien.complang.carfactory.ui.tableModels;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

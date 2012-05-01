@@ -8,5 +8,6 @@ public class SpaceLabels {
 	public static final String PAINTEDCAR = CarPartType.CAR + "PAINTED"; 
 	//label for painted body
 	public static final String PAINTEDBODY = CarPartType.BODY + "PAINTED";
-	
+	//
+	public static final String FINISHEDCAR = CarPartType.CAR + "FINISHED";
 }

@@ -32,6 +32,8 @@ import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
+import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
 
 
@@ -60,6 +62,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	private ISpaceListener listener;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
+	private FinishedGoodsTableModel finishedGoodsTableModel;
 	private NotificationManager notifMgr;
 
 	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener, NotificationManager notifMgr) {
@@ -127,7 +130,8 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
     	JLabel label = new JLabel("Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	Object[][] data = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-    	finishedGoodsTable = new JTable(data, FINISHED_GOODS_COLUMNS);
+    	finishedGoodsTableModel = new FinishedGoodsTableModel(data);
+    	finishedGoodsTable = new JTable(finishedGoodsTableModel);
     	JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
     	finishedGoodsTable.setFillsViewportHeight(true);
     	spaceTablePanel.add(label);
@@ -222,10 +226,17 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 			Operation operation, List<? extends Serializable> entries) {
 		System.out.println("[GUI_Notification]#######################################################");
 		System.out.println("opname: "+ operation.name());
-		
-		for(Entry e : (List<Entry>) entries){
-			if (e.getValue() instanceof Car){
-				System.out.println("[GUI_Notification] New Car created by Assembler");
+		if(operation.name().equals("WRITE")){
+			
+			for(Entry e : (List<Entry>) entries){
+				if (e.getValue() instanceof Car){
+					System.out.println("[GUI_Notification] New Car written");
+					Car c = (Car) e.getValue();
+					if(c.isComplete()){
+						//TODO show this car in the gui table.
+						finishedGoodsTableModel.addRow(c.getDetails());
+					}
+				}
 			}
 		}
 		
