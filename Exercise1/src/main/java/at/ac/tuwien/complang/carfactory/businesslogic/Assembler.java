@@ -42,12 +42,13 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 
-public class Assembler implements NotificationListener{
+public class Assembler implements NotificationListener, Runnable{
 	
 	private Capi capi;
 	private ContainerReference container;
 	private NotificationManager notifMgr;
 	public static long pid = 0;
+	public static long carId = 100000;
 	
 	
 	private Body body;
@@ -82,7 +83,7 @@ public class Assembler implements NotificationListener{
 				
 	
 	}
-	public synchronized void doAssemble(){
+	public void doAssemble(){
 		
 			
 				System.out.println("[Assembler] New loop");
@@ -113,24 +114,24 @@ public class Assembler implements NotificationListener{
 	
 	private void deleteParts() {
 		try {
-			TransactionReference tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
+			TransactionReference tx = capi.createTransaction(SpaceTimeout.ZERO_WITHEXCEPTION, new URI(SpaceConstants.CONTAINER_URI));
 			List<Selector> bodySelector = new ArrayList<Selector>();
 			bodySelector.add(KeyCoordinator.newSelector(""+this.body.getId(), 1));
 
 		     			
-			capi.delete(container, bodySelector, SpaceTimeout.INFINITE, tx);
+			capi.delete(container, bodySelector, SpaceTimeout.ZERO_WITHEXCEPTION, tx);
 			
 			List<Selector> motorSelector = new ArrayList<Selector>();
 			motorSelector.add(KeyCoordinator.newSelector(""+this.motor.getId(), 1));
 
 			
 		     			
-			capi.delete(container, motorSelector, SpaceTimeout.INFINITE, tx);
+			capi.delete(container, motorSelector, SpaceTimeout.ZERO_WITHEXCEPTION, tx);
 			
 			for(int i = 1; i < 4 ; i++){
 				List<Selector> wheelSelector = new ArrayList<Selector>();
 				wheelSelector.add(KeyCoordinator.newSelector(""+this.fourWheels[i].getId(), 1));
-				capi.delete(container,wheelSelector,SpaceTimeout.INFINITE,tx);
+				capi.delete(container,wheelSelector,SpaceTimeout.ZERO_WITHEXCEPTION,tx);
 			}
 			this.body = null;
 			this.motor = null;
@@ -152,13 +153,14 @@ public class Assembler implements NotificationListener{
 	}
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
+		c.setId(carId);
+		carId++;
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
+			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.CAR.toString()));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			capi.write(container, new Entry(c,cordinator));
 			System.out.println("*************Car Created");
-			deleteParts();
 			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -338,23 +340,42 @@ public class Assembler implements NotificationListener{
 
 
 	@Override
-	public synchronized void entryOperationFinished(Notification source,
+	public void entryOperationFinished(Notification source,
 			Operation operation, List<? extends Serializable> entries) {
 
-//		System.out.println("SpaceOperation " + operation.name());
-//		System.out.println("New enitry: " +  entries.get(0).getClass().toString());
-		if(entries.get(0) instanceof Body)	System.out.println("[Notification] Body written in the space");
-		if(entries.get(0) instanceof Wheel)	System.out.println("[Notification] Wheel written in the space");
-		if(entries.get(0) instanceof Motor)	System.out.println("[Notification] Motor written in the space");
-//		switch (operation) {
-//		case WRITE:
-//			
-//			doAssemble();
-//			break;
-//
-//		default:
-//			break;
-//		}
+
+		System.out.println("[Notification]");
+	
+	}
+	@Override
+	public void run() {
+		while(true){
+			System.out.println("[Assembler] New loop");
+			if(this.motor == null){
+				System.out.println("[Assembler] motor was null");
+				getOneMotor();
+			}
+			if(this.fourWheels[0] == null || this.fourWheels[1] == null || this.fourWheels[2] == null || this.fourWheels[3] == null){
+				System.out.println("[Assembler] wheel was null");
+				getFourWheels();
+				
+			}
+			if(this.body == null){
+				System.out.println("[Assembler] body was null");
+				getOneBody();
+				
+			}
+			if(this.motor != null && this.fourWheels[0] != null && this.body != null){
+				System.out.println("[Assembler] all field set");
+				//create Car
+				createCar();
+				this.body = null;
+				this.motor = null;
+				this.fourWheels = new Wheel[4];
+				//deleteParts();
+				
+			}
+		}
 	}
 
 

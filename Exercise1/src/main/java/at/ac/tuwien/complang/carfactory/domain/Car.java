@@ -11,7 +11,7 @@ public class Car implements Serializable, ICarPart {
 	private static final CarPartType type = CarPartType.CAR;
 
 	//Static Fields
-	private static long next_id= 100000;
+	//private static long next_id;
 	
 	//Fields
     private boolean isComplete; //Whether assembly is complete
@@ -24,8 +24,8 @@ public class Car implements Serializable, ICarPart {
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
-    	this.id = next_id;
-		next_id++;
+    	this.id = AbstractFactory.carPartId;
+		AbstractFactory.carPartId++;
     	this.pid = pid;
     	this.body = body;
     	this.motor = motor;
@@ -58,6 +58,10 @@ public class Car implements Serializable, ICarPart {
     
     public long getId() {
         return id;
+    }
+    
+    public void setId(long id) {
+        this.id = id;
     }
 
 	public Motor getMotor() {

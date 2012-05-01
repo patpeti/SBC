@@ -23,9 +23,7 @@ public class StartUpAssembler {
 		 */
 		
 		Assembler assembler = new Assembler();
-		while(true){
-			assembler.doAssemble();
-		}
+		new Thread(assembler).start();
 		
 		
 	}
