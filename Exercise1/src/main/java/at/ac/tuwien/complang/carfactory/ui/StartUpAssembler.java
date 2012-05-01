@@ -22,6 +22,8 @@ public class StartUpAssembler {
 		 * 6. save the car object back into the space
 		 */
 		
+		
+		
 		Assembler assembler = new Assembler();
 		new Thread(assembler).start();
 		

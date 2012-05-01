@@ -71,6 +71,8 @@ public class Assembler implements NotificationListener, Runnable{
 		 * 6. save the car object back into the space
 		 */
 		
+		//TODO check whether body is painted
+		
 		pid++;
 		//1
 		initSpace();
@@ -105,52 +107,13 @@ public class Assembler implements NotificationListener, Runnable{
 					System.out.println("[Assembler] all field set");
 					//create Car
 					createCar();
-					deleteParts();
+					
 					
 				}
 			
 	
 	}
 	
-	private void deleteParts() {
-		try {
-			TransactionReference tx = capi.createTransaction(SpaceTimeout.ZERO_WITHEXCEPTION, new URI(SpaceConstants.CONTAINER_URI));
-			List<Selector> bodySelector = new ArrayList<Selector>();
-			bodySelector.add(KeyCoordinator.newSelector(""+this.body.getId(), 1));
-
-		     			
-			capi.delete(container, bodySelector, SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-			
-			List<Selector> motorSelector = new ArrayList<Selector>();
-			motorSelector.add(KeyCoordinator.newSelector(""+this.motor.getId(), 1));
-
-			
-		     			
-			capi.delete(container, motorSelector, SpaceTimeout.ZERO_WITHEXCEPTION, tx);
-			
-			for(int i = 1; i < 4 ; i++){
-				List<Selector> wheelSelector = new ArrayList<Selector>();
-				wheelSelector.add(KeyCoordinator.newSelector(""+this.fourWheels[i].getId(), 1));
-				capi.delete(container,wheelSelector,SpaceTimeout.ZERO_WITHEXCEPTION,tx);
-			}
-			this.body = null;
-			this.motor = null;
-			this.fourWheels = new Wheel[4];
-			capi.commitTransaction(tx);
-			
-		
-			
-		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		
-	}
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
 		c.setId(carId);
