@@ -222,8 +222,10 @@ public class Assembler implements NotificationListener, Runnable{
 			    Matchmaker[] array = new Matchmaker[2];
 			    prop = Property.forName("*", "paintState");
 			    matchmakers.add(prop.equalTo(PaintState.PAINTED));    
-			    matchmakers.add(prop.equalTo(PaintState.UNPAINTED));    
-			    query = new Query().filter(Matchmakers.or(matchmakers.toArray(array)));
+			    matchmakers.add(prop.equalTo(PaintState.UNPAINTED));  
+			    
+
+			    query = new Query().filter(Matchmakers.and(    (Matchmakers.or(matchmakers.toArray(array))),   Property.forName("type").equalTo(CarPartType.BODY)   ));
 				
 				selectors.add(QueryCoordinator.newSelector(query));
 				List<ICarPart> bodies = null;
