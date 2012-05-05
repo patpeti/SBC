@@ -18,8 +18,8 @@ public class StartUpAlternativeGui {
 		/**TODO:
 		 * Create queue for wheel
 		 * Create queue for motor
-		 * Create topic for Body
-		 * Create topic for Car?
+		 * Create topic for Body --> because it can go to two endpoints: Painter and Assembler (or painter just writes back the painted body on the top of a queue?)
+		 * Create topic for Car? -- > similarly to endpoints possible Painter and Supervisor
 		 * 	
 		 * 
 		 */
