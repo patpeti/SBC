@@ -5,6 +5,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.Session;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.alternative.altGui.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.alternative.altGui.listener.IQueueObserver;
@@ -49,8 +55,10 @@ public class AltProductionUI extends JFrame implements IQueueObserver{
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
 
-
 	public AltProductionUI(IQueueListener listener) {
+		
+
+		
 	
 		tableContainer = new JPanel(new GridLayout(1, 2));
 		this.listener = listener;
