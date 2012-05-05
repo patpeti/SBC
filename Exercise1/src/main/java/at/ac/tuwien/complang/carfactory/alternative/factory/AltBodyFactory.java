@@ -48,7 +48,7 @@ public class AltBodyFactory extends AltAbstractFactory implements IProducer {
 		
 		
 		connection.close();
-		
+		getListener().onObjectWrittenInQueue(body);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

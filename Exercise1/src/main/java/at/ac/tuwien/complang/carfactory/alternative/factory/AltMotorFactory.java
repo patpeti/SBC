@@ -47,7 +47,7 @@ public class AltMotorFactory extends AltAbstractFactory  implements IProducer {
 		
 		
 		connection.close();
-		
+		getListener().onObjectWrittenInQueue(motor);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

@@ -45,7 +45,7 @@ public class AltWheelFactory extends AltAbstractFactory implements IProducer  {
 		
 		
 		connection.close();
-		
+		getListener().onObjectWrittenInQueue(wheel);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
