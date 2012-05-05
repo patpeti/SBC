@@ -17,6 +17,8 @@ import javax.swing.JTable;
 import at.ac.tuwien.complang.carfactory.alternative.altGui.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.alternative.altGui.listener.IQueueObserver;
 import at.ac.tuwien.complang.carfactory.alternative.enums.QueueChangeType;
+import at.ac.tuwien.complang.carfactory.alternative.factory.AltFactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
@@ -159,41 +161,38 @@ public class AltProductionUI extends JFrame implements IQueueObserver{
     
     class CreationListener implements ActionListener {
 
+		
+	
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-//
-//        public void actionPerformed(ActionEvent e) {
-//            String command = e.getActionCommand();
-//            if(command.equals("body")) {
-//            	int value = (Integer) bodyCountSpinner.getValue();
-//            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref, listener);
-//            	if(!bodyFactory.isRunning()) {
-//	            	bodyFactory.init(value);
-//	            	bodyFactory.start();
-//            	}
-//
-//            } else if(command.equals("wheel")) {
-//            	int value = (Integer) wheelCountSpinner.getValue();
-//            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref, listener);
-//            	if(!wheelFactory.isRunning()) {
-//            		wheelFactory.init(value);
-//            		wheelFactory.start();
-//            	}
-//            } else if(command.equals("motor")) {
-//            	int value = (Integer) motorCountSpinner.getValue();
-//            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref, listener);
-//            	if(!motorFactory.isRunning()) {
-//	            	motorFactory.init(value);
-//	            	motorFactory.start();
-//            	}
-//
-//            }
-//            
-//        }
-//        
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
+            if(command.equals("body")) {
+            	int value = (Integer) bodyCountSpinner.getValue();
+            	AltFactoryFacade bodyFactory = AltFactoryFacade.getInstance(ProducerType.BODY, listener);
+            	if(!bodyFactory.isRunning()) {
+	            	bodyFactory.init(value);
+	            	bodyFactory.start();
+            	}
+
+            } else if(command.equals("wheel")) {
+            	int value = (Integer) wheelCountSpinner.getValue();
+            	AltFactoryFacade wheelFactory = AltFactoryFacade.getInstance(ProducerType.WHEEL, listener);
+            	if(!wheelFactory.isRunning()) {
+            		wheelFactory.init(value);
+            		wheelFactory.start();
+            	}
+            } else if(command.equals("motor")) {
+            	int value = (Integer) motorCountSpinner.getValue();
+            	AltFactoryFacade motorFactory = AltFactoryFacade.getInstance(ProducerType.MOTOR, listener);
+            	if(!motorFactory.isRunning()) {
+	            	motorFactory.init(value);
+	            	motorFactory.start();
+            	}
+
+            }
+            
+        }
+        
     }
 
 
