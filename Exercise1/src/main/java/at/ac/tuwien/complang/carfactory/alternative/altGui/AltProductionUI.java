@@ -53,12 +53,12 @@ public class AltProductionUI extends JFrame implements IQueueObserver{
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
-
+	
 
 	public AltProductionUI(IQueueListener listener) {
 		
 
-		
+	
 	
 		tableContainer = new JPanel(new GridLayout(1, 2));
 		this.listener = listener;
