@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
 
-public class StartUpAltAssembler {
+public class StartUpJmsAssembler {
 
 	static int id;
 	
@@ -12,12 +12,12 @@ public class StartUpAltAssembler {
 		assembler.initialize();
 		assembler.startAssemblyLoop();
 	}
-
+	
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpAltAssembler.class.getName() + " --id=<id>";
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id>";
 		if(args.length != 1) {
 			System.out.println(usage);
-			return;
+			System.exit(1);
 		}
 		try {
 			if(!args[0].startsWith("--id=")) {

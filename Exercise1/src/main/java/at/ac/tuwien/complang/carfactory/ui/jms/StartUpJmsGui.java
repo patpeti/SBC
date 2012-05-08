@@ -1,20 +1,16 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
-import javax.jms.Connection;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.QueueListenerImpl;
 
-public class StartUpAlternativeGui {
+public class StartUpJmsGui {
 	
 	public static void main(String[] args) {
 		/**TODO:
-		 * Create queue for wheel
-		 * Create queue for motor
-		 * Create topic for Body
-		 * Create topic for Car?
+		 * Create queue for wheel [Done, JmsWheelFactory]
+		 * Create queue for motor [Done, JmsMotorFactory]
+		 * Create topic for Body [Done, JmsBodyFactory]
+		 * Create topic for Car? [Done, JmsAssembler]
 		 */
 		//instantiate global Listener
 		IQueueListener listener = new QueueListenerImpl();

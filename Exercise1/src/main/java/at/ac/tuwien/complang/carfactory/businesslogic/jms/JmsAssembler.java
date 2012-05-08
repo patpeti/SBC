@@ -17,19 +17,16 @@ import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
-public class JmsAssembler {
+public class JmsAssembler extends JmsAbstractWorker {
 
-	//Static Fields
-	public static long pid = 0;
-	
 	//Fields
-	private Connection connection = null;
 	private Session session;
 	private Queue wheelQueue, motorQueue;
 	private Topic carTopic, bodyTopic;
 	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, carConsumer;
 	
-	public JmsAssembler(int pid) {
+	public JmsAssembler(long pid) {
+		super(pid);
 		/**
 		 * TODO:
 		 * 1. Connect to all queues/topics
@@ -42,13 +39,8 @@ public class JmsAssembler {
 		 *    FIXME: decide if objects should remain in the space -->all infos still available inside the car objects no need to have the original objects in the space
 		 * 6. save the car object back into the space
 		 */
-		JmsAssembler.pid = pid;
 	}
-	
-	public void initialize() {
-		connectToQueues();
-	}
-	
+
 	public void startAssemblyLoop() {
 		while(true) {
 			//produce some cars
@@ -71,7 +63,8 @@ public class JmsAssembler {
 		//disconnect(); //TODO: implement the conditions for which the assembler terminates
 	}
 
-	private void connectToQueues() {
+	@Override
+	protected void connectToQueues() {
 		//test get Motor
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
@@ -137,14 +130,5 @@ public class JmsAssembler {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	public void disconnect() {
-		try {
-			connection.close();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }
