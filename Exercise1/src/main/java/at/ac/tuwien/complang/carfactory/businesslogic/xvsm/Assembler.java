@@ -126,7 +126,6 @@ public class Assembler implements NotificationListener, Runnable{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	public void getOneMotor() {
 		//4
