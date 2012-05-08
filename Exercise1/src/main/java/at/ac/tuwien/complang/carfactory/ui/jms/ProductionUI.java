@@ -30,7 +30,7 @@ import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueObserver;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-public class ProductionUI extends JFrame implements IQueueObserver{
+public class ProductionUI extends JFrame implements IQueueObserver {
 	
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -45,7 +45,7 @@ public class ProductionUI extends JFrame implements IQueueObserver{
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
 	public ProductionUI(IQueueListener listener) {
-		tableContainer = new JPanel(new GridLayout(1, 2));
+		tableContainer = new JPanel(new GridLayout(2, 1));
 		this.listener = listener;
         showUI();
     }
@@ -53,8 +53,6 @@ public class ProductionUI extends JFrame implements IQueueObserver{
     private void showUI() {
     	buildCreationPanel();
     	buildTables();
-    	
-        
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
@@ -63,7 +61,9 @@ public class ProductionUI extends JFrame implements IQueueObserver{
     private void buildTables() {
     	JPanel spaceTable = buildSpaceTable();
     	JPanel finishedGoodsTable = buildFinishedGoodsTable();
-    	tableContainer.add(spaceTable);
+    	JPanel spaceMargin = new JPanel();
+    	spaceMargin.add(spaceTable);
+    	tableContainer.add(spaceMargin);
     	tableContainer.add(finishedGoodsTable);
     	this.add(tableContainer, BorderLayout.SOUTH);
     }
@@ -141,11 +141,6 @@ public class ProductionUI extends JFrame implements IQueueObserver{
         this.add(padding, BorderLayout.CENTER);
 	}
 
-	public void onSpaceChange (ICarPart carPart, SpaceChangeType type){
-		System.out.println("#GUI# : CarPart is created");
-		spaceDataTableModel.addRow(carPart.getObjectData());
-	}
-
     class CreationListener implements ActionListener {
 		@Override
         public void actionPerformed(ActionEvent e) {
@@ -178,8 +173,7 @@ public class ProductionUI extends JFrame implements IQueueObserver{
 
 	@Override
 	public void onQueueChange(ICarPart carpart, QueueChangeType changeType) {
-		System.out.println("#GUI# : CarPart is created");
+		System.out.println("#GUI.onQueueChange# : CarPart is created");
 		spaceDataTableModel.addRow(carpart.getObjectData());
-		
 	}
 }

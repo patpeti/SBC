@@ -35,25 +35,11 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-
-
-
-
 public class ProductionUI extends JFrame implements ISpaceObserver, NotificationListener{
+
+	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
-	private static final String[] FINISHED_GOODS_COLUMNS = {"Car ID", "PID",
-		"Body ID", "Body PID",
-		"Motor ID", "Motor PID",
-		"WHEEL 1 ID",
-		"WHEEL 1 PID",
-		"WHEEL 2 ID",
-		"WHEEL 2 PID",
-		"WHEEL 3 ID",
-		"WHEEL 3 PID",
-		"WHEEL 4 ID",
-		"WHEEL 4 PID"};
-	private static final String[] SPACE_CONTENT_COLUMNS = {"ID", "PartName", "PID"};
-	
+
 	//Fields
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
@@ -63,25 +49,23 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
-	private NotificationManager notifMgr;
 
 	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener, NotificationManager notifMgr) {
 		this.capi = capi;
 		this.cref = cref;
-		this.notifMgr = notifMgr;
 		Set<Operation> operations = new HashSet<Operation>();
-	    operations.add(Operation.DELETE);
-	    operations.add(Operation.TAKE);
-	    operations.add(Operation.WRITE);
+		operations.add(Operation.DELETE);
+		operations.add(Operation.TAKE);
+		operations.add(Operation.WRITE);
 
-	    try {
+		try {
 			notifMgr.createNotification(cref, this, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		tableContainer = new JPanel(new GridLayout(1, 2));
+		tableContainer = new JPanel(new GridLayout(2, 1));
 		this.listener = listener;
         showUI();
     }
@@ -99,7 +83,9 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
     private void buildTables() {
     	JPanel spaceTable = buildSpaceTable();
     	JPanel finishedGoodsTable = buildFinishedGoodsTable();
-    	tableContainer.add(spaceTable);
+    	JPanel spaceMargin = new JPanel();
+    	spaceMargin.add(spaceTable);
+    	tableContainer.add(spaceMargin);
     	tableContainer.add(finishedGoodsTable);
     	this.add(tableContainer, BorderLayout.SOUTH);
     }
@@ -232,15 +218,10 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 					Car c = (Car) e.getValue();
 					if(c.isComplete()){
 						//TODO show this car in the gui table.
-						finishedGoodsTableModel.addRow(c.getDetails());
+						finishedGoodsTableModel.addRow(c.getObjectData());
 					}
 				}
 			}
 		}
-		
 	}
-
-	
-
-
 }
