@@ -17,7 +17,7 @@ import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
-public class AltAssembler {
+public class JmsAssembler {
 
 	//Static Fields
 	public static long pid = 0;
@@ -29,7 +29,7 @@ public class AltAssembler {
 	private Topic carTopic, bodyTopic;
 	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, carConsumer;
 	
-	public AltAssembler(int pid) {
+	public JmsAssembler(int pid) {
 		/**
 		 * TODO:
 		 * 1. Connect to all queues/topics
@@ -42,7 +42,7 @@ public class AltAssembler {
 		 *    FIXME: decide if objects should remain in the space -->all infos still available inside the car objects no need to have the original objects in the space
 		 * 6. save the car object back into the space
 		 */
-		AltAssembler.pid = pid;
+		JmsAssembler.pid = pid;
 	}
 	
 	public void initialize() {

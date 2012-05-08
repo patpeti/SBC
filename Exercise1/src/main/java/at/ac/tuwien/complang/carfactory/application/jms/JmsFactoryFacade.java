@@ -14,14 +14,14 @@ import at.ac.tuwien.complang.carfactory.application.xvsm.WheelFactory;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
-public class AltFactoryFacade {
+public class JmsFactoryFacade {
 
 	//Static Fields
-	private static Map<ProducerType, AltFactoryFacade> factories;
+	private static Map<ProducerType, JmsFactoryFacade> factories;
 	private static long next_id = 0;
 	
 	static {
-		factories = new Hashtable<ProducerType, AltFactoryFacade>();
+		factories = new Hashtable<ProducerType, JmsFactoryFacade>();
 	}
 	
 	//Fields
@@ -30,21 +30,21 @@ public class AltFactoryFacade {
 	private Thread thread;
 	private IProducer producer;
 	
-	private AltFactoryFacade(ProducerType type, IQueueListener listener) {
+	private JmsFactoryFacade(ProducerType type, IQueueListener listener) {
 		next_id++;
 		switch(type) {
-			case BODY: producer = new AltBodyFactory(next_id, listener);	break;
-			case WHEEL: producer = new AltWheelFactory(next_id, listener); break;
-			case MOTOR: producer = new AltMotorFactory(next_id, listener); break;
+			case BODY: producer = new JmsBodyFactory(next_id, listener);	break;
+			case WHEEL: producer = new JmsWheelFactory(next_id, listener); break;
+			case MOTOR: producer = new JmsMotorFactory(next_id, listener); break;
 			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
 		}
 	}
 	
-	public static AltFactoryFacade getInstance(ProducerType type, IQueueListener listener) {
+	public static JmsFactoryFacade getInstance(ProducerType type, IQueueListener listener) {
 		if(factories.get(type) == null) {
-			synchronized(AltFactoryFacade.class) {
+			synchronized(JmsFactoryFacade.class) {
 				if(factories.get(type) == null) {
-					AltFactoryFacade.factories.put(type, new AltFactoryFacade(type, listener));
+					JmsFactoryFacade.factories.put(type, new JmsFactoryFacade(type, listener));
 				}
 			}
 		}
@@ -96,7 +96,7 @@ public class AltFactoryFacade {
 				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
 			}
 			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
-			AltFactoryFacade.this.running = false;
+			JmsFactoryFacade.this.running = false;
 		}
 
 	}

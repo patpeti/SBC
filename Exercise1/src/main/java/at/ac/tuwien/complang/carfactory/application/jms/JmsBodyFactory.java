@@ -5,43 +5,42 @@ import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
-import at.ac.tuwien.complang.carfactory.domain.Wheel;
+import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public class AltWheelFactory extends AltAbstractFactory implements IProducer  {
-
-	
+public class JmsBodyFactory extends JmsAbstractFactory implements IProducer {
 	private Connection connection = null;
 	private Session session;
 	//Fields
 	private long id; //The ID of this producer
 
-	public AltWheelFactory(long id, IQueueListener listener) {
+	public JmsBodyFactory(long id, IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);
 	}
 
 	public void produce() {
-		Wheel wheel = new Wheel(id);
-		System.out.println("Produced a wheel with ID: " + wheel.getId());
-		
-		System.out.println("writing wheel into jms...");
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+		Body body = new Body(id);
+		System.out.println("Produced a body with ID: " + body.getId());
+		System.out.println("writing Body into jms...");
+		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
 		try {
-			connection = connectionFactory.createConnection();
+			connection = conFac.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Queue queue = session.createQueue(QueueConstants.WHEELQUEUE);
-			MessageProducer msgProducer = session.createProducer(queue);
-			msgProducer.send(session.createObjectMessage(wheel));
+			Topic t = session.createTopic(QueueConstants.BODYTOPIC);
+			MessageProducer msgProducer = session.createProducer(t);
+			//object message
+			msgProducer.send(session.createObjectMessage(body));
 			connection.close();
-			getListener().onObjectWrittenInQueue(wheel); //notify GUI
+			getListener().onObjectWrittenInQueue(body);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

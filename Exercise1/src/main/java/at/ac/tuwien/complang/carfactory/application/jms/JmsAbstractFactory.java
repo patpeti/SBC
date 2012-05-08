@@ -2,12 +2,12 @@ package at.ac.tuwien.complang.carfactory.application.jms;
 
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public abstract class AltAbstractFactory {
+public abstract class JmsAbstractFactory {
 
 	private IQueueListener listener;
 	public static long carPartId = 1;
 	
-	public AltAbstractFactory() {
+	public JmsAbstractFactory() {
 		super();
 	}
 

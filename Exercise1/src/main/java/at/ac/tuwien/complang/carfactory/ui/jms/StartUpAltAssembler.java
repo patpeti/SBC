@@ -1,6 +1,6 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.jms.AltAssembler;
+import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
 
 public class StartUpAltAssembler {
 
@@ -8,7 +8,7 @@ public class StartUpAltAssembler {
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		AltAssembler assembler = new AltAssembler(id);
+		JmsAssembler assembler = new JmsAssembler(id);
 		assembler.initialize();
 		assembler.startAssemblyLoop();
 	}

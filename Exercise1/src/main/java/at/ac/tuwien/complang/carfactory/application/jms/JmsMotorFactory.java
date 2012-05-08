@@ -1,46 +1,49 @@
 package at.ac.tuwien.complang.carfactory.application.jms;
 
 import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
-import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
-import at.ac.tuwien.complang.carfactory.domain.Body;
+import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public class AltBodyFactory extends AltAbstractFactory implements IProducer {
+public class JmsMotorFactory extends JmsAbstractFactory  implements IProducer {
+	
+	
 	private Connection connection = null;
 	private Session session;
+
 	//Fields
 	private long id; //The ID of this producer
 
-	public AltBodyFactory(long id, IQueueListener listener) {
+	public JmsMotorFactory(long id,  IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);
 	}
 
 	public void produce() {
-		Body body = new Body(id);
-		System.out.println("Produced a body with ID: " + body.getId());
-		System.out.println("writing Body into jms...");
+		Motor motor = new Motor(id);
+		System.out.println("Produced a motor with id: " + motor.getId());
+		
+		System.out.println("writing Motor into jms...");
 		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
 		try {
 			connection = conFac.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Topic t = session.createTopic(QueueConstants.BODYTOPIC);
-			MessageProducer msgProducer = session.createProducer(t);
-			//object message
-			msgProducer.send(session.createObjectMessage(body));
+			Queue q = session.createQueue(QueueConstants.MOTORQUEUE);
+			MessageProducer msgProducer = session.createProducer(q);
+			msgProducer.send(session.createObjectMessage(motor));
 			connection.close();
-			getListener().onObjectWrittenInQueue(body);
+			getListener().onObjectWrittenInQueue(motor);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

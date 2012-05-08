@@ -22,7 +22,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
-import at.ac.tuwien.complang.carfactory.application.jms.AltFactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.jms.enums.QueueChangeType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
@@ -167,7 +167,7 @@ public class ProductionUI extends JFrame implements IQueueObserver{
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	AltFactoryFacade bodyFactory = AltFactoryFacade.getInstance(ProducerType.BODY, listener);
+            	JmsFactoryFacade bodyFactory = JmsFactoryFacade.getInstance(ProducerType.BODY, listener);
             	if(!bodyFactory.isRunning()) {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
@@ -175,14 +175,14 @@ public class ProductionUI extends JFrame implements IQueueObserver{
 
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	AltFactoryFacade wheelFactory = AltFactoryFacade.getInstance(ProducerType.WHEEL, listener);
+            	JmsFactoryFacade wheelFactory = JmsFactoryFacade.getInstance(ProducerType.WHEEL, listener);
             	if(!wheelFactory.isRunning()) {
             		wheelFactory.init(value);
             		wheelFactory.start();
             	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	AltFactoryFacade motorFactory = AltFactoryFacade.getInstance(ProducerType.MOTOR, listener);
+            	JmsFactoryFacade motorFactory = JmsFactoryFacade.getInstance(ProducerType.MOTOR, listener);
             	if(!motorFactory.isRunning()) {
 	            	motorFactory.init(value);
 	            	motorFactory.start();
