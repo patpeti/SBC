@@ -12,7 +12,10 @@ public class SpaceDataTableModel extends AbstractTableModel {
 			"PID" };
 	private List<Object[]> data = new ArrayList<Object[]>();
 
+	public SpaceDataTableModel() { }
+	
 	public SpaceDataTableModel(Object[][] data) {
+		if(data == null) return;
 		for (Object[] dates : data) {
 			this.data.add(dates);
 		}

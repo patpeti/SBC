@@ -113,8 +113,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
     	spaceTablePanel.setLayout(layout);
     	JLabel label = new JLabel("Current Content of the Space");
     	label.setAlignmentX(CENTER_ALIGNMENT);
-    	Object[][] data = {{1, "test", "PID"}, {2, "test2", "PID"}};
-    	spaceDataTableModel = new SpaceDataTableModel(data);
+    	spaceDataTableModel = new SpaceDataTableModel();
     	spaceTable = new JTable(spaceDataTableModel);
     	JScrollPane scrollPane = new JScrollPane(spaceTable);
     	spaceTable.setFillsViewportHeight(true);
@@ -129,8 +128,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
     	spaceTablePanel.setLayout(layout);
     	JLabel label = new JLabel("Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
-    	Object[][] data = {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-    	finishedGoodsTableModel = new FinishedGoodsTableModel(data);
+    	finishedGoodsTableModel = new FinishedGoodsTableModel();
     	finishedGoodsTable = new JTable(finishedGoodsTableModel);
     	JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
     	finishedGoodsTable.setFillsViewportHeight(true);

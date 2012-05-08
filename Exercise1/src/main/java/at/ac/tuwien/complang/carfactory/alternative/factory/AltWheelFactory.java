@@ -32,24 +32,19 @@ public class AltWheelFactory extends AltAbstractFactory implements IProducer  {
 		System.out.println("Produced a wheel with ID: " + wheel.getId());
 		
 		System.out.println("writing wheel into jms...");
-		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
-        try {
-        	
-        	
-		connection = conFac.createConnection();
-		connection.start();
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Queue q = session.createQueue(QueueConstants.WHEELQUEUE);
-		MessageProducer msgProducer = session.createProducer(q);
-		msgProducer.send(session.createObjectMessage(wheel));
-		
-		
-		connection.close();
-		getListener().onObjectWrittenInQueue(wheel);
+		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+		try {
+			connection = connectionFactory.createConnection();
+			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Queue queue = session.createQueue(QueueConstants.WHEELQUEUE);
+			MessageProducer msgProducer = session.createProducer(queue);
+			msgProducer.send(session.createObjectMessage(wheel));
+			connection.close();
+			getListener().onObjectWrittenInQueue(wheel); //notify GUI
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	public long getId() {

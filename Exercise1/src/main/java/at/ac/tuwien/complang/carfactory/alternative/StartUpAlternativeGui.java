@@ -10,8 +10,6 @@ import at.ac.tuwien.complang.carfactory.alternative.altGui.listener.QueueListene
 
 public class StartUpAlternativeGui {
 	
-
-	
 	public static void main(String[] args) {
 		
 		

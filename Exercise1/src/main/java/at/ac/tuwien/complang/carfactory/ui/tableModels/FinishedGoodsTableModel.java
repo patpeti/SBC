@@ -10,7 +10,10 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 			"BodyID", "BodyPID", "MotorID", "MotorPID", "WHEEL1ID", "WHEEL1PID", "WHEEL2ID", "WHEEL2PID", "WHEEL3ID", "WHEEL3PID", "WHEEL4ID", "WHEEL4PID" };
 	private List<Object[]> data = new ArrayList<Object[]>();
 
+	public FinishedGoodsTableModel() { }
+	
 	public FinishedGoodsTableModel(Object[][] data) {
+		if(data == null) return;
 		for (Object[] dates : data) {
 			this.data.add(dates);
 		}

@@ -44,6 +44,7 @@ public class AltBodyFactory extends AltAbstractFactory implements IProducer {
 		Topic t = session.createTopic(QueueConstants.BODYTOPIC);
 //		Queue q = session.createQueue(QueueConstants.MOTORQUEUE);
 		MessageProducer msgProducer = session.createProducer(t);
+		//object message
 		msgProducer.send(session.createObjectMessage(body));
 		
 		

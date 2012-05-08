@@ -28,6 +28,7 @@ public class AltAssembler {
 		connection = conFac.createConnection();
 		connection.start();
 		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		//createQueue connects to a queue if it exists otherwise creates it
 		Queue q = session.createQueue(QueueConstants.MOTORQUEUE);
 		MessageConsumer myMsgConsumer = session.createConsumer(q);
 		
