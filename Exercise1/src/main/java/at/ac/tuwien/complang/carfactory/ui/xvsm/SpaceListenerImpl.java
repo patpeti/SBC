@@ -8,7 +8,7 @@ public class SpaceListenerImpl implements ISpaceListener{
 
 	public void onObjectWrittenInSpace(ICarPart carPart) {
 		
-		gui.onSpaceChange(carPart, SpaceChangeType.WRITE);
+		gui.addPart(carPart, SpaceChangeType.WRITE);
 	}
 
 	public void setSpaceObserver(ISpaceObserver gui) {

@@ -31,7 +31,7 @@ public class Motor implements Serializable, ICarPart {
 	}
 	
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getType(), pid};
+		return new Object[] {id, this.getType(), pid, ""};
 	}
 	
 	public CarPartType getType() {

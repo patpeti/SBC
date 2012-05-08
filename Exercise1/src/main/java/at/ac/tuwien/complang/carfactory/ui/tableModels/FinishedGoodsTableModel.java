@@ -48,5 +48,6 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		for(int column = 0; column < dates.length; column++) {
 			fireTableCellUpdated(row, column);
 		}
+		fireTableRowsInserted(row, row);
 	}
 }

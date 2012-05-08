@@ -5,7 +5,7 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 public interface ISpaceObserver {
 
-	public void onSpaceChange(ICarPart carpart, SpaceChangeType changeType);
+	public void addPart(ICarPart carpart, SpaceChangeType changeType);
 
 	
 }

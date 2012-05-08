@@ -8,7 +8,8 @@ import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 
 public class Body implements Serializable, ICarPart {
-	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = 217392531648766282L;
 
 	//Static fields
 	//private static long next_id = 0;
@@ -56,7 +57,7 @@ public class Body implements Serializable, ICarPart {
 	}
 
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getType(), pid};
+		return new Object[] {id, this.getType(), pid, (color != null) ? "Painted" : "No Color"};
 	}
 
 	public CarPartType getType() {

@@ -70,15 +70,13 @@ public class Painter extends SpaceUtil {
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
 			getCapi().write(getContainer(), new Entry(b,cordinator));
-			System.out.println("[Painter] Body Painted and written in space");
+			System.out.println("[Painter] Body " + b.getId() + " Painted and written in space");
 			getNotifMgr().createNotification(getContainer(), this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 	private void writeCarIntoSpace(Car c) {
@@ -96,7 +94,6 @@ public class Painter extends SpaceUtil {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 }
