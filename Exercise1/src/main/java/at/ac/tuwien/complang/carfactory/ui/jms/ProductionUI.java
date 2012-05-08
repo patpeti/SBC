@@ -31,20 +31,10 @@ import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
 public class ProductionUI extends JFrame implements IQueueObserver{
-	private static final long serialVersionUID = -6151830798597607052L;
-	private static final String[] FINISHED_GOODS_COLUMNS = {"Car ID", "PID",
-		"Body ID", "Body PID",
-		"Motor ID", "Motor PID",
-		"WHEEL 1 ID",
-		"WHEEL 1 PID",
-		"WHEEL 2 ID",
-		"WHEEL 2 PID",
-		"WHEEL 3 ID",
-		"WHEEL 3 PID",
-		"WHEEL 4 ID",
-		"WHEEL 4 PID"};
-	private static final String[] SPACE_CONTENT_COLUMNS = {"ID", "PartName", "PID"};
 	
+	//Static Fields
+	private static final long serialVersionUID = -6151830798597607052L;
+
 	//Fields
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
@@ -53,13 +43,8 @@ public class ProductionUI extends JFrame implements IQueueObserver{
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
-	
 
 	public ProductionUI(IQueueListener listener) {
-		
-
-	
-	
 		tableContainer = new JPanel(new GridLayout(1, 2));
 		this.listener = listener;
         showUI();
