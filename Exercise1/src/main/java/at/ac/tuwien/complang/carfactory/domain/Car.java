@@ -3,9 +3,9 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.awt.Color;
 import java.io.Serializable;
 
-import at.ac.tuwien.complang.carfactory.application.AbstractFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
+import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 
 public class Car implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
