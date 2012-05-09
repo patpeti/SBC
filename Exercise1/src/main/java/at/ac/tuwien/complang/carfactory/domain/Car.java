@@ -93,9 +93,22 @@ public class Car implements Serializable, ICarPart {
 	}
 
 	public Object[] getObjectData() {
+		String colorString;
+		Color color = getColor();
+		if(color == null) {
+			colorString = "NONE";
+		} else if(color.equals(Color.RED)) {
+			colorString = "RED";
+		} else if(color.equals(Color.BLUE)) {
+			colorString = "BLUE";
+		} else if(color.equals(Color.GREEN)) {
+			colorString = "GREEN";
+		} else {
+			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
+		}
 		return new Object[] {id, pid,
 				body.getId(), body.getPid(),
-				getColor(), body.getPainterId(),
+				colorString, body.getPainterId(),
 				motor.getId(), motor.getPid(),
 				wheels[0].getId(),
 				wheels[0].getPid(),
@@ -119,5 +132,4 @@ public class Car implements Serializable, ICarPart {
 	public void setPaintState(PaintState paintState) {
 		this.paintState = paintState;
 	}
-	
 }
