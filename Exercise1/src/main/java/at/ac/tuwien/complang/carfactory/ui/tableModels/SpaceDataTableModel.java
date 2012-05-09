@@ -37,7 +37,11 @@ public class SpaceDataTableModel extends AbstractTableModel {
 	}
 
 	public synchronized Object getValueAt(int row, int column) {
-		return data.get(row)[column];
+		if(data.size() > row && data.get(row).length > column) {
+			return data.get(row)[column];
+		} else {
+			return null;
+		}
 	}
 
 	public Class getColumnClass(int c) {
@@ -53,13 +57,29 @@ public class SpaceDataTableModel extends AbstractTableModel {
 		fireTableRowsInserted(row, row);
 	}
 
-	public synchronized void deleteColumn(Object[] objectData) {
+	public synchronized void deleteRow(Object[] objectData) {
 		for(Object[] object : data) {
-			if(object[0] == objectData[0]); //compare the unique global space id at position 0 of the data array
-			int index = data.indexOf(object);
-			data.remove(object);
-			fireTableRowsDeleted(index, index);
-			break;
+			if(object[0] == objectData[0]) { //compare the unique global space id at position 0 of the data array
+				int index = data.indexOf(object);
+				data.remove(object);
+				fireTableRowsDeleted(index, index);
+				return;
+			}
+		}
+		System.out.println("Could not remove part from space. ID: " + objectData[0]);
+	}
+	
+	public synchronized void updateRow(Object[] objectData) {
+		int index = -1;
+		for(Object[] object : data) {
+			if(object[0] == objectData[0]) {
+				index = data.indexOf(object);
+				break;
+			}
+		}
+		if(index != -1) {
+			data.set(index, objectData);
+			fireTableRowsUpdated(index, index);
 		}
 	}
 }

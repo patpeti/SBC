@@ -59,7 +59,7 @@ public class JmsPainter extends JmsAbstractWorker {
 				Car car = (Car) objectMessage.getObject();
 				if(car.getPaintState() == PaintState.UNPAINTED) {
 					car.setPaintState(PaintState.PAINTED);
-					//TODO: write it to the PAINTEDCARQUEU
+					//TODO: write it to the PAINTEDCARQUEUE
 				}
 			} catch (JMSException e) {
 				// TODO Auto-generated catch block

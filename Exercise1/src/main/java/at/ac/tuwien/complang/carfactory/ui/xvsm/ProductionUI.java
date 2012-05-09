@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -113,7 +114,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
     	JPanel spaceTablePanel = new JPanel();
     	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
     	spaceTablePanel.setLayout(layout);
-    	JLabel label = new JLabel("Finished Goods");
+    	JLabel label = new JLabel("(Semi-)Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	finishedGoodsTableModel = new FinishedGoodsTableModel();
     	finishedGoodsTable = new JTable(finishedGoodsTableModel);
@@ -142,11 +143,11 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
         createMotorFactoryButton.addActionListener(listener);
         
         bodyCountSpinner = new JSpinner();
-        bodyCountSpinner.setValue(50);
+        bodyCountSpinner.setValue(40);
         wheelCountSpinner = new JSpinner();
-        wheelCountSpinner.setValue(50);
+        wheelCountSpinner.setValue(100);
         motorCountSpinner = new JSpinner();
-        motorCountSpinner.setValue(50);
+        motorCountSpinner.setValue(40);
         
         JLabel label = new JLabel("Create a worker");
         label.setAlignmentX(CENTER_ALIGNMENT);
@@ -172,8 +173,25 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart taken from space");
-		spaceDataTableModel.deleteColumn(carPart.getObjectData());
+		spaceDataTableModel.deleteRow(carPart.getObjectData());
 		spaceTable.validate();
+	}
+	
+	public void addCar(Car car) {
+		System.out.println("#GUI# : Car added to space");
+		finishedGoodsTableModel.addRow(car.getObjectData());
+		finishedGoodsTable.validate();
+	}
+	
+	public void removeCar(Car car) {
+		System.out.println("#GUI# : Car removed from space");
+		finishedGoodsTableModel.removeRow(car.getObjectData());
+		finishedGoodsTable.validate();
+	}
+	
+	public void updateCar(Car car) {
+		finishedGoodsTableModel.updateRow(car.getObjectData());
+		finishedGoodsTable.validate();
 	}
 
     class CreationListener implements ActionListener {
@@ -215,18 +233,25 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		System.out.println("opname: "+ operation.name());
 		if(operation.name().equals("WRITE")) {
 			for(Entry entry : (List<Entry>) entries){
-				if (entry.getValue() instanceof Car){
+				if (entry.getValue() instanceof Car) {
 					System.out.println("[GUI_Notification] New Car written");
 					Car car = (Car) entry.getValue();
 					if(car.isComplete()){
 						//TODO show this car in the gui table.
-						finishedGoodsTableModel.addRow(car.getObjectData());
+						//finishedGoodsTableModel.
+						updateCar(car);
+					} else {
+						addCar(car);
 					}
+				} else if (entry.getValue() instanceof ICarPart) { //its not a car but still a carpart
+					ICarPart part = (ICarPart) entry.getValue();
+					spaceDataTableModel.addRow(part.getObjectData());
 				}
 			}
 		} else if(operation.name().equals("TAKE")) {
 			for(ICarPart entry : (List<ICarPart>) entries) {
-				removePart(entry);	
+				System.out.println("TAKE");
+				removePart(entry);
 			}
 		}
 	}
