@@ -17,6 +17,8 @@ import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
 public class BodyFactory extends AbstractFactory implements IProducer {
 
+	//Static Fields
+	private static final int TIME_IN_SEC = 3;
 	//Fields
 	private long id; //The ID of this producer
 
@@ -49,5 +51,10 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 
 	public long getId() {
 		return id;
+	}
+	
+	@Override
+	public int timeInSec() {
+		return TIME_IN_SEC;
 	}
 }

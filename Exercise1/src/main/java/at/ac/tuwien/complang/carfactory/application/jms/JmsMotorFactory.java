@@ -15,13 +15,13 @@ import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
 public class JmsMotorFactory extends JmsAbstractFactory  implements IProducer {
-	
-	
-	private Connection connection = null;
-	private Session session;
 
+	//Static Fields
+	private static final int TIME_IN_SEC = 3;
 	//Fields
 	private long id; //The ID of this producer
+	private Connection connection = null;
+	private Session session;
 
 	public JmsMotorFactory(long id,  IQueueListener listener) {
 		super();
@@ -51,5 +51,10 @@ public class JmsMotorFactory extends JmsAbstractFactory  implements IProducer {
 
 	public long getId() {
 		return id;
+	}
+	
+	@Override
+	public int timeInSec() {
+		return TIME_IN_SEC;
 	}
 }

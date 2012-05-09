@@ -65,9 +65,7 @@ public class FactoryFacade {
 		if(running) {
 			throw new IllegalStateException("Factory must be stopped first");
 		}
-		
 		this.count = count;
-		
 		//Prepare TimerTask
 		thread = new Thread(new Producer());
 	}
@@ -80,7 +78,7 @@ public class FactoryFacade {
 			int total = 0;
 			while(count > 0) {
 				//The producer sleeps for a random period between 1 and 3 seconds
-				delay = (int) (Math.random() * 3) + 1;
+				delay = (int) (Math.random() * producer.timeInSec()) + 1;
 				total += delay;
 				int millisecondsPerSecond = 1000;
 				try {
