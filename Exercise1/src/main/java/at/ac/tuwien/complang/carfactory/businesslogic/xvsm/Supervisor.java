@@ -48,10 +48,10 @@ public class Supervisor implements NotificationListener{
 	private Capi capi;
 	private ContainerReference container;
 	private NotificationManager notifMgr;
-	private static long id = 0;
+	private static long pid = 0;
 	
-	public Supervisor() {
-		id++;
+	public Supervisor(long id) {
+		this.pid = id;
 		initSpace();
 		while(true){
 			readPaintedCar();
@@ -63,36 +63,32 @@ public class Supervisor implements NotificationListener{
 		selectors.add(FifoCoordinator.newSelector());
 		selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(1));
-		
 		List<ICarPart> parts = null;
 		try {
 			parts = capi.take(container, selectors, RequestTimeout.INFINITE, null);
-
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-
 		if(parts != null){
 			Car c = (Car) parts.get(0);
-			c.setComplete(id, true);
+			c.setComplete(pid, true);
 			writeCar(c);
+			System.out.println("Supervised car " + c.getId());
 		}
 	}
 
 	private void writeCar(Car c) {
-		
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(LabelCoordinator.newCoordinationData(SpaceLabels.FINISHEDCAR));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
-		//write
 		try {
+			// Write the finished car back to the space
 			capi.write(container, new Entry(c,cordinator));
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-		
-		//notify
 		try {
+			// Evoke a notification
 			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -119,7 +115,6 @@ public class Supervisor implements NotificationListener{
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
 			}
-				
 		} catch (MzsCoreException e) {
 			System.out.println("Error: Could not initialize Space");
 			e.printStackTrace();
@@ -134,6 +129,5 @@ public class Supervisor implements NotificationListener{
 	public void entryOperationFinished(Notification source,
 			Operation operation, List<? extends Serializable> entries) {
 		// TODO Auto-generated method stub
-		
 	}
 }

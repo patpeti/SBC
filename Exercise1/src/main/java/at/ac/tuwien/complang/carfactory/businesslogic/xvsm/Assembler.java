@@ -50,7 +50,7 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 
-public class Assembler implements NotificationListener, Runnable{
+public class Assembler implements NotificationListener {
 	
 	private Capi capi;
 	private ContainerReference container;
@@ -62,7 +62,7 @@ public class Assembler implements NotificationListener, Runnable{
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
 
-	public Assembler(){
+	public Assembler(long id){
 		/**
 		 * TODO:
 		 * 1. Connect to the space
@@ -78,7 +78,7 @@ public class Assembler implements NotificationListener, Runnable{
 		
 		//TODO check whether body is painted
 		
-		pid++;
+		pid = id;
 		//1
 		initSpace();
 		System.out.println("Space initialized");
@@ -119,7 +119,7 @@ public class Assembler implements NotificationListener, Runnable{
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			cordinator.add(FifoCoordinator.newCoordinationData());
 			capi.write(container, new Entry(c,cordinator));
-			System.out.println("[Assembler]*Car Created");
+			System.out.println("[Assembler]*Car " + c.getId() + " created");
 			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -127,6 +127,7 @@ public class Assembler implements NotificationListener, Runnable{
 			e.printStackTrace();
 		}
 	}
+
 	public void getOneMotor() {
 		//4
 		TransactionReference tx = null;
@@ -137,12 +138,12 @@ public class Assembler implements NotificationListener, Runnable{
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-		List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, tx);
+		List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, null);
 		//set body
 		if(motors != null)
-		this.motor = (Motor) motors.get(0);
+			this.motor = (Motor) motors.get(0);
 		else
-		this.motor = null;	
+			this.motor = null;	
 		try {
 			Set<Operation> operations = new HashSet<Operation>();
 			operations.add(Operation.DELETE);
@@ -152,7 +153,7 @@ public class Assembler implements NotificationListener, Runnable{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("[Assembler]*Motor taken");
+		System.out.println("[Assembler] *Motor taken");
 	}
 	
 	public void getFourWheels(){
@@ -165,7 +166,7 @@ public class Assembler implements NotificationListener, Runnable{
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, tx);
+		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, null);
 		//set wheels
 		int i = 0;
 		for(ICarPart w : wheels){
@@ -181,7 +182,7 @@ public class Assembler implements NotificationListener, Runnable{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("[Assembler]*Four Wheel taken");
+		System.out.println("[Assembler] *Four Wheels taken");
 	}
 	
 	public void getOneBody() {
@@ -198,23 +199,23 @@ public class Assembler implements NotificationListener, Runnable{
 			List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
 			Matchmaker[] array = new Matchmaker[2];
 			prop = Property.forName("*", "paintState");
-			matchmakers.add(prop.equalTo(PaintState.PAINTED));    
-			matchmakers.add(prop.equalTo(PaintState.UNPAINTED));  
+			matchmakers.add(prop.equalTo(PaintState.PAINTED));
+			matchmakers.add(prop.equalTo(PaintState.UNPAINTED));
 			query = new Query().filter(Matchmakers.and(    (Matchmakers.or(matchmakers.toArray(array))),   Property.forName("type").equalTo(CarPartType.BODY)   ));
 			selectors.add(QueryCoordinator.newSelector(query));
 			List<ICarPart> bodies = null;
-			bodies = capi.take(container, selectors, RequestTimeout.INFINITE, tx);		
+			bodies = capi.take(container, selectors, RequestTimeout.INFINITE, null);
 			//set body
 			if(bodies != null)
 				this.body = (Body) bodies.get(0);
 			else
-				this.body = null;	
+				this.body = null;
 			Set<Operation> operations = new HashSet<Operation>();
 			operations.add(Operation.DELETE);
 			operations.add(Operation.TAKE);
 			operations.add(Operation.WRITE);
 			notifMgr.createNotification(container, this, operations, null, null);
-			System.out.println("[Assembler]*Body taken");
+			System.out.println("[Assembler] *Body taken");
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
@@ -293,7 +294,6 @@ public class Assembler implements NotificationListener, Runnable{
 		}
 	}
 
-
 	@Override
 	public void entryOperationFinished(
 			Notification source,
@@ -303,27 +303,24 @@ public class Assembler implements NotificationListener, Runnable{
 		//System.out.println("[Notification]");
 	}
 
-	@Override
-	public void run() {
+	public void doWork() {
 		while(true){
 			//System.out.println("[Assembler] New loop");
 			if(this.motor == null){
-//				System.out.println("[Assembler] motor was null");
+				//System.out.println("[Assembler] motor was null");
 				getOneMotor();
 			}
 			if(this.fourWheels[0] == null || this.fourWheels[1] == null || this.fourWheels[2] == null || this.fourWheels[3] == null){
-//				System.out.println("[Assembler] wheel was null");
+				//System.out.println("[Assembler] wheel was null");
 				getFourWheels();
-				
 			}
 			if(this.body == null){
-//				System.out.println("[Assembler] body was null");
+				//System.out.println("[Assembler] body was null");
 				getOneBody();
-				
 			}
-			if(this.motor != null && this.fourWheels[0] != null && this.body != null){
+			if(this.motor != null && this.fourWheels[0] != null && this.body != null) {
 				System.out.println("[Assembler] all field set, creating car");
-				//create Car
+				// Create a new Car
 				createCar();
 				this.body = null;
 				this.motor = null;

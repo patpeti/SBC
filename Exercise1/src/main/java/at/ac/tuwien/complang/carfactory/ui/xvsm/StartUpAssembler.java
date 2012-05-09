@@ -1,12 +1,12 @@
 package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
-import org.mozartspaces.core.Capi;
-
 import at.ac.tuwien.complang.carfactory.businesslogic.xvsm.Assembler;
+import at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsAssembler;
 
 public class StartUpAssembler {
 	
-	private static Capi capi; 
+	//Static Fields 
+	private static long id;
 	
 	public static void main(String[] args) {
 		/**
@@ -22,11 +22,28 @@ public class StartUpAssembler {
 		 * 6. save the car object back into the space
 		 */
 
-		Assembler assembler = new Assembler();
-		//uebrigens dass bracht man nicht... ~Peter
-		new Thread(assembler).start();
+		parseArguments(args);
+		Assembler assembler = new Assembler(id);
+		assembler.doWork();
 	}
-	
-	
+
+	private static void parseArguments(String[] args) {
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id>";
+		if(args.length != 1) {
+			System.out.println(usage);
+			System.exit(1);
+		}
+		try {
+			if(!args[0].startsWith("--id=")) {
+				System.out.println(usage);
+				System.exit(1);
+			}
+			String substring = args[0].substring(5);
+			id = Integer.parseInt(substring);
+		} catch(NumberFormatException e) {
+			System.out.println(usage);
+			System.exit(1);
+		}
+	}
 	
 }
