@@ -41,7 +41,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 		 */
 	}
 
-	public void startAssemblyLoop() {
+	public void startWorkLoop() {
 		while(true) {
 			//produce some cars
 			Body body = getOneBody();
@@ -65,7 +65,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 
 	@Override
 	protected void connectToQueues() {
-		//test get Motor
+		//Connect to all queues that are required by the assembler
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
 			connection = connectionFactory.createConnection();
@@ -78,7 +78,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.wheelConsumer = session.createConsumer(wheelQueue);
 			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
 			this.bodyConsumer = session.createConsumer(bodyTopic);
-			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
+			this.carTopic = session.createTopic(QueueConstants.CARQUEUE);
 			this.carConsumer = session.createConsumer(carTopic);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {

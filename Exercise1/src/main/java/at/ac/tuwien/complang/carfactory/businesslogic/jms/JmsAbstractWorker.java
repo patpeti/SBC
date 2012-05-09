@@ -26,5 +26,6 @@ public abstract class JmsAbstractWorker {
 		}
 	}
 	
-	protected void connectToQueues() { }
+	abstract void connectToQueues();
+	abstract void startWorkLoop();
 }

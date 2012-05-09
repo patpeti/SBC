@@ -10,9 +10,9 @@ public class StartUpJmsPainter {
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		JmsPainter painter = new JmsPainter(id);
+		JmsPainter painter = new JmsPainter(id, color);
 		painter.initialize();
-		painter.startAssemblyLoop(); //currently the loop needs to be terminated by pressing CTRL+C
+		painter.startWorkLoop(); //currently the loop needs to be terminated by pressing CTRL+C
 	}
 	
 	private static void parseArguments(String[] args) {
@@ -36,7 +36,7 @@ public class StartUpJmsPainter {
 			System.out.println(usage);
 			System.exit(1);
 		}
-		String substring = args[1].substring(9).toUpperCase();
+		String substring = args[1].substring(8).toUpperCase();
 		if(substring.equals("RED")) {
 			color = Color.RED;
 		} else if (substring.equals("BLUE")) {

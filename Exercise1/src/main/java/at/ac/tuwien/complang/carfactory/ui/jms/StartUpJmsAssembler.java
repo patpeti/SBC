@@ -10,7 +10,7 @@ public class StartUpJmsAssembler {
 		parseArguments(args);
 		JmsAssembler assembler = new JmsAssembler(id);
 		assembler.initialize();
-		assembler.startAssemblyLoop();
+		assembler.startWorkLoop();
 	}
 	
 	private static void parseArguments(String[] args) {
