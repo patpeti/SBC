@@ -24,6 +24,7 @@ import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.jms.enums.QueueChangeType;
+import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueObserver;
@@ -100,7 +101,7 @@ public class ProductionUI extends JFrame implements IQueueObserver {
     	spaceTablePanel.add(scrollPane);
     	return spaceTablePanel;
     }
-    
+
 	private void buildCreationPanel() {
 		CreationListener listener = new CreationListener();
     	JPanel container = new JPanel();
@@ -119,11 +120,11 @@ public class ProductionUI extends JFrame implements IQueueObserver {
         createMotorFactoryButton.addActionListener(listener);
         
         bodyCountSpinner = new JSpinner();
-        bodyCountSpinner.setValue(50);
+        bodyCountSpinner.setValue(40);
         wheelCountSpinner = new JSpinner();
-        wheelCountSpinner.setValue(50);
+        wheelCountSpinner.setValue(100);
         motorCountSpinner = new JSpinner();
-        motorCountSpinner.setValue(50);
+        motorCountSpinner.setValue(40);
         
         JLabel label = new JLabel("Create a worker");
         label.setAlignmentX(CENTER_ALIGNMENT);
@@ -139,6 +140,40 @@ public class ProductionUI extends JFrame implements IQueueObserver {
         container.add(producerPanel);
         padding.add(container);
         this.add(padding, BorderLayout.CENTER);
+	}
+
+	public void addPart(ICarPart carPart, SpaceChangeType type) {
+		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
+		spaceDataTableModel.addRow(carPart.getObjectData());
+		spaceTable.validate();
+	}
+	
+	public void updatePart(ICarPart part) {
+		spaceDataTableModel.updateRow(part.getObjectData());
+		spaceTable.validate();
+	}
+
+	public void removePart(ICarPart carPart) {
+		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
+		spaceDataTableModel.deleteRow(carPart.getObjectData());
+		spaceTable.validate();
+	}
+
+	public void addCar(Car car) {
+		System.out.println("#GUI# : Car " + car.getId() + " added to space");
+		finishedGoodsTableModel.addRow(car.getObjectData());
+		finishedGoodsTable.validate();
+	}
+
+	public void removeCar(Car car) {
+		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
+		finishedGoodsTableModel.removeRow(car.getObjectData());
+		finishedGoodsTable.validate();
+	}
+	
+	public void updateCar(Car car) {
+		finishedGoodsTableModel.updateRow(car.getObjectData());
+		finishedGoodsTable.validate();
 	}
 
     class CreationListener implements ActionListener {
