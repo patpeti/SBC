@@ -1,11 +1,11 @@
 package at.ac.tuwien.complang.carfactory.application.jms.constants;
 
 public class QueueConstants {
-	public static final String MOTORQUEUE = "MOTORQUEUE";
-	public static final String WHEELQUEUE = "WHEELQUEUE";
-	public static final String BODYTOPIC = "BODYTOPIC";
-	public static final String PAINTEDBODYQUEUE = "PAINTEDBODYQUEUE";
-	public static final String CARQUEUE = "CARQUEUE";
-	public static final String PAINTEDCARQUEUE = "PAINTEDCARQUEUE";
-	public static final String FINISHEDCARQUEUE = "FINISHEDCARQUEUE";
+	public static final String MOTORQUEUE = "MOTORQUEUE"; //Only accessed by Assembler
+	public static final String WHEELQUEUE = "WHEELQUEUE"; //Only accessed by Assembler
+	public static final String BODYQUEUE = "BODYQUEUE"; //Subscribers are: Assembler and Painter, access is exclusive
+	public static final String PAINTEDBODYTOPIC = "PAINTEDBODYTOPIC"; //Subscribers are: GUI and Assembler
+	public static final String CARTOPIC = "CARTOPIC"; //Subscribers are: GUI and Painter
+	public static final String PAINTEDCARTOPIC = "PAINTEDCARTOPIC"; //Subscribers are: GUI and Supervisor
+	public static final String FINISHEDCARQUEUE = "FINISHEDCARQUEUE"; //Only accessed by GUI
 }

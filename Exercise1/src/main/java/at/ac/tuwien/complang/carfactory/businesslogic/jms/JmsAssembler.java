@@ -21,8 +21,8 @@ public class JmsAssembler extends JmsAbstractWorker {
 
 	//Fields
 	private Session session;
-	private Queue wheelQueue, motorQueue;
-	private Topic carTopic, bodyTopic;
+	private Queue wheelQueue, motorQueue, bodyQueue;
+	private Topic carTopic;
 	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, carConsumer;
 	
 	public JmsAssembler(long pid) {
@@ -76,9 +76,9 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.motorConsumer = session.createConsumer(motorQueue);
 			this.wheelQueue = session.createQueue(QueueConstants.WHEELQUEUE);
 			this.wheelConsumer = session.createConsumer(wheelQueue);
-			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
-			this.bodyConsumer = session.createConsumer(bodyTopic);
-			this.carTopic = session.createTopic(QueueConstants.CARQUEUE);
+			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
+			this.bodyConsumer = session.createConsumer(bodyQueue);
+			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
 			this.carConsumer = session.createConsumer(carTopic);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {

@@ -38,8 +38,8 @@ public class JmsBodyFactory extends JmsAbstractFactory implements IProducer {
 			connection = conFac.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Topic t = session.createTopic(QueueConstants.BODYTOPIC);
-			MessageProducer msgProducer = session.createProducer(t);
+			Queue queue = session.createQueue(QueueConstants.BODYQUEUE);
+			MessageProducer msgProducer = session.createProducer(queue);
 			//object message
 			msgProducer.send(session.createObjectMessage(body));
 			connection.close();
