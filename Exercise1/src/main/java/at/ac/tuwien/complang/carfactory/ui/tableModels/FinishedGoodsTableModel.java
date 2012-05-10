@@ -45,9 +45,6 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 	public synchronized void addRow(Object[] dates) {
 		data.add(dates);
 		int row = data.indexOf(dates);
-		//for(int column = 0; column < dates.length; column++) {
-//			fireTableCellUpdated(row, column);
-		//}
 		fireTableRowsInserted(row, row);
 	}
 
@@ -74,6 +71,25 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		if(index != -1) {
 			data.set(index, objectData);
 			fireTableRowsUpdated(index, index);
+		}
+	}
+
+	public void addOrUpdateRow(Object[] objectData) {
+		// TODO Auto-generated method stub
+		int index = -1;
+		for(Object[] object : data) {
+			if(object[0] == objectData[0]) {
+				index = data.indexOf(object);
+				break;
+			}
+		}
+		if(index != -1) {
+			data.set(index, objectData);
+			fireTableRowsUpdated(index, index);
+		} else {
+			data.add(objectData);
+			int row = data.indexOf(objectData);
+			fireTableRowsInserted(row, row);
 		}
 	}
 }
