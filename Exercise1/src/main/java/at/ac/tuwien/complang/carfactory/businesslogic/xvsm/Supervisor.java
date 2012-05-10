@@ -35,7 +35,6 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 
 public class Supervisor implements NotificationListener{
 
-	
 	/**
 	 * Workflow:
 	 * 1. Connect to the Mozard space
@@ -43,7 +42,6 @@ public class Supervisor implements NotificationListener{
 	 * 3. Set the complete flag for the car
 	 * 4. write it back into the space 		
 	 */
-	
 	
 	private Capi capi;
 	private ContainerReference container;

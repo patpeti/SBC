@@ -64,7 +64,7 @@ public class Assembler implements NotificationListener {
 
 	public Assembler(long id){
 		/**
-		 * TODO:
+		 * Workflow:
 		 * 1. Connect to the space
 		 * 2. take a body
 		 * 3. take 4 wheels
