@@ -14,6 +14,8 @@ public class StartUpJmsGui {
 		 */
 		//instantiate global Listener
 		IQueueListener listener = new QueueListenerImpl();
+		listener.connectToQueues();
+		
 		//1. Start the User interface
 		ProductionUI gui = new ProductionUI(listener);
 		listener.setQueueObserver(gui);
