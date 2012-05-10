@@ -16,7 +16,7 @@ public interface IQueueObserver {
 	//Car Methods
 	void addCar(Car car);
 	void removeCar(Car car);
-	void updateCar(Car car);
+	void addOrUpdateCar(Car car);
 	//Part Methods
 	void addPart(ICarPart carPart, SpaceChangeType type);
 	void removePart(ICarPart carPart);

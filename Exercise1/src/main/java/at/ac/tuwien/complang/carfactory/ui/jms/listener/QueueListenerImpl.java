@@ -48,7 +48,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			if(part instanceof Car) {
 				System.out.println("Car (" + part.getId() + ") was received, im going to tell the GUI...");
 				Car car = (Car) part;
-				if(!car.isComplete() && !car.hasColor()) {
+				if(!car.hasColor()) {
 					gui.addCar(car);
 					//TODO: remove parts...
 					Body body = car.getBody();
@@ -60,7 +60,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 						gui.removePart(wheel);
 					}
 				} else {
-					gui.updateCar(car);
+					gui.addOrUpdateCar(car);
 				}
 				//update the semi/finished table model with the car object
 				//If we receive a car, we must backtrack the parts used in the car to know what we should remove from the parts list

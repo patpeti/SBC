@@ -21,8 +21,8 @@ public class JmsAssembler extends JmsAbstractWorker {
 	//Fields
 	private Session session;
 	private Queue wheelQueue, motorQueue, bodyQueue;
-	private Topic carTopic;
-	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer;
+	private Topic carTopic, paintedBodyTopic, paintedCarTopic;
+	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, paintedBodyConsumer;
 	
 	public JmsAssembler(long pid) {
 		super(pid);
@@ -47,9 +47,15 @@ public class JmsAssembler extends JmsAbstractWorker {
 			//write the car to the queue
 			MessageProducer messageProducer;
 			try {
-				messageProducer = session.createProducer(carTopic);
-				messageProducer.send(session.createObjectMessage(car));
-				System.out.println("One car produced with id: " + car.getId());
+				if(car.hasColor()) {
+					messageProducer = session.createProducer(paintedCarTopic);
+					messageProducer.send(session.createObjectMessage(car));
+					System.out.println("One painted car produced with id: " + car.getId());
+				} else {
+					messageProducer = session.createProducer(carTopic);
+					messageProducer.send(session.createObjectMessage(car));
+					System.out.println("One unpainted car produced with id: " + car.getId());
+				}
 			} catch (JMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -69,12 +75,15 @@ public class JmsAssembler extends JmsAbstractWorker {
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			this.motorQueue = session.createQueue(QueueConstants.MOTORQUEUE);
-			this.motorConsumer = session.createConsumer(motorQueue);
+			this.motorConsumer = session.createConsumer(this.motorQueue);
 			this.wheelQueue = session.createQueue(QueueConstants.WHEELQUEUE);
-			this.wheelConsumer = session.createConsumer(wheelQueue);
+			this.wheelConsumer = session.createConsumer(this.wheelQueue);
 			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
-			this.bodyConsumer = session.createConsumer(bodyQueue);
+			this.bodyConsumer = session.createConsumer(this.bodyQueue);
+			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
+			this.paintedBodyConsumer = session.createConsumer(this.paintedBodyTopic);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
+			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -82,9 +91,14 @@ public class JmsAssembler extends JmsAbstractWorker {
 	}
 	
 	private Body getOneBody() {
-		ObjectMessage message;
+		ObjectMessage message = null;
 		try {
-			message = (ObjectMessage) bodyConsumer.receive();
+			while(message == null) {
+				message = (ObjectMessage) bodyConsumer.receive(10);
+				if(message == null) {
+					message = (ObjectMessage) paintedBodyConsumer.receive(10);
+				}
+			}
 			Body body = (Body) message.getObject();
 			System.out.println("Received Body: " + body.getId());
 			return body;
