@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
+import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsSupervisor;
 
 public class StartUpJmsSupervisor {
 
@@ -9,9 +10,9 @@ public class StartUpJmsSupervisor {
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		JmsAssembler assembler = new JmsAssembler(id);
-		assembler.initialize();
-		assembler.startWorkLoop();
+		JmsSupervisor supervisor = new JmsSupervisor(id);
+		supervisor.initialize();
+		supervisor.startWorkLoop();
 	}
 	
 	private static void parseArguments(String[] args) {
