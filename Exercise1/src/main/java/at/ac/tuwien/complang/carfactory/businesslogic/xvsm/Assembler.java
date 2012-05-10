@@ -61,7 +61,7 @@ public class Assembler implements NotificationListener {
 	private Body body;
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
-
+    private TransactionReference tx = null;
 	public Assembler(long id){
 		/**
 		 * Workflow:
@@ -81,6 +81,15 @@ public class Assembler implements NotificationListener {
 	
 	public void doAssemble(){
 		System.out.println("[Assembler] New loop");
+		try {
+			tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
+			
+			
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		if(this.motor == null){
 			System.out.println("[Assembler] motor was null");
 			getOneMotor();
@@ -99,6 +108,11 @@ public class Assembler implements NotificationListener {
 			System.out.println("[Assembler] all field set");
 			//create Car
 			createCar();
+		}
+		try {
+			capi.commitTransaction(tx);
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -125,15 +139,9 @@ public class Assembler implements NotificationListener {
 
 	public void getOneMotor() {
 		//4
-		TransactionReference tx = null;
-		try {
-			tx = capi.createTransaction(100000, new URI(SpaceConstants.CONTAINER_URI));
-		} catch (MzsCoreException e1) {
-			e1.printStackTrace();
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-		}
-		List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, null);
+		
+	
+		List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, tx);
 		//set body
 		if(motors != null)
 			this.motor = (Motor) motors.get(0);
@@ -161,7 +169,7 @@ public class Assembler implements NotificationListener {
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, null);
+		List<ICarPart> wheels = this.takeCarPart(CarPartType.WHEEL, new Integer(4), SpaceTimeout.INFINITE, tx);
 		//set wheels
 		int i = 0;
 		for(ICarPart w : wheels){
@@ -199,7 +207,7 @@ public class Assembler implements NotificationListener {
 			query = new Query().filter(Matchmakers.and(    (Matchmakers.or(matchmakers.toArray(array))),   Property.forName("type").equalTo(CarPartType.BODY)   ));
 			selectors.add(QueryCoordinator.newSelector(query));
 			List<ICarPart> bodies = null;
-			bodies = capi.take(container, selectors, RequestTimeout.INFINITE, null);
+			bodies = capi.take(container, selectors, RequestTimeout.INFINITE, tx);
 			//set body
 			if(bodies != null)
 				this.body = (Body) bodies.get(0);
@@ -209,7 +217,7 @@ public class Assembler implements NotificationListener {
 			operations.add(Operation.DELETE);
 			operations.add(Operation.TAKE);
 			operations.add(Operation.WRITE);
-			notifMgr.createNotification(container, this, operations, null, null);
+			notifMgr.createNotification(container, this, operations, tx, null);
 			System.out.println("[Assembler] *Body taken");
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
@@ -233,7 +241,7 @@ public class Assembler implements NotificationListener {
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());
 			try {
-				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, tx, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();

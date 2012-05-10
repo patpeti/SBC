@@ -63,7 +63,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 					gui.addOrUpdateCar(car);
 				}
 				//update the semi/finished table model with the car object
-				//If we receive a car, we must backtrack the parts used in the car to know what we should remove from the parts list
+				//If we receive a car, we must backtrack the parts used in the car to know what we shouljad remove from the parts list
 				//1. Car is not complete and not painted (from the carTopic)
 				//2. Car is painted but not completed (from the paintedCarTopic)
 				//3. Car is painted and completed (from the finishedCarTopic). This case has no representation in the GUI yet!
