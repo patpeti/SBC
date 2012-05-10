@@ -107,6 +107,7 @@ public class Car implements Serializable, ICarPart {
 			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
 		}
 		return new Object[] {id, pid,
+				this.isComplete_pid,
 				body.getId(), body.getPid(),
 				colorString, body.getPainterId(),
 				motor.getId(), motor.getPid(),

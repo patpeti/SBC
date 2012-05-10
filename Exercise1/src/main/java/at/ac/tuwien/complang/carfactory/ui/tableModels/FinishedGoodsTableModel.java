@@ -6,8 +6,8 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 public class FinishedGoodsTableModel extends AbstractTableModel {
-	private static final String[] SPACE_CONTENT_COLUMNS = { "CarID", "PID",
-			"BodyID", "BodyPID", "BodyColor", "PainterPID", "MotorID", "MotorPID", "WHEEL1ID", "WHEEL1PID", "WHEEL2ID", "WHEEL2PID", "WHEEL3ID", "WHEEL3PID", "WHEEL4ID", "WHEEL4PID" };
+	private static final String[] SPACE_CONTENT_COLUMNS = { "CarID", "PID", "SupervisorID",
+			"BodyID", "BodyPID", "BodyColor", "PainterID", "MotorID", "MotorPID", "WHEEL1ID", "WHEEL1PID", "WHEEL2ID", "WHEEL2PID", "WHEEL3ID", "WHEEL3PID", "WHEEL4ID", "WHEEL4PID" };
 	private List<Object[]> data = new ArrayList<Object[]>();
 
 	public FinishedGoodsTableModel() { }
