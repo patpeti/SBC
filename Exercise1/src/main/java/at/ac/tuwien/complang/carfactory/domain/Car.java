@@ -3,9 +3,9 @@ package at.ac.tuwien.complang.carfactory.domain;
 import java.awt.Color;
 import java.io.Serializable;
 
-import at.ac.tuwien.complang.carfactory.application.AbstractFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
+import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 
 public class Car implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
@@ -79,22 +79,6 @@ public class Car implements Serializable, ICarPart {
 	public Wheel[] getWheels() {
 		return wheels;
 	}
-	
-	public Object[] getDetails() {
-		//TODO: Add null checks
-		return new Object[] {id, pid,
-				body.getId(), body.getPid(),
-				motor.getId(), motor.getPid(),
-				wheels[0].getId(),
-				wheels[0].getPid(),
-				wheels[1].getId(),
-				wheels[1].getPid(),
-				wheels[2].getId(),
-				wheels[2].getPid(),
-				wheels[3].getId(),
-				wheels[3].getPid(),
-				};
-	}
 
 	public long getSupervisorId() {
 		return isComplete_pid;
@@ -109,12 +93,37 @@ public class Car implements Serializable, ICarPart {
 	}
 
 	public Object[] getObjectData() {
-		// TODO Auto-generated method stub
-		return null;
+		String colorString;
+		Color color = getColor();
+		if(color == null) {
+			colorString = "NONE";
+		} else if(color.equals(Color.RED)) {
+			colorString = "RED";
+		} else if(color.equals(Color.BLUE)) {
+			colorString = "BLUE";
+		} else if(color.equals(Color.GREEN)) {
+			colorString = "GREEN";
+		} else {
+			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
+		}
+		return new Object[] {id, pid,
+				this.isComplete_pid,
+				body.getId(), body.getPid(),
+				colorString, body.getPainterId(),
+				motor.getId(), motor.getPid(),
+				wheels[0].getId(),
+				wheels[0].getPid(),
+				wheels[1].getId(),
+				wheels[1].getPid(),
+				wheels[2].getId(),
+				wheels[2].getPid(),
+				wheels[3].getId(),
+				wheels[3].getPid(),
+			};
 	}
 
 	public CarPartType getType() {
-		return this.type;
+		return Car.type;
 	}
 
 	public PaintState getPaintState() {
@@ -124,5 +133,4 @@ public class Car implements Serializable, ICarPart {
 	public void setPaintState(PaintState paintState) {
 		this.paintState = paintState;
 	}
-	
 }
