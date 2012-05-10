@@ -90,7 +90,6 @@ public class JmsFactoryFacade {
 				} catch (InterruptedException e) {
 					System.err.println("Producer was interrupted.");
 				}
-				//TODO: Produce a Body...
 				//Produce a part with the factory and decrease the counter
 				count--;
 				producer.produce();

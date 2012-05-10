@@ -9,9 +9,6 @@ public class StartUpSupervisor {
 	
 	public static void main(String[] args) {
 		/**
-		 * TODO:
-		 * 1. Connect to the mozard space
-		 * 2. Load a car from the mozardspace and verify its completed
 		 * Workflow:
 		 * 1. Connect to the Mozard space
 		 * 2. Load a car from the Mozard space and verify its completed

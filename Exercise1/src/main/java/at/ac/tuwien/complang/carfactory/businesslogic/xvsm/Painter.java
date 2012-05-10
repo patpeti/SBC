@@ -21,11 +21,7 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 public class Painter extends SpaceUtil {
 
 	/**
-<<<<<<< HEAD
-	 * TODO:
-=======
 	 * Workflow:
->>>>>>> branch 'master' of https://patonaipeter@github.com/patonaipeter/SBC.git
 	 * 1. Connect to the Mozard space
 	 * 2. Load a Body (which is not yet painted) or an
 	 *    assembled car (which is not yet painted)

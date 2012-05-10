@@ -56,7 +56,6 @@ public class JmsSupervisor extends JmsAbstractWorker {
 				MessageProducer messageProducer = session.createProducer(finishedCarQueue);
 				messageProducer.send(session.createObjectMessage(car));
 				System.out.println("[Supervisor] Car " + car.getId() + " send to finishedCarQueue.");
-				//TODO: notify UI
 			} catch (JMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
