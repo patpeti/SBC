@@ -45,7 +45,12 @@ public class SpaceDataTableModel extends AbstractTableModel {
 	}
 
 	public Class getColumnClass(int c) {
-		return getValueAt(0, c).getClass();
+		Object object = getValueAt(0, c);
+		if(object == null) {
+			return Object.class;
+		} else {
+			return getValueAt(0, c).getClass();
+		}
 	}
 
 	public synchronized void addRow(Object[] dates) {
