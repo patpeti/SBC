@@ -11,6 +11,7 @@ public class StartUpJmsGui {
 		 * Create queue for motor [Done, JmsMotorFactory]
 		 * Create topic for Body [Done, JmsBodyFactory]
 		 * Create topic for Car? [Done, JmsAssembler]
+
 		 */
 		//instantiate global Listener
 		IQueueListener listener = new QueueListenerImpl();

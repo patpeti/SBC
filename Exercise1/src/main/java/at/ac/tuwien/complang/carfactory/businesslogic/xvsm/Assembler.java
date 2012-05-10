@@ -64,6 +64,7 @@ public class Assembler implements NotificationListener {
 
 	public Assembler(long id){
 		/**
+<<<<<<< HEAD
 		 * TODO:
 		 * 1. Connect to the space
 		 * 2. load a body
@@ -77,6 +78,7 @@ public class Assembler implements NotificationListener {
 		 */
 		
 		//TODO check whether body is painted
+
 		
 		pid = id;
 		//1

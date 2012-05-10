@@ -87,6 +87,7 @@ public class FactoryFacade {
 					System.err.println("Producer was interrupted.");
 				}
 				//TODO: Produce a Body...
+				//Produce a car part with the factory and decrease the counter
 				count--;
 				producer.produce();
 				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);

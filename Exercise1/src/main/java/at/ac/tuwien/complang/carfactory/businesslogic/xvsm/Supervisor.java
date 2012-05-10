@@ -35,7 +35,6 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 
 public class Supervisor implements NotificationListener{
 
-	
 	/**
 	 * TODO:
 	 * 1. Connect to the mozard space
@@ -44,6 +43,7 @@ public class Supervisor implements NotificationListener{
 	 * 4. write it back into the space 		
 	 */
 	
+
 	
 	private Capi capi;
 	private ContainerReference container;

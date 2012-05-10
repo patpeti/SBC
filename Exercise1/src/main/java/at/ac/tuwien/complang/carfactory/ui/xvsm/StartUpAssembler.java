@@ -19,6 +19,7 @@ public class StartUpAssembler {
 		 * 7. mark the body, wheels and motor as already used 
 		 *    (or alternatively remove them from the space)
 		 *    FIXME: decide if objects should remain in the space
+
 		 * 6. save the car object back into the space
 		 */
 

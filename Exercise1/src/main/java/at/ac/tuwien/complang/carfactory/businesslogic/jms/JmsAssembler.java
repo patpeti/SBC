@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -80,6 +81,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.bodyConsumer = session.createConsumer(bodyQueue);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
 			this.carConsumer = session.createConsumer(carTopic);
+
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
