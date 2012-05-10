@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 
-import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -23,21 +22,18 @@ public class JmsAssembler extends JmsAbstractWorker {
 	private Session session;
 	private Queue wheelQueue, motorQueue, bodyQueue;
 	private Topic carTopic;
-	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, carConsumer;
+	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer;
 	
 	public JmsAssembler(long pid) {
 		super(pid);
 		/**
-		 * TODO:
+		 * Workflow:
 		 * 1. Connect to all queues/topics
-		 * 2. load a body (from bodyTopic)
-		 * 3. load 4 wheels (from wheelQueue)
-		 * 4. load a motor (from motorQueue)
+		 * 2. receive a body (from bodyTopic)
+		 * 3. receive 4 wheels (from wheelQueue)
+		 * 4. receive a motor (from motorQueue)
 		 * 5. assemble them into a car object (create a new car object and set the parts)
-		 * 7. mark the body, wheels and motor as already used 
-		 *    (or alternatively remove them from the space)
-		 *    FIXME: decide if objects should remain in the space -->all infos still available inside the car objects no need to have the original objects in the space
-		 * 6. save the car object back into the space
+		 * 6. save the car object into the right queue (depending on wether it is painted or not)
 		 */
 	}
 
@@ -79,7 +75,6 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
 			this.bodyConsumer = session.createConsumer(bodyQueue);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
-			this.carConsumer = session.createConsumer(carTopic);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();

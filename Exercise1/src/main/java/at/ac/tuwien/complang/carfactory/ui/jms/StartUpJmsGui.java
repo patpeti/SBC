@@ -6,11 +6,13 @@ import at.ac.tuwien.complang.carfactory.ui.jms.listener.QueueListenerImpl;
 public class StartUpJmsGui {
 	
 	public static void main(String[] args) {
-		/**TODO:
+		/**
+		 * Workflow:
 		 * Create queue for wheel [Done, JmsWheelFactory]
 		 * Create queue for motor [Done, JmsMotorFactory]
-		 * Create topic for Body [Done, JmsBodyFactory]
-		 * Create topic for Car? [Done, JmsAssembler]
+		 * Create queue for Body [Done, JmsBodyFactory]
+		 * Create topics for Car [Done, JmsAssembler]
+		 * For all queue and topics available, see the application.jms.constants.QueueConstanst Class
 		 */
 		//instantiate global Listener
 		IQueueListener listener = new QueueListenerImpl();

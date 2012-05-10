@@ -237,8 +237,6 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 					System.out.println("[GUI_Notification] New Car written");
 					Car car = (Car) entry.getValue();
 					if(car.isComplete()){
-						//TODO show this car in the gui table.
-						//finishedGoodsTableModel.
 						updateCar(car);
 					} else {
 						addCar(car);

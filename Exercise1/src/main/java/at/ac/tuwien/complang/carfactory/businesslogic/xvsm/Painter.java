@@ -21,7 +21,7 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 public class Painter extends SpaceUtil {
 
 	/**
-	 * TODO:
+	 * Workflow:
 	 * 1. Connect to the Mozard space
 	 * 2. Load a Body (which is not yet painted) or an
 	 *    assembled car (which is not yet painted)

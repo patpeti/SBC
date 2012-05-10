@@ -68,7 +68,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 				//2. Car is painted but not completed (from the paintedCarTopic)
 				//3. Car is painted and completed (from the finishedCarTopic). This case has no representation in the GUI yet!
 			} else {
-				// TODO: The only ICarPart object we can receive which is not a car, 
+				// The only ICarPart object we can receive which is not a car, 
 				// is a painted body, in this case, we need to update the body in 
 				// the spaceDataTableModel.
 				Body body = (Body) part;
