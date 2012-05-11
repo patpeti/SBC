@@ -193,6 +193,11 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		finishedGoodsTableModel.updateRow(car.getObjectData());
 		finishedGoodsTable.validate();
 	}
+	
+	public void addOrUpdateCar(Car car) {
+		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
+		finishedGoodsTable.validate();
+	}
 
     class CreationListener implements ActionListener {
 
@@ -236,11 +241,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 				if (entry.getValue() instanceof Car) {
 					System.out.println("[GUI_Notification] New Car written");
 					Car car = (Car) entry.getValue();
-					if(car.isComplete()){
-						updateCar(car);
-					} else {
-						addCar(car);
-					}
+					addOrUpdateCar(car);
 				} else if (entry.getValue() instanceof ICarPart) { //its not a car but still a carpart
 					ICarPart part = (ICarPart) entry.getValue();
 					spaceDataTableModel.addRow(part.getObjectData());

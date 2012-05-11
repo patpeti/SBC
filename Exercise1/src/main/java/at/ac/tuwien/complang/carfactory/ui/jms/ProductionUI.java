@@ -173,7 +173,6 @@ public class ProductionUI extends JFrame implements IQueueObserver {
 	
 	public void addOrUpdateCar(Car car) {
 		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
-		//finishedGoodsTableModel.updateRow(car.getObjectData());
 		finishedGoodsTable.validate();
 	}
 

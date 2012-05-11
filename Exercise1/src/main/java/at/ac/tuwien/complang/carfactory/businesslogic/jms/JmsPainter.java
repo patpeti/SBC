@@ -67,19 +67,15 @@ public class JmsPainter extends JmsAbstractWorker {
 		//the assembly loop never terminates. As long as the assembler is running, it will paint cars and bodys.
 		while(true) {
 			try {
-				//Try to get a car from the car Queue (one which is not yet painted)
-				
 				ObjectMessage objectMessage = null;
 				while(objectMessage == null) {
-					//System.out.println("LOOOPING... POLLING...");
+					//Try to get a car from the car Queue (one which is not yet painted)
 					objectMessage = (ObjectMessage) carConsumer.receive(1);
 					if(objectMessage == null) {
-						objectMessage = (ObjectMessage) bodyConsumer.receive(1); //ich glaube der painter bleibt hier haengen, wenn es keine bodies gibt...und wenn du auch ein timeout einstellest?
-						//dann gibt es diese nullpointer exception...
+						objectMessage = (ObjectMessage) bodyConsumer.receive(1);
 					}
 				}
-				//das problem bei der loesung ist, das man so immer am POLLEN ist, im loop, das ist nicht besonders effizient!!!!, im XVSM haben wird das so gemacht!!!
-				Serializable object = (Serializable) objectMessage.getObject(); //wenn ich den timeout verwende, dann ist das objectMessage null, man koennte es so machen...
+				Serializable object = (Serializable) objectMessage.getObject();
 				if(object instanceof Car) {
 					Car car = (Car) object;
 					if(car.getPaintState() == PaintState.PAINTED) {
