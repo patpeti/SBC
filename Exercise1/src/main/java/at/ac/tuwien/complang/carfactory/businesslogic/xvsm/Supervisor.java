@@ -51,20 +51,17 @@ public class Supervisor{
 	
 	private void readPaintedCar(){
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(FifoCoordinator.newSelector(1));
+		selectors.add(FifoCoordinator.newSelector());
 		selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
-		//selectors.add(AnyCoordinator.newSelector(1));
+		selectors.add(AnyCoordinator.newSelector(1));
 		List<ICarPart> parts = null;
 		try {
 			parts = capi.take(container, selectors, RequestTimeout.INFINITE, null);
-			System.out.println("Car taken");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
 		if(parts != null){
-			System.out.println("size: "+parts.size());
 			Car c = (Car) parts.get(0);
-			
 			c.setComplete(pid, true);
 			writeCar(c);
 			System.out.println("Supervised car " + c.getId());
@@ -87,10 +84,10 @@ public class Supervisor{
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
 	
-		
+		this.container = null;
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
-			//coords.add(new AnyCoordinator());
+			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());						
