@@ -62,7 +62,9 @@ public class Supervisor{
 			e.printStackTrace();
 		}
 		if(parts != null){
+			System.out.println("size: "+parts.size());
 			Car c = (Car) parts.get(0);
+			
 			c.setComplete(pid, true);
 			writeCar(c);
 			System.out.println("Supervised car " + c.getId());
@@ -85,7 +87,7 @@ public class Supervisor{
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
 	
-		this.container = null;
+		
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			//coords.add(new AnyCoordinator());
