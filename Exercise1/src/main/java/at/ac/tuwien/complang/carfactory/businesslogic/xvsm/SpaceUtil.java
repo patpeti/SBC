@@ -69,7 +69,7 @@ public class SpaceUtil{
 
 	public List<ICarPart> takeCarPart(String selectorLabel, Integer amount, long timeout, TransactionReference tx){
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
+		//selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		List<ICarPart> parts = null;
 		

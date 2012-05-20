@@ -33,7 +33,7 @@ public class MotorFactory extends AbstractFactory {
 		
 		System.out.println("writing Motor into space...");
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.MOTOR.toString()));
+		//cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.MOTOR.toString()));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+motor.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(motor,cordinator));
