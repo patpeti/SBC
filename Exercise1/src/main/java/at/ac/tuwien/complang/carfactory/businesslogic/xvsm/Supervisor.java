@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -22,18 +21,13 @@ import org.mozartspaces.core.MzsConstants;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
-import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
-import org.mozartspaces.notifications.NotificationManager;
-import org.mozartspaces.notifications.Operation;
 
-import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 
-public class Supervisor implements NotificationListener{
+public class Supervisor{
 
 	/**
 	 * Workflow:
@@ -45,7 +39,6 @@ public class Supervisor implements NotificationListener{
 	
 	private Capi capi;
 	private ContainerReference container;
-	private NotificationManager notifMgr;
 	private static long pid = 0;
 	
 	public Supervisor(long id) {
@@ -85,20 +78,11 @@ public class Supervisor implements NotificationListener{
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-		try {
-			// Evoke a notification
-			notifMgr.createNotification(container, this, Operation.WRITE);
-		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-		notifMgr = new NotificationManager(core);		
 	
 		this.container = null;
 		try {
@@ -123,9 +107,5 @@ public class Supervisor implements NotificationListener{
 		
 	}
 
-	@Override
-	public void entryOperationFinished(Notification source,
-			Operation operation, List<? extends Serializable> entries) {
-		// TODO Auto-generated method stub
-	}
+	
 }

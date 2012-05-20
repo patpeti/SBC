@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.List;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.CountNotMetException;
-import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.Selector;
@@ -24,16 +22,13 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
-import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
-import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
-public class SpaceUtil implements NotificationListener {
+public class SpaceUtil{
 
 	private Capi capi;
 	private ContainerReference container;
@@ -111,14 +106,6 @@ public class SpaceUtil implements NotificationListener {
 		}
 	}
 
-	@Override
-	public void entryOperationFinished(
-		Notification source,
-		Operation operation,
-		List<? extends Serializable> entries)
-	{
-		//System.out.println("[Notification]");
-	}
 	
 	public Capi getCapi() {
 		return capi;

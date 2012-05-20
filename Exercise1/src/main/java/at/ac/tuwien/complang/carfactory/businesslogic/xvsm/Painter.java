@@ -9,7 +9,6 @@ import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
-import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Body;
@@ -82,10 +81,7 @@ public class Painter extends SpaceUtil {
 			cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
 			getCapi().write(getContainer(), new Entry(b,cordinator));
 			System.out.println("[Painter] Body " + b.getId() + " Painted and written in space");
-			getNotifMgr().createNotification(getContainer(), this, Operation.WRITE);
 		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -98,10 +94,7 @@ public class Painter extends SpaceUtil {
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			getCapi().write(getContainer(), new Entry(c,cordinator));
 			System.out.println("[Painter] Car " + c.getId() + " painted and written in space");
-			getNotifMgr().createNotification(getContainer(), this, Operation.WRITE);
 		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

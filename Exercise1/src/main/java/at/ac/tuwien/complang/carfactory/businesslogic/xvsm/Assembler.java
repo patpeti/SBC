@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
-import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
@@ -50,11 +47,10 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 
-public class Assembler implements NotificationListener {
+public class Assembler{
 	
 	private Capi capi;
 	private ContainerReference container;
-	private NotificationManager notifMgr;
 	public static long pid = 0;
 	public static long carId = 100000;
 
@@ -116,10 +112,7 @@ public class Assembler implements NotificationListener {
 			cordinator.add(FifoCoordinator.newCoordinationData());
 			capi.write(container, new Entry(c,cordinator));
 			System.out.println("[Assembler]*Car " + c.getId() + " created");
-			notifMgr.createNotification(container, this, Operation.WRITE);
 		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -137,7 +130,6 @@ public class Assembler implements NotificationListener {
 			operations.add(Operation.DELETE);
 			operations.add(Operation.TAKE);
 			operations.add(Operation.WRITE);
-			notifMgr.createNotification(container, this, operations, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -159,7 +151,6 @@ public class Assembler implements NotificationListener {
 			operations.add(Operation.DELETE);
 			operations.add(Operation.TAKE);
 			operations.add(Operation.WRITE);
-			notifMgr.createNotification(container, this, operations, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -194,7 +185,7 @@ public class Assembler implements NotificationListener {
 			operations.add(Operation.DELETE);
 			operations.add(Operation.TAKE);
 			operations.add(Operation.WRITE);
-			notifMgr.createNotification(container, this, operations, null, null);
+			//notifMgr.createNotification(container, this, operations, null, null);
 			System.out.println("[Assembler] *Body taken");
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
@@ -206,7 +197,7 @@ public class Assembler implements NotificationListener {
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-		notifMgr = new NotificationManager(core);		
+		//notifMgr = new NotificationManager(core);		
 		this.container = null;
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
@@ -272,14 +263,7 @@ public class Assembler implements NotificationListener {
 		}
 	}
 
-	@Override
-	public void entryOperationFinished(
-			Notification source,
-			Operation operation,
-			List<? extends Serializable> entries)
-	{
-		//System.out.println("[Notification]");
-	}
+	
 
 	public void doWork() {
 		while(true){
