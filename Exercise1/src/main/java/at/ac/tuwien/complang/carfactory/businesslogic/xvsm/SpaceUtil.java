@@ -24,6 +24,7 @@ import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.notifications.NotificationManager;
 
+import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
@@ -31,8 +32,8 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 public class SpaceUtil{
 
 	private Capi capi;
-	private ContainerReference container;
-	private NotificationManager notifMgr;
+	private ContainerReference CarContainer;
+	private ContainerReference BodyContainer;
 
 	public SpaceUtil(){
 		initSpace();
@@ -41,9 +42,8 @@ public class SpaceUtil{
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-		notifMgr = new NotificationManager(core);		
 
-		this.container = null;
+		
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
@@ -51,7 +51,8 @@ public class SpaceUtil{
 			coords.add(new KeyCoordinator());
 
 			try {
-				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
@@ -71,6 +72,15 @@ public class SpaceUtil{
 		selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		List<ICarPart> parts = null;
+		
+		ContainerReference container  = null;
+		if(selectorLabel.equals(CarPartType.BODY.toString())){
+			container = BodyContainer;
+		}else{
+			container = CarContainer;
+		}
+			
+		
 		try {
 			if (timeout == 0) {
 				try {
@@ -111,11 +121,11 @@ public class SpaceUtil{
 		return capi;
 	}
 	
-	public ContainerReference getContainer() {
-		return container;
+	public ContainerReference getBodyContainer() {
+		return BodyContainer;
+	}
+	public ContainerReference getCarContainer() {
+		return CarContainer;
 	}
 	
-	public NotificationManager getNotifMgr() {
-		return notifMgr;
-	}
 }

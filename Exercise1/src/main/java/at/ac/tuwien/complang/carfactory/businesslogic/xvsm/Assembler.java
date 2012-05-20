@@ -50,7 +50,11 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 public class Assembler{
 	
 	private Capi capi;
-	private ContainerReference container;
+	private ContainerReference CarContainer;
+	private ContainerReference MotorContainer;
+	private ContainerReference WheelContainer;
+	private ContainerReference BodyContainer;
+	
 	public static long pid = 0;
 	public static long carId = 100000;
 
@@ -110,7 +114,7 @@ public class Assembler{
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 			cordinator.add(FifoCoordinator.newCoordinationData());
-			capi.write(container, new Entry(c,cordinator));
+			capi.write(CarContainer, new Entry(c,cordinator));
 			System.out.println("[Assembler]*Car " + c.getId() + " created");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -175,7 +179,7 @@ public class Assembler{
 			query = new Query().filter(Matchmakers.and(    (Matchmakers.or(matchmakers.toArray(array))),   Property.forName("type").equalTo(CarPartType.BODY)   ));
 			selectors.add(QueryCoordinator.newSelector(query));
 			List<ICarPart> bodies = null;
-			bodies = capi.take(container, selectors, RequestTimeout.INFINITE, tx);
+			bodies = capi.take(BodyContainer, selectors, RequestTimeout.INFINITE, tx);
 			//set body
 			if(bodies != null)
 				this.body = (Body) bodies.get(0);
@@ -198,7 +202,7 @@ public class Assembler{
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
 		//notifMgr = new NotificationManager(core);		
-		this.container = null;
+		
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
@@ -207,7 +211,11 @@ public class Assembler{
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());
 			try {
-				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
@@ -226,6 +234,23 @@ public class Assembler{
 		selectors.add(AnyCoordinator.newSelector(amount));
 		
 		List<ICarPart> parts = null;
+		ContainerReference container = null;
+		switch (type) {
+		case WHEEL:
+			container = WheelContainer;
+			break;
+		case BODY:
+			container = BodyContainer;
+			break;
+		case CAR:
+			container = CarContainer;
+			break;
+		case MOTOR:
+			container = MotorContainer;
+			break;
+		default:
+			break;
+		}
 		
 		try {
 			if (timeout == 0) {

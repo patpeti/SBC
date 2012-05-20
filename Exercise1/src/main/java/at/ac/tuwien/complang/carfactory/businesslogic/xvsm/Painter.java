@@ -79,7 +79,7 @@ public class Painter extends SpaceUtil {
 			String label =  SpaceLabels.PAINTEDBODY;
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
-			getCapi().write(getContainer(), new Entry(b,cordinator));
+			getCapi().write(getBodyContainer(), new Entry(b,cordinator));
 			System.out.println("[Painter] Body " + b.getId() + " Painted and written in space");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
@@ -92,7 +92,7 @@ public class Painter extends SpaceUtil {
 			String label =  SpaceLabels.PAINTEDCAR;
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
-			getCapi().write(getContainer(), new Entry(c,cordinator));
+			getCapi().write(getCarContainer(), new Entry(c,cordinator));
 			System.out.println("[Painter] Car " + c.getId() + " painted and written in space");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();

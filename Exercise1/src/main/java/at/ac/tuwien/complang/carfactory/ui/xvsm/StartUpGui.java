@@ -27,12 +27,15 @@ public class StartUpGui {
 	
 	
 	public static void main(String[] args) {
-		ContainerReference container;
+		
 		//2. Create an embedded instance of mozart spaces and initialize a container on port 9876
 		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
 		NotificationManager notifMgr = new NotificationManager(core);
-		container = null;
+		ContainerReference motorContainer = null;
+		ContainerReference wheelContainer = null;
+		ContainerReference carContainer = null;
+		ContainerReference bodyContainer = null;
 		try {
 			//List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
 			List<Coordinator> coords = new ArrayList<Coordinator>();
@@ -43,13 +46,14 @@ public class StartUpGui {
 			List<Coordinator> optionalCoords = new ArrayList<Coordinator>();
 			optionalCoords.add(new FifoCoordinator());
 			try {
-				container = capi.createContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
-				//container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				motorContainer = capi.createContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				carContainer = capi.createContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				bodyContainer = capi.createContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
 			}
-			//container = capi.createContainer();
 		} catch (MzsCoreException e) {
 			System.out.println("Error: Could not initialize Space");
 			System.exit(1);
@@ -58,7 +62,12 @@ public class StartUpGui {
 		//insatnciate globale Listener
 		ISpaceListener listener = new SpaceListenerImpl();
 		//1. Start the User interface
-		ProductionUI gui = new ProductionUI(capi, container, listener, notifMgr);
+		List<ContainerReference> containers = new ArrayList<ContainerReference>();
+		containers.add(bodyContainer);
+		containers.add(carContainer);
+		containers.add(motorContainer);
+		containers.add(wheelContainer);
+		ProductionUI gui = new ProductionUI(capi, containers, listener, notifMgr);
 		listener.setSpaceObserver(gui);
 	}
 }

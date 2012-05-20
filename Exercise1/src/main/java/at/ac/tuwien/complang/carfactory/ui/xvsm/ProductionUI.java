@@ -48,22 +48,26 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
 	private Capi capi;
-	private ContainerReference cref;
+	private List<ContainerReference> crefs;
 	private ISpaceListener listener;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
-	public ProductionUI(Capi capi, ContainerReference cref, ISpaceListener listener, NotificationManager notifMgr) {
+	public ProductionUI(Capi capi, List<ContainerReference> crefs, ISpaceListener listener, NotificationManager notifMgr) {
 		this.capi = capi;
-		this.cref = cref;
+		this.crefs = crefs;
 		Set<Operation> operations = new HashSet<Operation>();
 		operations.add(Operation.DELETE);
 		operations.add(Operation.TAKE);
 		operations.add(Operation.WRITE);
 
 		try {
-			notifMgr.createNotification(cref, this, operations, null, null);
+			notifMgr.createNotification(crefs.get(0), this, operations, null, null);
+			notifMgr.createNotification(crefs.get(1), this, operations, null, null);
+			notifMgr.createNotification(crefs.get(2), this, operations, null, null);
+			notifMgr.createNotification(crefs.get(3), this, operations, null, null);
+			
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -205,21 +209,21 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, cref, listener);
+            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, crefs.get(0), listener);
             	if(!bodyFactory.isRunning()) {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
             	}
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, cref, listener);
+            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, crefs.get(3), listener);
             	if(!wheelFactory.isRunning()) {
             		wheelFactory.init(value);
             		wheelFactory.start();
             	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, cref, listener);
+            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, crefs.get(2), listener);
             	if(!motorFactory.isRunning()) {
 	            	motorFactory.init(value);
 	            	motorFactory.start();
