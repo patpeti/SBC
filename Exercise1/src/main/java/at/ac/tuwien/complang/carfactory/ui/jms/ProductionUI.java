@@ -17,15 +17,13 @@ import javax.swing.JTable;
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
-import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
-import at.ac.tuwien.complang.carfactory.application.jms.enums.QueueChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
-import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueObserver;
+import at.ac.tuwien.complang.carfactory.ui.jms.listener.IFactoryData;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-public class ProductionUI extends JFrame implements IQueueObserver {
+public class ProductionUI extends JFrame implements IFactoryData {
 	
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -136,7 +134,7 @@ public class ProductionUI extends JFrame implements IQueueObserver {
         this.add(padding, BorderLayout.CENTER);
 	}
 
-	public void addPart(ICarPart carPart, SpaceChangeType type) {
+	public void addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
 		spaceTable.validate();
@@ -198,10 +196,4 @@ public class ProductionUI extends JFrame implements IQueueObserver {
             }
         }
     }
-
-	@Override
-	public void onQueueChange(ICarPart carpart, QueueChangeType changeType) {
-		System.out.println("#GUI.onQueueChange# : CarPart is created");
-		spaceDataTableModel.addRow(carpart.getObjectData());
-	}
 }

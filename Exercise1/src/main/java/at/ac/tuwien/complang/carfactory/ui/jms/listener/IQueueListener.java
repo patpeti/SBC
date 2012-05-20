@@ -4,6 +4,6 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 public interface IQueueListener {
 	void onObjectWrittenInQueue(ICarPart carPart);
-	void setQueueObserver(IQueueObserver gui);
+	void setQueueObserver(IFactoryData gui);
 	void connectToQueues();
 }

@@ -9,18 +9,24 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.jms.TopicSubscriber;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
-import at.ac.tuwien.complang.carfactory.application.jms.enums.QueueChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
+/**
+ * The QueueListener connects to all Queues and Topics
+ * that are relevant for the UI and listens for incoming
+ * messages. If there is a relevant message the Listener will
+ * inform the UI by invoking the necessary update methods.
+ * 
+ * @author Sebastian Geiger
+ */
 public class QueueListenerImpl implements IQueueListener, MessageListener {
 	
 	//Fields
@@ -28,15 +34,15 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	private Connection connection;
 	private Topic paintedBodyTopic, carTopic, paintedCarTopic;
 	private Queue finishedCarQueue;
-	private IQueueObserver gui;
+	private IFactoryData gui;
 	
 	public QueueListenerImpl() { }
 
 	public void onObjectWrittenInQueue(ICarPart carPart) {
-		gui.onQueueChange(carPart, QueueChangeType.WRITE);
+		gui.addPart(carPart);
 	}
 
-	public void setQueueObserver(IQueueObserver gui) {
+	public void setQueueObserver(IFactoryData gui) {
 		this.gui = gui;
 	}
 
