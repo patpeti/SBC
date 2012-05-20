@@ -56,28 +56,25 @@ public class SpaceDataTableModel extends AbstractTableModel {
 	public synchronized void addRow(Object[] dates) {
 		data.add(dates);
 		int row = data.indexOf(dates);
-		for(int column = 0; column < dates.length; column++) {
-			fireTableCellUpdated(row, column);
-		}
 		fireTableRowsInserted(row, row);
 	}
 
 	public synchronized void deleteRow(Object[] objectData) {
 		for(Object[] object : data) {
-			if(object[0] == objectData[0]) { //compare the unique global space id at position 0 of the data array
+			if(object[0].equals(objectData[0])) { //compare the unique global space id at position 0 of the data array
 				int index = data.indexOf(object);
 				data.remove(object);
 				fireTableRowsDeleted(index, index);
 				return;
 			}
 		}
-		System.out.println("Could not remove part from space. ID: " + objectData[0]);
+		System.out.println("Could not remove part from table model. ID: " + objectData[0]);
 	}
 	
 	public synchronized void updateRow(Object[] objectData) {
 		int index = -1;
 		for(Object[] object : data) {
-			if(object[0] == objectData[0]) {
+			if(object[0].equals(objectData[0])) {
 				index = data.indexOf(object);
 				break;
 			}
