@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
+import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.QueueListenerImpl;
 
@@ -19,7 +20,7 @@ public class StartUpJmsGui {
 		listener.connectToQueues();
 		
 		//1. Start the User interface
-		ProductionUI gui = new ProductionUI(listener);
+		ProductionUI gui = new ProductionUI(JmsFactoryFacade.getInstance(listener));
 		listener.setQueueObserver(gui);
 	}
 }

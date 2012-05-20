@@ -1,12 +1,18 @@
 package at.ac.tuwien.complang.carfactory.application.jms;
 
+import at.ac.tuwien.complang.carfactory.application.IFactory;
+import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public abstract class JmsAbstractFactory {
+public abstract class JmsAbstractFactory implements IFactory, IProducer {
 
-	private IQueueListener listener;
 	public static long carPartId = 1;
-	
+	//Fields
+	private int count;
+	private boolean running = false;
+	private Thread thread;
+	private IQueueListener listener;
+
 	public JmsAbstractFactory() {
 		super();
 	}
@@ -18,7 +24,60 @@ public abstract class JmsAbstractFactory {
 	public void setListener(IQueueListener listener) {
 		this.listener = listener;
 	}
-	
-	
+
+	public void start() {
+		this.running = true;
+		//start the timer task and produce bodies
+		this.thread.start();
+	}
+
+	public void stop() {
+		this.count = 0;
+		this.thread.interrupt();
+		this.running = false;
+	}
+
+	public void init(int count) throws IllegalStateException {
+		if(running) {
+			throw new IllegalStateException("Factory must be stopped first");
+		}
+
+		this.count = count;
+
+		//Prepare TimerTask
+		thread = new Thread(new Producer());
+	}
+
+	class Producer implements Runnable {
+
+		public void run() {
+			int originalCount = count;
+			int delay = 0;
+			int total = 0;
+			while(count > 0) {
+				//The producer sleeps for a random period between 1 and 3 seconds
+				delay = (int) (Math.random() * timeInSec()) + 1;
+				total += delay;
+				int millisecondsPerSecond = 1000;
+				try {
+					Thread.sleep(delay * millisecondsPerSecond);
+				} catch (InterruptedException e) {
+					System.err.println("Producer was interrupted.");
+				}
+				//Produce a part with the factory and decrease the counter
+				count--;
+				produce();
+				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
+			}
+			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
+			JmsAbstractFactory.this.running = false;
+		}
+
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
 
 }

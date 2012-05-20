@@ -6,6 +6,8 @@ import java.util.Map;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 
+import at.ac.tuwien.complang.carfactory.application.IFacade;
+import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.xvsm.BodyFactory;
 import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
@@ -14,95 +16,56 @@ import at.ac.tuwien.complang.carfactory.application.xvsm.WheelFactory;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
-public class JmsFactoryFacade {
+public class JmsFactoryFacade implements IFacade {
 
 	//Static Fields
-	private static Map<ProducerType, JmsFactoryFacade> factories;
-	private static long next_id = 0;
-	
-	static {
-		factories = new Hashtable<ProducerType, JmsFactoryFacade>();
-	}
-	
+	private static final String INITIALIZATION_ERROR = "JMS FactoryFacade has not been initialized " +
+			"with the proper queue listener.\n" +
+			"You must call the initialization methods " +
+			"and pass queue listener reference.";
+	private static IFacade facade;
+
 	//Fields
-	private int count;
-	private boolean running = false;
-	private Thread thread;
-	private IProducer producer;
+	private Map<ProducerType, IFactory> factories;
+	private long next_id = 0;
+	private IQueueListener listener;
 	
-	private JmsFactoryFacade(ProducerType type, IQueueListener listener) {
-		next_id++;
-		switch(type) {
-			case BODY: producer = new JmsBodyFactory(next_id, listener);	break;
-			case WHEEL: producer = new JmsWheelFactory(next_id, listener); break;
-			case MOTOR: producer = new JmsMotorFactory(next_id, listener); break;
-			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
-		}
+	private JmsFactoryFacade(IQueueListener listener) {
+		this.listener = listener;
+		factories = new Hashtable<ProducerType, IFactory>();
 	}
 	
-	public static JmsFactoryFacade getInstance(ProducerType type, IQueueListener listener) {
+	public static IFacade getInstance(IQueueListener listener) {
+		if(JmsFactoryFacade.facade == null) {
+			synchronized (JmsFactoryFacade.class) {
+				if(JmsFactoryFacade.facade == null) {
+					JmsFactoryFacade.facade = new JmsFactoryFacade(listener);
+				}
+			}
+		}
+		return JmsFactoryFacade.facade;
+	}
+	
+	@Override
+	public IFactory getInstance(ProducerType type) {
+		if(listener == null) {
+			throw new RuntimeException(INITIALIZATION_ERROR);
+		}
 		if(factories.get(type) == null) {
-			synchronized(JmsFactoryFacade.class) {
+			synchronized(factories) {
 				if(factories.get(type) == null) {
-					JmsFactoryFacade.factories.put(type, new JmsFactoryFacade(type, listener));
+					next_id++;
+					IFactory factory;
+					switch(type) {
+						case BODY: factory = new JmsBodyFactory(next_id, listener);	break;
+						case WHEEL: factory = new JmsWheelFactory(next_id, listener); break;
+						case MOTOR: factory = new JmsMotorFactory(next_id, listener); break;
+						default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
+					}
+					factories.put(type, factory);
 				}
 			}
 		}
 		return factories.get(type);
 	}
-	
-	public void start() {
-		this.running = true;
-		//start the timer task and produce bodies
-		this.thread.start();
-	}
-	
-	public void stop() {
-		this.count = 0;
-		this.thread.interrupt();
-		this.running = false;
-	}
-	
-	public void init(int count) throws IllegalStateException {
-		if(running) {
-			throw new IllegalStateException("Factory must be stopped first");
-		}
-		
-		this.count = count;
-		
-		//Prepare TimerTask
-		thread = new Thread(new Producer());
-	}
-	
-	class Producer implements Runnable {
-
-		public void run() {
-			int originalCount = count;
-			int delay = 0;
-			int total = 0;
-			while(count > 0) {
-				//The producer sleeps for a random period between 1 and 3 seconds
-				delay = (int) (Math.random() * producer.timeInSec()) + 1;
-				total += delay;
-				int millisecondsPerSecond = 1000;
-				try {
-					Thread.sleep(delay * millisecondsPerSecond);
-				} catch (InterruptedException e) {
-					System.err.println("Producer was interrupted.");
-				}
-				//Produce a part with the factory and decrease the counter
-				count--;
-				producer.produce();
-				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
-			}
-			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
-			JmsFactoryFacade.this.running = false;
-		}
-
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
 }

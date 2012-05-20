@@ -20,6 +20,8 @@ import javax.swing.JTable;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import at.ac.tuwien.complang.carfactory.application.IFacade;
+import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
@@ -40,14 +42,14 @@ public class ProductionUI extends JFrame implements IQueueObserver {
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
 
-	private IQueueListener listener;
+	private IFacade factoryFacade;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
-	public ProductionUI(IQueueListener listener) {
+	public ProductionUI(IFacade factoryFacade) {
 		tableContainer = new JPanel(new GridLayout(2, 1));
-		this.listener = listener;
+		this.factoryFacade = factoryFacade;
         showUI();
     }
 
@@ -182,7 +184,7 @@ public class ProductionUI extends JFrame implements IQueueObserver {
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	JmsFactoryFacade bodyFactory = JmsFactoryFacade.getInstance(ProducerType.BODY, listener);
+            	IFactory bodyFactory = factoryFacade.getInstance(ProducerType.BODY);
             	if(!bodyFactory.isRunning()) {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
@@ -190,14 +192,14 @@ public class ProductionUI extends JFrame implements IQueueObserver {
 
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	JmsFactoryFacade wheelFactory = JmsFactoryFacade.getInstance(ProducerType.WHEEL, listener);
+            	IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
             	if(!wheelFactory.isRunning()) {
             		wheelFactory.init(value);
             		wheelFactory.start();
             	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	JmsFactoryFacade motorFactory = JmsFactoryFacade.getInstance(ProducerType.MOTOR, listener);
+            	IFactory motorFactory = factoryFacade.getInstance(ProducerType.MOTOR);
             	if(!motorFactory.isRunning()) {
 	            	motorFactory.init(value);
 	            	motorFactory.start();

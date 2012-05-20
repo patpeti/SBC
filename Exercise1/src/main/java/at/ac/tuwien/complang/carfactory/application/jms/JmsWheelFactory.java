@@ -13,7 +13,7 @@ import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public class JmsWheelFactory extends JmsAbstractFactory implements IProducer  {
+public class JmsWheelFactory extends JmsAbstractFactory {
 
 	//Static Fields
 	private static final int TIME_IN_SEC = 3;
