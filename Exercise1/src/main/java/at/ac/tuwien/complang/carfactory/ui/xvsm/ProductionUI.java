@@ -54,7 +54,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
-	public ProductionUI(Capi capi, List<ContainerReference> crefs, ISpaceListener listener, NotificationManager notifMgr) {
+	public ProductionUI(Capi capi, ContainerReference cref, NotificationManager notifMgr) {
 		this.capi = capi;
 		this.crefs = crefs;
 		Set<Operation> operations = new HashSet<Operation>();
@@ -74,7 +74,6 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 			e.printStackTrace();
 		}
 		tableContainer = new JPanel(new GridLayout(2, 1));
-		this.listener = listener;
         showUI();
     }
 
@@ -209,21 +208,21 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
             String command = e.getActionCommand();
             if(command.equals("body")) {
             	int value = (Integer) bodyCountSpinner.getValue();
-            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, crefs.get(0), listener);
+            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, crefs.get(0));
             	if(!bodyFactory.isRunning()) {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
             	}
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
-            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, crefs.get(3), listener);
+            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, crefs.get(3));
             	if(!wheelFactory.isRunning()) {
             		wheelFactory.init(value);
             		wheelFactory.start();
             	}
             } else if(command.equals("motor")) {
             	int value = (Integer) motorCountSpinner.getValue();
-            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, crefs.get(2), listener);
+            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, crefs.get(2));
             	if(!motorFactory.isRunning()) {
 	            	motorFactory.init(value);
 	            	motorFactory.start();
@@ -238,10 +237,9 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		Operation operation,
 		List<? extends Serializable> entries) 
 	{
-		System.out.println("[GUI_Notification]#######################################################");
-		System.out.println("opname: "+ operation.name());
+		System.out.println("[XVSM Notification: " + operation.name() + "]");
 		if(operation.name().equals("WRITE")) {
-			for(Entry entry : (List<Entry>) entries){
+			for(Entry entry : (List<Entry>) entries) {
 				if (entry.getValue() instanceof Car) {
 					System.out.println("[GUI_Notification] New Car written");
 					Car car = (Car) entry.getValue();
@@ -253,7 +251,6 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 			}
 		} else if(operation.name().equals("TAKE")) {
 			for(ICarPart entry : (List<ICarPart>) entries) {
-				System.out.println("TAKE");
 				removePart(entry);
 			}
 		}

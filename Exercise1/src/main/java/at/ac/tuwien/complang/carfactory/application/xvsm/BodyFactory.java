@@ -22,10 +22,9 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 	//Fields
 	private long id; //The ID of this producer
 
-	public BodyFactory(long id, Capi capi, ContainerReference cref, ISpaceListener listener) {
+	public BodyFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
 		this.id = id;
-		setListener(listener);
 	}
 
 	
@@ -42,8 +41,6 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		try {
 			getCapi().write(getCref(), new Entry(body, cordinator));
 			System.out.println("Body written in space sucessfully");
-			//notify listener
-			getListener().onObjectWrittenInSpace(body);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

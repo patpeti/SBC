@@ -58,16 +58,13 @@ public class StartUpGui {
 			System.out.println("Error: Could not initialize Space");
 			System.exit(1);
 		}
-		
-		//insatnciate globale Listener
-		ISpaceListener listener = new SpaceListenerImpl();
+
 		//1. Start the User interface
 		List<ContainerReference> containers = new ArrayList<ContainerReference>();
 		containers.add(bodyContainer);
 		containers.add(carContainer);
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
-		ProductionUI gui = new ProductionUI(capi, containers, listener, notifMgr);
-		listener.setSpaceObserver(gui);
+		ProductionUI gui = new ProductionUI(capi, containers, notifMgr);
 	}
 }

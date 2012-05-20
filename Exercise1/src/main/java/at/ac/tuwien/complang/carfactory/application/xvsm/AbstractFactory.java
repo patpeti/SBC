@@ -5,11 +5,10 @@ import org.mozartspaces.core.ContainerReference;
 
 import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
-public abstract class AbstractFactory implements IProducer{
+public abstract class AbstractFactory implements IProducer {
 
 	private Capi capi;
 	private ContainerReference cref;
-	private ISpaceListener listener;
 	public static long carPartId = 1;
 	
 	public AbstractFactory(Capi capi, ContainerReference cref) {
@@ -33,15 +32,4 @@ public abstract class AbstractFactory implements IProducer{
 	public void setCref(ContainerReference cref) {
 		this.cref = cref;
 	}
-
-	public ISpaceListener getListener() {
-		return listener;
-	}
-
-	public void setListener(ISpaceListener listener) {
-		this.listener = listener;
-	}
-	
-	
-
 }

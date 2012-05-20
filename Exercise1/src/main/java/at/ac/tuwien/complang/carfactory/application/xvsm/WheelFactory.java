@@ -22,10 +22,9 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 	//Fields
 	private long id; //The ID of this producer
 
-	public WheelFactory(long id, Capi capi, ContainerReference cref, ISpaceListener listener) {
+	public WheelFactory(long id, Capi capi, ContainerReference cref) {
 		super(capi,cref);
 		this.id = id;
-		setListener(listener);
 	}
 
 	public void produce() {
@@ -38,9 +37,7 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 		cordinator.add(KeyCoordinator.newCoordinationData(""+wheel.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(wheel,cordinator));
-			System.out.println("wheel written in space sucessfully");
-			//notify listener
-			getListener().onObjectWrittenInSpace(wheel);
+			System.out.println("Wheel written in space sucessfully");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

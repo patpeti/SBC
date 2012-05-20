@@ -28,21 +28,21 @@ public class FactoryFacade {
 	private Thread thread;
 	private IProducer producer;
 	
-	private FactoryFacade(ProducerType type, Capi capi, ContainerReference cref, ISpaceListener listener) {
+	private FactoryFacade(ProducerType type, Capi capi, ContainerReference cref) {
 		next_id++;
 		switch(type) {
-			case BODY: producer = new BodyFactory(next_id, capi, cref,listener);	break;
-			case WHEEL: producer = new WheelFactory(next_id, capi, cref, listener); break;
-			case MOTOR: producer = new MotorFactory(next_id, capi, cref, listener); break;
+			case BODY: producer = new BodyFactory(next_id, capi, cref);	break;
+			case WHEEL: producer = new WheelFactory(next_id, capi, cref); break;
+			case MOTOR: producer = new MotorFactory(next_id, capi, cref); break;
 			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
 		}
 	}
 	
-	public static FactoryFacade getInstance(ProducerType type, Capi capi, ContainerReference cref, ISpaceListener listener) {
+	public static FactoryFacade getInstance(ProducerType type, Capi capi, ContainerReference cref) {
 		if(factories.get(type) == null) {
 			synchronized(FactoryFacade.class) {
 				if(factories.get(type) == null) {
-					FactoryFacade.factories.put(type, new FactoryFacade(type, capi, cref, listener));
+					FactoryFacade.factories.put(type, new FactoryFacade(type, capi, cref));
 				}
 			}
 		}
