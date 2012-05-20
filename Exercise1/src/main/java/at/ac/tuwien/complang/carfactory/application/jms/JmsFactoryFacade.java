@@ -3,18 +3,10 @@ package at.ac.tuwien.complang.carfactory.application.jms;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.mozartspaces.core.Capi;
-import org.mozartspaces.core.ContainerReference;
-
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
-import at.ac.tuwien.complang.carfactory.application.xvsm.BodyFactory;
-import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
-import at.ac.tuwien.complang.carfactory.application.xvsm.MotorFactory;
-import at.ac.tuwien.complang.carfactory.application.xvsm.WheelFactory;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
-import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
 public class JmsFactoryFacade implements IFacade {
 

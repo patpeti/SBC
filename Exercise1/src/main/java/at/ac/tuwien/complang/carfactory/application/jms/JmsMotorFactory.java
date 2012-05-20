@@ -1,7 +1,6 @@
 package at.ac.tuwien.complang.carfactory.application.jms;
 
 import javax.jms.Connection;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -10,7 +9,6 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
-import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 

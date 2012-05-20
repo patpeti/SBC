@@ -3,7 +3,6 @@ package at.ac.tuwien.complang.carfactory.ui.xvsm;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,9 +16,9 @@ import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
-import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 

@@ -9,7 +9,6 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
-import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 

@@ -17,7 +17,6 @@ import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
-import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 
 public class JmsPainter extends JmsAbstractWorker {
 

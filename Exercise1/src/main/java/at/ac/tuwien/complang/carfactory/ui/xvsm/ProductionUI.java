@@ -24,7 +24,6 @@ import org.mozartspaces.notifications.Operation;
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
-import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.IFactoryData;

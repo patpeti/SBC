@@ -13,7 +13,6 @@ import org.mozartspaces.core.MzsCoreException;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
-import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
 public class WheelFactory extends AbstractFactory {
 

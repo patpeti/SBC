@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsSupervisor;
 
 public class StartUpJmsSupervisor {
