@@ -28,6 +28,8 @@ import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import at.ac.tuwien.complang.carfactory.application.IFacade;
+import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
@@ -47,35 +49,17 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	//Fields
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
-	private Capi capi;
 	private List<ContainerReference> crefs;
-	private ISpaceListener listener;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
+	private IFacade factoryFacade;
 
-	public ProductionUI(Capi capi, List<ContainerReference> crefs, NotificationManager notifMgr) {
-		this.capi = capi;
-		this.crefs = crefs;
-		Set<Operation> operations = new HashSet<Operation>();
-		operations.add(Operation.DELETE);
-		operations.add(Operation.TAKE);
-		operations.add(Operation.WRITE);
-
-		try {
-			notifMgr.createNotification(crefs.get(0), this, operations, null, null);
-			notifMgr.createNotification(crefs.get(1), this, operations, null, null);
-			notifMgr.createNotification(crefs.get(2), this, operations, null, null);
-			notifMgr.createNotification(crefs.get(3), this, operations, null, null);
-			
-		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public ProductionUI(NotificationManager notifMgr, IFacade factoryFacade) {
+		this.factoryFacade = factoryFacade;
 		tableContainer = new JPanel(new GridLayout(2, 1));
-        showUI();
-    }
+		showUI();
+	}
 
     private void showUI() {
     	buildCreationPanel();
@@ -202,40 +186,39 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		finishedGoodsTable.validate();
 	}
 
-    class CreationListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            String command = e.getActionCommand();
-            if(command.equals("body")) {
-            	int value = (Integer) bodyCountSpinner.getValue();
-            	FactoryFacade bodyFactory = FactoryFacade.getInstance(ProducerType.BODY, capi, crefs.get(0));
-            	if(!bodyFactory.isRunning()) {
-	            	bodyFactory.init(value);
-	            	bodyFactory.start();
-            	}
-            } else if(command.equals("wheel")) {
-            	int value = (Integer) wheelCountSpinner.getValue();
-            	FactoryFacade wheelFactory = FactoryFacade.getInstance(ProducerType.WHEEL, capi, crefs.get(3));
-            	if(!wheelFactory.isRunning()) {
-            		wheelFactory.init(value);
-            		wheelFactory.start();
-            	}
-            } else if(command.equals("motor")) {
-            	int value = (Integer) motorCountSpinner.getValue();
-            	FactoryFacade motorFactory = FactoryFacade.getInstance(ProducerType.MOTOR, capi, crefs.get(2));
-            	if(!motorFactory.isRunning()) {
-	            	motorFactory.init(value);
-	            	motorFactory.start();
-            	}
-            }
-        }
-    }
+	class CreationListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			String command = e.getActionCommand();
+			if(command.equals("body")) {
+				int value = (Integer) bodyCountSpinner.getValue();
+				IFactory bodyFactory = factoryFacade.getInstance(ProducerType.BODY);
+				if(!bodyFactory.isRunning()) {
+					bodyFactory.init(value);
+					bodyFactory.start();
+				}
+			} else if(command.equals("wheel")) {
+				int value = (Integer) wheelCountSpinner.getValue();
+				IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
+				if(!wheelFactory.isRunning()) {
+					wheelFactory.init(value);
+					wheelFactory.start();
+				}
+			} else if(command.equals("motor")) {
+				int value = (Integer) motorCountSpinner.getValue();
+				IFactory motorFactory = factoryFacade.getInstance(ProducerType.MOTOR);
+				if(!motorFactory.isRunning()) {
+					motorFactory.init(value);
+					motorFactory.start();
+				}
+			}
+		}
+	}
 
 	@Override
 	public void entryOperationFinished(
 		Notification source,
 		Operation operation,
-		List<? extends Serializable> entries) 
+		List<? extends Serializable> entries)
 	{
 		System.out.println("[XVSM Notification: " + operation.name() + "]");
 		if(operation.name().equals("WRITE")) {

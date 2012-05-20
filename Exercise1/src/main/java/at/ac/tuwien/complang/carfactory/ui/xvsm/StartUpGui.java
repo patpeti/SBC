@@ -4,7 +4,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
@@ -13,14 +15,15 @@ import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
-import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
+import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
 public class StartUpGui {
@@ -65,6 +68,22 @@ public class StartUpGui {
 		containers.add(carContainer);
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
-		ProductionUI gui = new ProductionUI(capi, containers, notifMgr);
+		ProductionUI gui = new ProductionUI(notifMgr, new FactoryFacade(capi, containers));
+		Set<Operation> operations = new HashSet<Operation>();
+		operations.add(Operation.DELETE);
+		operations.add(Operation.TAKE);
+		operations.add(Operation.WRITE);
+
+		try {
+			notifMgr.createNotification(containers.get(0), gui, operations, null, null);
+			notifMgr.createNotification(containers.get(1), gui, operations, null, null);
+			notifMgr.createNotification(containers.get(2), gui, operations, null, null);
+			notifMgr.createNotification(containers.get(3), gui, operations, null, null);
+			
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

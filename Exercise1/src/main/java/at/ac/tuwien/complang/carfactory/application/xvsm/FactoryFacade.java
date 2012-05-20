@@ -1,104 +1,57 @@
 package at.ac.tuwien.complang.carfactory.application.xvsm;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.mozartspaces.core.Capi;
-
 import org.mozartspaces.core.ContainerReference;
 
+import at.ac.tuwien.complang.carfactory.application.IFacade;
+import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
-import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
-public class FactoryFacade {
+public class FactoryFacade implements IFacade {
 
 	//Static Fields
-	private static Map<ProducerType, FactoryFacade> factories;
+	private static final String INITIALIZATION_ERROR = "XVSM FactoryFacade has not been initialized " +
+			"with the proper space reference.\n" +
+			"You must call the initialization methods " +
+			"and pass the Capi object and the container reference.";
+	private List<ContainerReference> crefs;
+	private Capi capi;
+	private static Map<ProducerType, IFactory> factories;
 	private static long next_id = 0;
 	
 	static {
-		factories = new Hashtable<ProducerType, FactoryFacade>();
+		factories = new Hashtable<ProducerType, IFactory>();
 	}
 	
-	//Fields
-	private int count;
-	private boolean running = false;
-	private Thread thread;
-	private IProducer producer;
+	public FactoryFacade(Capi capi, List<ContainerReference> crefs) {
+		this.capi = capi;
+		this.crefs = crefs;
+	}
 	
-	private FactoryFacade(ProducerType type, Capi capi, ContainerReference cref) {
-		next_id++;
-		switch(type) {
-			case BODY: producer = new BodyFactory(next_id, capi, cref);	break;
-			case WHEEL: producer = new WheelFactory(next_id, capi, cref); break;
-			case MOTOR: producer = new MotorFactory(next_id, capi, cref); break;
-			default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
+	@Override
+	public IFactory getInstance(ProducerType type) {
+		if(capi == null ||crefs == null) {
+			throw new RuntimeException(INITIALIZATION_ERROR);
 		}
-	}
-	
-	public static FactoryFacade getInstance(ProducerType type, Capi capi, ContainerReference cref) {
 		if(factories.get(type) == null) {
 			synchronized(FactoryFacade.class) {
 				if(factories.get(type) == null) {
-					FactoryFacade.factories.put(type, new FactoryFacade(type, capi, cref));
+					next_id++;
+					IFactory producer;
+					switch(type) {
+						case BODY: producer = new BodyFactory(next_id, capi, crefs.get(0));	break;
+						case WHEEL: producer = new WheelFactory(next_id, capi, crefs.get(3)); break;
+						case MOTOR: producer = new MotorFactory(next_id, capi, crefs.get(2)); break;
+						default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
+					}
+					FactoryFacade.factories.put(type, producer);
 				}
 			}
 		}
 		return factories.get(type);
 	}
-	
-	public void start() {
-		this.running = true;
-		//start the timer task and produce bodies
-		this.thread.start();
-	}
-	
-	public void stop() {
-		this.count = 0;
-		this.thread.interrupt();
-		this.running = false;
-	}
-	
-	public void init(int count) throws IllegalStateException {
-		if(running) {
-			throw new IllegalStateException("Factory must be stopped first");
-		}
-		this.count = count;
-		//Prepare TimerTask
-		thread = new Thread(new Producer());
-	}
-	
-	class Producer implements Runnable {
-
-		public void run() {
-			int originalCount = count;
-			int delay = 0;
-			int total = 0;
-			while(count > 0) {
-				//The producer sleeps for a random period between 1 and 3 seconds
-				delay = (int) (Math.random() * producer.timeInSec()) + 1;
-				total += delay;
-				int millisecondsPerSecond = 1000;
-				try {
-					Thread.sleep(delay * millisecondsPerSecond);
-				} catch (InterruptedException e) {
-					System.err.println("Producer was interrupted.");
-				}
-				//Produce a car part with the factory and decrease the counter
-				count--;
-				producer.produce();
-				System.out.println("Time to produce was " + delay + " seconds. Parts remaining: " + count);
-			}
-			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
-			FactoryFacade.this.running = false;
-		}
-
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
 }
