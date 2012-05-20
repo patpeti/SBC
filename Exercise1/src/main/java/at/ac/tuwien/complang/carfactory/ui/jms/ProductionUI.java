@@ -19,7 +19,7 @@ import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
-import at.ac.tuwien.complang.carfactory.ui.jms.listener.IFactoryData;
+import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
@@ -137,35 +137,33 @@ public class ProductionUI extends JFrame implements IFactoryData {
 	public void addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
-		spaceTable.validate();
 	}
 	
 	public void updatePart(ICarPart part) {
 		spaceDataTableModel.updateRow(part.getObjectData());
-		spaceTable.validate();
 	}
 
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
-		spaceTable.validate();
 	}
 
 	public void addCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " added to space");
 		finishedGoodsTableModel.addRow(car.getObjectData());
-		finishedGoodsTable.validate();
 	}
 
 	public void removeCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
 		finishedGoodsTableModel.removeRow(car.getObjectData());
-		finishedGoodsTable.validate();
+	}
+	
+	public void updateCar(Car car) {
+		finishedGoodsTableModel.updateRow(car.getObjectData());
 	}
 	
 	public void addOrUpdateCar(Car car) {
 		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
-		finishedGoodsTable.validate();
 	}
 
     class CreationListener implements ActionListener {

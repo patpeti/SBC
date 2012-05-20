@@ -18,6 +18,7 @@ import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
+import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 
 /**
  * The QueueListener connects to all Queues and Topics

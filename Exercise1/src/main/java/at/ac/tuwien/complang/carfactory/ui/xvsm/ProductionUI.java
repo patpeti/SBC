@@ -19,7 +19,6 @@ import javax.swing.JTable;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
-import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.IFacade;
@@ -28,10 +27,11 @@ import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-public class ProductionUI extends JFrame implements NotificationListener {
+public class ProductionUI extends JFrame implements IFactoryData, NotificationListener {
 
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -142,38 +142,44 @@ public class ProductionUI extends JFrame implements NotificationListener {
         this.add(padding, BorderLayout.CENTER);
 	}
 
-	public void addPart(ICarPart carPart, SpaceChangeType type){
+
+	@Override
+	public void addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
-		//spaceTable.validate();
 	}
 	
+	@Override
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
-		//spaceTable.validate();
 	}
-	
+
+	@Override
+	public void updatePart(ICarPart carPart) {
+		spaceDataTableModel.updateRow(carPart.getObjectData());
+	}
+
+	@Override
 	public void addCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " added to space");
 		finishedGoodsTableModel.addRow(car.getObjectData());
-		//finishedGoodsTable.validate();
 	}
 	
+	@Override
 	public void removeCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
 		finishedGoodsTableModel.removeRow(car.getObjectData());
-		//finishedGoodsTable.validate();
 	}
 	
+	@Override
 	public void updateCar(Car car) {
 		finishedGoodsTableModel.updateRow(car.getObjectData());
-		//finishedGoodsTable.validate();
 	}
 	
+	@Override
 	public void addOrUpdateCar(Car car) {
 		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
-		//finishedGoodsTable.validate();
 	}
 
 	class CreationListener implements ActionListener {

@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.carfactory.ui.jms.listener;
+package at.ac.tuwien.complang.carfactory.ui;
 
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
@@ -13,6 +13,7 @@ public interface IFactoryData {
 	//Car Methods
 	void addCar(Car car);
 	void removeCar(Car car);
+	void updateCar(Car car);
 	void addOrUpdateCar(Car car);
 	//Part Methods
 	void addPart(ICarPart carPart);
