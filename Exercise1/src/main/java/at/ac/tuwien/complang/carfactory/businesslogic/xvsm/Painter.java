@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozartspaces.capi3.CoordinationData;
+import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Entry;
@@ -92,6 +93,7 @@ public class Painter extends SpaceUtil {
 			String label =  SpaceLabels.PAINTEDCAR;
 			cordinator.add(LabelCoordinator.newCoordinationData(label));
 			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+			cordinator.add(FifoCoordinator.newCoordinationData());
 			getCapi().write(getCarContainer(), new Entry(c,cordinator));
 			System.out.println("[Painter] Car " + c.getId() + " painted and written in space");
 		} catch (MzsCoreException e) {

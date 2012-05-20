@@ -230,7 +230,7 @@ public class Assembler{
 
 	private List<ICarPart> takeCarPart(CarPartType type, Integer amount, long timeout, TransactionReference tx){
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(LabelCoordinator.newSelector(type.toString(), MzsConstants.Selecting.COUNT_MAX));
+//		selectors.add(LabelCoordinator.newSelector(type.toString(), MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		
 		List<ICarPart> parts = null;
