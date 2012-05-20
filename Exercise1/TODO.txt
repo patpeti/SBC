@@ -5,7 +5,7 @@
 2. Produce defect parts:
 	* Add boolean for each entity: isDefect
 	* Also save for each car if it is defect
-3. Create one container per part and for car
+3. Create one container per part and for car -- check
 	* Clean up coordinators
 	* Add one container for Tasks (FIFO Order for tasks)
 	* Add one container for defect cars

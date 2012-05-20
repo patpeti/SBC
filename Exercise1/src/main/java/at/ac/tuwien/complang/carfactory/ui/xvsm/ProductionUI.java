@@ -54,7 +54,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
-	public ProductionUI(Capi capi, ContainerReference cref, NotificationManager notifMgr) {
+	public ProductionUI(Capi capi, List<ContainerReference> crefs, NotificationManager notifMgr) {
 		this.capi = capi;
 		this.crefs = crefs;
 		Set<Operation> operations = new HashSet<Operation>();
