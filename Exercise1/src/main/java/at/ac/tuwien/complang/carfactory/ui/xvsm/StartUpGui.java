@@ -72,12 +72,12 @@ public class StartUpGui {
 		operations.add(Operation.DELETE);
 		operations.add(Operation.TAKE);
 		operations.add(Operation.WRITE);
-
+		SpaceListener listener = new SpaceListener(gui);
 		try {
-			notifMgr.createNotification(containers.get(0), gui, operations, null, null);
-			notifMgr.createNotification(containers.get(1), gui, operations, null, null);
-			notifMgr.createNotification(containers.get(2), gui, operations, null, null);
-			notifMgr.createNotification(containers.get(3), gui, operations, null, null);
+			notifMgr.createNotification(containers.get(0), listener, operations, null, null);
+			notifMgr.createNotification(containers.get(1), listener, operations, null, null);
+			notifMgr.createNotification(containers.get(2), listener, operations, null, null);
+			notifMgr.createNotification(containers.get(3), listener, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

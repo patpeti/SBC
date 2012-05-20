@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,11 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 
-import org.mozartspaces.core.Entry;
-import org.mozartspaces.notifications.Notification;
-import org.mozartspaces.notifications.NotificationListener;
-import org.mozartspaces.notifications.Operation;
-
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
@@ -30,7 +23,7 @@ import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-public class ProductionUI extends JFrame implements IFactoryData, NotificationListener {
+public class ProductionUI extends JFrame implements IFactoryData {
 
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -149,14 +142,14 @@ public class ProductionUI extends JFrame implements IFactoryData, NotificationLi
 	}
 	
 	@Override
+	public void updatePart(ICarPart carPart) {
+		spaceDataTableModel.updateRow(carPart.getObjectData());
+	}
+	
+	@Override
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
-	}
-
-	@Override
-	public void updatePart(ICarPart carPart) {
-		spaceDataTableModel.updateRow(carPart.getObjectData());
 	}
 
 	@Override
@@ -205,34 +198,6 @@ public class ProductionUI extends JFrame implements IFactoryData, NotificationLi
 				if(!motorFactory.isRunning()) {
 					motorFactory.init(value);
 					motorFactory.start();
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void entryOperationFinished(
-		Notification source,
-		Operation operation,
-		List<? extends Serializable> entries)
-	{
-		System.out.println("[XVSM Notification: " + operation.name() + "]");
-		if(operation.name().equals("WRITE")) {
-			for(Entry entry : (List<Entry>) entries) {
-				if (entry.getValue() instanceof Car) {
-					System.out.println("[GUI_Notification] New Car written");
-					Car car = (Car) entry.getValue();
-					addOrUpdateCar(car);
-				} else if (entry.getValue() instanceof ICarPart) { //its not a car but still a carpart
-					ICarPart part = (ICarPart) entry.getValue();
-					spaceDataTableModel.addRow(part.getObjectData());
-				}
-			}
-		} else if(operation.name().equals("TAKE")) {
-			for(ICarPart part: (List<ICarPart>) entries) {
-				if(!(part instanceof Car)) {
-					removePart(part);
 				}
 			}
 		}

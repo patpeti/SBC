@@ -133,35 +133,43 @@ public class ProductionUI extends JFrame implements IFactoryData {
         padding.add(container);
         this.add(padding, BorderLayout.CENTER);
 	}
-
+	
+	
+	@Override
 	public void addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
 	}
 	
-	public void updatePart(ICarPart part) {
-		spaceDataTableModel.updateRow(part.getObjectData());
+	@Override
+	public void updatePart(ICarPart carPart) {
+		spaceDataTableModel.updateRow(carPart.getObjectData());
 	}
 
+	@Override
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
 	}
 
+	@Override
 	public void addCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " added to space");
 		finishedGoodsTableModel.addRow(car.getObjectData());
 	}
 
+	@Override
 	public void removeCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
 		finishedGoodsTableModel.removeRow(car.getObjectData());
 	}
 	
+	@Override
 	public void updateCar(Car car) {
 		finishedGoodsTableModel.updateRow(car.getObjectData());
 	}
 	
+	@Override
 	public void addOrUpdateCar(Car car) {
 		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
 	}
