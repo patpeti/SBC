@@ -33,7 +33,7 @@ public class WheelFactory extends AbstractFactory implements IProducer {
 		
 		System.out.println("writing wheel into space...");
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
+		//cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+wheel.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(wheel,cordinator));

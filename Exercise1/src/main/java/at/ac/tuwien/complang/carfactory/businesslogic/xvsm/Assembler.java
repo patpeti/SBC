@@ -32,7 +32,6 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
-import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
@@ -206,7 +205,7 @@ public class Assembler{
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
-			coords.add(new LabelCoordinator());
+			//coords.add(new LabelCoordinator());
 			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());
@@ -230,7 +229,7 @@ public class Assembler{
 
 	private List<ICarPart> takeCarPart(CarPartType type, Integer amount, long timeout, TransactionReference tx){
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(LabelCoordinator.newSelector(type.toString(), MzsConstants.Selecting.COUNT_MAX));
+		//selectors.add(LabelCoordinator.newSelector(type.toString(), MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		
 		List<ICarPart> parts = null;

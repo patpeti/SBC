@@ -36,7 +36,7 @@ public class BodyFactory extends AbstractFactory implements IProducer {
 		System.out.println("writing Body into space...");
 		
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
+		//cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+body.getId()));
 		try {
 			getCapi().write(getCref(), new Entry(body, cordinator));
