@@ -3,6 +3,7 @@
 	* Update UI to show if part is defect
 	* Add parameter to producers for set the error rate for each producer.
 2. Produce defect parts:
+	* Add boolean for each entity: isDefect
 3. Create one container per part and for car
 	* Clean up coordinators
 	* Add one container for Tasks (FIFO Order for tasks)
