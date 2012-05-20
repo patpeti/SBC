@@ -68,7 +68,7 @@ public class StartUpGui {
 		containers.add(carContainer);
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
-		ProductionUI gui = new ProductionUI(notifMgr, new FactoryFacade(capi, containers));
+		ProductionUI gui = new ProductionUI(notifMgr, FactoryFacade.getInstance(capi, containers));
 		Set<Operation> operations = new HashSet<Operation>();
 		operations.add(Operation.DELETE);
 		operations.add(Operation.TAKE);

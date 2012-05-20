@@ -18,18 +18,28 @@ public class FactoryFacade implements IFacade {
 			"with the proper space reference.\n" +
 			"You must call the initialization methods " +
 			"and pass the Capi object and the container reference.";
+	private static IFacade facade;
 	private List<ContainerReference> crefs;
 	private Capi capi;
-	private static Map<ProducerType, IFactory> factories;
-	private static long next_id = 0;
+	private Map<ProducerType, IFactory> factories;
+	private long next_id = 0;
 	
-	static {
+	
+	private FactoryFacade(Capi capi, List<ContainerReference> crefs) {
+		this.capi = capi;
+		this.crefs = crefs;
 		factories = new Hashtable<ProducerType, IFactory>();
 	}
 	
-	public FactoryFacade(Capi capi, List<ContainerReference> crefs) {
-		this.capi = capi;
-		this.crefs = crefs;
+	public static IFacade getInstance(Capi capi, List<ContainerReference> crefs) {
+		if(FactoryFacade.facade == null) {
+			synchronized(FactoryFacade.class) {
+				if(FactoryFacade.facade == null) {
+					facade = new FactoryFacade(capi, crefs);
+				}
+			}
+		}
+		return facade;
 	}
 	
 	@Override
@@ -38,17 +48,17 @@ public class FactoryFacade implements IFacade {
 			throw new RuntimeException(INITIALIZATION_ERROR);
 		}
 		if(factories.get(type) == null) {
-			synchronized(FactoryFacade.class) {
+			synchronized(factories) {
 				if(factories.get(type) == null) {
 					next_id++;
-					IFactory producer;
+					IFactory factory;
 					switch(type) {
-						case BODY: producer = new BodyFactory(next_id, capi, crefs.get(0));	break;
-						case WHEEL: producer = new WheelFactory(next_id, capi, crefs.get(3)); break;
-						case MOTOR: producer = new MotorFactory(next_id, capi, crefs.get(2)); break;
+						case BODY: factory = new BodyFactory(next_id, capi, crefs.get(0));	break;
+						case WHEEL: factory = new WheelFactory(next_id, capi, crefs.get(3)); break;
+						case MOTOR: factory = new MotorFactory(next_id, capi, crefs.get(2)); break;
 						default: throw new IllegalArgumentException("Specificed ProducerType is not implemented");
 					}
-					FactoryFacade.factories.put(type, producer);
+					factories.put(type, factory);
 				}
 			}
 		}

@@ -15,7 +15,7 @@ import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.ui.xvsm.ISpaceListener;
 
-public class MotorFactory extends AbstractFactory implements IProducer {
+public class MotorFactory extends AbstractFactory {
 	
 	//Static Fields
 	private static final int TIME_IN_SEC = 3;
