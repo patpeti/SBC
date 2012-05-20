@@ -1,0 +1,11 @@
+1. Update GUI: 
+	* UI must fit on Notebook Screen (add JScrollPane)
+	* Update UI to show if part is defect
+	* Add parameter to producers for set the error rate for each producer.
+2. Produce defect parts:
+3. Create one container per part and for car
+	* Clean up coordinators
+	* Add one container for Tasks (FIFO Order for tasks)
+4. Solve ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle ids
+5. Make sure that more than one painter, assembler and supervisor can run
+6. Add taskId field to Car
