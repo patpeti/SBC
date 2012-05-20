@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.carfactory.ui.xvsm;
+package at.ac.tuwien.complang.carfactory.ui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -19,7 +19,6 @@ import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
-import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
@@ -148,19 +147,19 @@ public class ProductionUI extends JFrame implements IFactoryData {
 	
 	@Override
 	public void removePart(ICarPart carPart) {
-		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
+		System.out.println("#GUI# : CarPart " + carPart.getId() + " removed from warehouse");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
 	}
 
 	@Override
 	public void addCar(Car car) {
-		System.out.println("#GUI# : Car " + car.getId() + " added to space");
+		System.out.println("#GUI# : Car " + car.getId() + " added to warehouse");
 		finishedGoodsTableModel.addRow(car.getObjectData());
 	}
 	
 	@Override
 	public void removeCar(Car car) {
-		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
+		System.out.println("#GUI# : Car " + car.getId() + " removed from warehouse");
 		finishedGoodsTableModel.removeRow(car.getObjectData());
 	}
 	

@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
+import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.QueueListenerImpl;
 

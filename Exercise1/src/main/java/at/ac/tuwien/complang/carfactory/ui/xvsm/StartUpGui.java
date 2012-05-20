@@ -23,6 +23,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
+import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
 public class StartUpGui {
