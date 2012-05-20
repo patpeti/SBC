@@ -13,8 +13,8 @@
 5. Make sure that more than one painter, assembler and supervisor can run
 6. Add taskId field to Car
 7. Create a new worker to perform testing:
-	* ui.xvsm.StartUpTester
-	* ui.jms.StartUpTester
+	* ui.xvsm.StartUpTester [DONE]
+	* ui.jms.StartUpTester [DONE]
 	* businesslogic.xvsm.Tester
 	* businesslogic.jms.Tester
 8. Add transactions for painter, supervisor and tester
