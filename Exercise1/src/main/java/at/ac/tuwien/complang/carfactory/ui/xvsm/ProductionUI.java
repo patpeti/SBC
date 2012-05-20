@@ -2,13 +2,10 @@ package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,10 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 
-import org.mozartspaces.core.Capi;
-import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
-import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
@@ -32,16 +26,12 @@ import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
-import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
-import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
-import at.ac.tuwien.complang.carfactory.domain.Motor;
-import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 
-public class ProductionUI extends JFrame implements ISpaceObserver, NotificationListener {
+public class ProductionUI extends JFrame implements NotificationListener {
 
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
@@ -49,13 +39,13 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	//Fields
 	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
 	private JPanel tableContainer;
-	private List<ContainerReference> crefs;
+	
+	private IFacade factoryFacade;
 	private JTable spaceTable, finishedGoodsTable;
 	private SpaceDataTableModel spaceDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
-	private IFacade factoryFacade;
 
-	public ProductionUI(NotificationManager notifMgr, IFacade factoryFacade) {
+	public ProductionUI(IFacade factoryFacade) {
 		this.factoryFacade = factoryFacade;
 		tableContainer = new JPanel(new GridLayout(2, 1));
 		showUI();
@@ -153,40 +143,41 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 	}
 
 	public void addPart(ICarPart carPart, SpaceChangeType type){
-		System.out.println("#GUI# : CarPart is created");
+		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		spaceDataTableModel.addRow(carPart.getObjectData());
-		spaceTable.validate();
+		//spaceTable.validate();
 	}
 	
 	public void removePart(ICarPart carPart) {
-		System.out.println("#GUI# : CarPart taken from space");
+		System.out.println("#GUI# : CarPart " + carPart.getId() + " taken from space");
 		spaceDataTableModel.deleteRow(carPart.getObjectData());
-		spaceTable.validate();
+		//spaceTable.validate();
 	}
 	
 	public void addCar(Car car) {
-		System.out.println("#GUI# : Car added to space");
+		System.out.println("#GUI# : Car " + car.getId() + " added to space");
 		finishedGoodsTableModel.addRow(car.getObjectData());
-		finishedGoodsTable.validate();
+		//finishedGoodsTable.validate();
 	}
 	
 	public void removeCar(Car car) {
-		System.out.println("#GUI# : Car removed from space");
+		System.out.println("#GUI# : Car " + car.getId() + " removed from space");
 		finishedGoodsTableModel.removeRow(car.getObjectData());
-		finishedGoodsTable.validate();
+		//finishedGoodsTable.validate();
 	}
 	
 	public void updateCar(Car car) {
 		finishedGoodsTableModel.updateRow(car.getObjectData());
-		finishedGoodsTable.validate();
+		//finishedGoodsTable.validate();
 	}
 	
 	public void addOrUpdateCar(Car car) {
 		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
-		finishedGoodsTable.validate();
+		//finishedGoodsTable.validate();
 	}
 
 	class CreationListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
 			if(command.equals("body")) {
@@ -214,6 +205,7 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void entryOperationFinished(
 		Notification source,
@@ -233,8 +225,10 @@ public class ProductionUI extends JFrame implements ISpaceObserver, Notification
 				}
 			}
 		} else if(operation.name().equals("TAKE")) {
-			for(ICarPart entry : (List<ICarPart>) entries) {
-				removePart(entry);
+			for(ICarPart part: (List<ICarPart>) entries) {
+				if(!(part instanceof Car)) {
+					removePart(part);
+				}
 			}
 		}
 	}

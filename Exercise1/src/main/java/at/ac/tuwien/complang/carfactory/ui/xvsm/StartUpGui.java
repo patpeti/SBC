@@ -27,14 +27,14 @@ import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
 public class StartUpGui {
-	
-	
+
 	public static void main(String[] args) {
 		
-		//2. Create an embedded instance of mozart spaces and initialize a container on port 9876
+		//1. Create an embedded instance of Mozart spaces on port 9876
 		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
 		NotificationManager notifMgr = new NotificationManager(core);
+		//2. Initialise a container for each type of data we store in the space (e.g Car, Body, Motor, Wheel) 
 		ContainerReference motorContainer = null;
 		ContainerReference wheelContainer = null;
 		ContainerReference carContainer = null;
@@ -62,13 +62,13 @@ public class StartUpGui {
 			System.exit(1);
 		}
 
-		//1. Start the User interface
 		List<ContainerReference> containers = new ArrayList<ContainerReference>();
 		containers.add(bodyContainer);
 		containers.add(carContainer);
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
-		ProductionUI gui = new ProductionUI(notifMgr, FactoryFacade.getInstance(capi, containers));
+		//1. Start the User interface
+		ProductionUI gui = new ProductionUI(FactoryFacade.getInstance(capi, containers));
 		Set<Operation> operations = new HashSet<Operation>();
 		operations.add(Operation.DELETE);
 		operations.add(Operation.TAKE);
@@ -79,7 +79,6 @@ public class StartUpGui {
 			notifMgr.createNotification(containers.get(1), gui, operations, null, null);
 			notifMgr.createNotification(containers.get(2), gui, operations, null, null);
 			notifMgr.createNotification(containers.get(3), gui, operations, null, null);
-			
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

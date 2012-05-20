@@ -5,10 +5,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Session;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,17 +14,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.application.enums.SpaceChangeType;
-import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
 import at.ac.tuwien.complang.carfactory.application.jms.enums.QueueChangeType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
-import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueObserver;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
@@ -48,8 +40,8 @@ public class ProductionUI extends JFrame implements IQueueObserver {
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 
 	public ProductionUI(IFacade factoryFacade) {
-		tableContainer = new JPanel(new GridLayout(2, 1));
 		this.factoryFacade = factoryFacade;
+		tableContainer = new JPanel(new GridLayout(2, 1));
         showUI();
     }
 
@@ -93,7 +85,7 @@ public class ProductionUI extends JFrame implements IQueueObserver {
     	JPanel spaceTablePanel = new JPanel();
     	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
     	spaceTablePanel.setLayout(layout);
-    	JLabel label = new JLabel("Finished Goods");
+    	JLabel label = new JLabel("(Semi-)Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	finishedGoodsTableModel = new FinishedGoodsTableModel();
     	finishedGoodsTable = new JTable(finishedGoodsTableModel);
@@ -189,7 +181,6 @@ public class ProductionUI extends JFrame implements IQueueObserver {
 	            	bodyFactory.init(value);
 	            	bodyFactory.start();
             	}
-
             } else if(command.equals("wheel")) {
             	int value = (Integer) wheelCountSpinner.getValue();
             	IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
