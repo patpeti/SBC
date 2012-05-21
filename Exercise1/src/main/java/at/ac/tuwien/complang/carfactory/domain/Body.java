@@ -12,7 +12,6 @@ public class Body implements Serializable, ICarPart {
 	private static final long serialVersionUID = 217392531648766282L;
 
 	//Static fields
-	//private static long next_id = 0;
 	private static final CarPartType type = CarPartType.BODY;
 	
 	//Fields
@@ -21,10 +20,9 @@ public class Body implements Serializable, ICarPart {
     private Color color;
     private long color_pid;
     private PaintState paintState;
+    private boolean isDefect;
 
 	public Body(long pid) {
-//		next_id++;
-//		this.id = Body.next_id;
 		this.paintState = PaintState.UNPAINTED;
 		this.id = AbstractFactory.carPartId;
 		AbstractFactory.carPartId++;
@@ -70,6 +68,14 @@ public class Body implements Serializable, ICarPart {
 
 	public void setPaintState(PaintState paintState) {
 		this.paintState = paintState;
+	}
+
+	public boolean isDefect() {
+		return isDefect;
+	}
+
+	public void setDefect(boolean isDefect) {
+		this.isDefect = isDefect;
 	}
 	
 }

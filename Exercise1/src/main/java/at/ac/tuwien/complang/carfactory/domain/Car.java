@@ -8,21 +8,22 @@ import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 
 public class Car implements Serializable, ICarPart {
-	private static final long serialVersionUID = 1L;
-	private static final CarPartType type = CarPartType.CAR;
 
 	//Static Fields
-	//private static long next_id;
+	private static final long serialVersionUID = 1L;
+	private static final CarPartType type = CarPartType.CAR;
 	
 	//Fields
     private boolean isComplete; //Whether assembly is complete
     private long isComplete_pid; //ID of the supervisor
     private long id;  //ID of the Car
     private long pid; //ID of the worker which produced the car
+    private long taskId; //ID of the task for which this car was produced
     private Motor motor;
     private Body body;
     private PaintState paintState;
     private Wheel[] wheels = new Wheel[4];
+    
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
@@ -132,5 +133,13 @@ public class Car implements Serializable, ICarPart {
 
 	public void setPaintState(PaintState paintState) {
 		this.paintState = paintState;
+	}
+
+	public long getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(long taskId) {
+		this.taskId = taskId;
 	}
 }
