@@ -51,5 +51,10 @@ public class MotorFactory extends AbstractFactory {
 	public int timeInSec() {
 		return TIME_IN_SEC;
 	}
-
+	
+	@Override
+	public void finished() {
+		setChanged();
+		notifyObservers("MOTOR");
+	}
 }

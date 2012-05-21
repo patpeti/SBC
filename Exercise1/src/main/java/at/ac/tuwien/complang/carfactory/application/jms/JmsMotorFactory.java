@@ -55,4 +55,10 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	public int timeInSec() {
 		return TIME_IN_SEC;
 	}
+	
+	@Override
+	public void finished() {
+		setChanged();
+		notifyObservers("MOTOR");
+	}
 }

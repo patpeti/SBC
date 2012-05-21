@@ -1,10 +1,12 @@
 package at.ac.tuwien.complang.carfactory.application.jms;
 
+import java.util.Observable;
+
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
-public abstract class JmsAbstractFactory implements IFactory, IProducer {
+public abstract class JmsAbstractFactory extends Observable implements IFactory, IProducer {
 
 	public static long carPartId = 1;
 	//Fields
@@ -87,4 +89,14 @@ public abstract class JmsAbstractFactory implements IFactory, IProducer {
 	 * specific task (such as cleaning up or disconnecting resources).
 	 */
 	public void finished() { }
+
+	@Override
+	protected synchronized void clearChanged() {
+		super.clearChanged();
+	}
+
+	@Override
+	protected synchronized void setChanged() {
+		super.setChanged();
+	}
 }

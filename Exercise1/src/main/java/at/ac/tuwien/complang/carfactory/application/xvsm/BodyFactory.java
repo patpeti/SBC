@@ -26,8 +26,6 @@ public class BodyFactory extends AbstractFactory {
 		this.id = id;
 	}
 
-	
-
 	public void produce() {
 		Body body = new Body(id);
 		System.out.println("Produced a body with ID: " + body.getId());
@@ -52,5 +50,11 @@ public class BodyFactory extends AbstractFactory {
 	@Override
 	public int timeInSec() {
 		return TIME_IN_SEC;
+	}
+	
+	@Override
+	public void finished() {
+		setChanged();
+		notifyObservers("BODY");
 	}
 }
