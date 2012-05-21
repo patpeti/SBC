@@ -39,8 +39,8 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	private JPanel tableContainer;
 	
 	private IFacade factoryFacade;
-	private JTable spaceTable, finishedGoodsTable;
-	private SpaceDataTableModel spaceDataTableModel;
+	private JTable partsTable, finishedGoodsTable;
+	private SpaceDataTableModel partsDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 	private StatusLight bodyFactoryStatus,wheelFactoryStatus,motorFactoryStatus;
 
@@ -59,48 +59,46 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
     }
     
     private void buildTables() {
-    	JPanel spaceTable = buildSpaceTable();
+    	JPanel partsTable = buildPartsTable();
     	JPanel finishedGoodsTable = buildFinishedGoodsTable();
-    	JPanel spaceMargin = new JPanel();
-    	spaceMargin.add(spaceTable);
-    	tableContainer.add(spaceMargin);
+    	tableContainer.add(partsTable);
     	tableContainer.add(finishedGoodsTable);
-    	this.add(tableContainer, BorderLayout.SOUTH);
+    	getContentPane().add(tableContainer, BorderLayout.CENTER);
     }
     
     /**
      * Show the Table for the content of the space
      */
-    private JPanel buildSpaceTable() {
+    private JPanel buildPartsTable() {
     	JPanel spaceTablePanel = new JPanel();
-    	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
-    	spaceTablePanel.setLayout(layout);
     	JLabel label = new JLabel("Current Content of the Space");
     	label.setAlignmentX(CENTER_ALIGNMENT);
-    	spaceDataTableModel = new SpaceDataTableModel();
-    	spaceTable = new JTable(spaceDataTableModel);
-    	JScrollPane scrollPane = new JScrollPane(spaceTable);
-    	spaceTable.setFillsViewportHeight(true);
+    	partsDataTableModel = new SpaceDataTableModel();
+    	partsTable = new JTable(partsDataTableModel);
+    	partsTable.setAutoResizeMode(HEIGHT);
+    	JScrollPane scrollPane = new JScrollPane(partsTable);
+    	partsTable.setFillsViewportHeight(true);
+    	spaceTablePanel.setLayout(new BoxLayout(spaceTablePanel, BoxLayout.Y_AXIS));
     	spaceTablePanel.add(label);
     	spaceTablePanel.add(scrollPane);
     	return spaceTablePanel;
     }
 
     private JPanel buildFinishedGoodsTable() {
-    	JPanel spaceTablePanel = new JPanel();
-    	BoxLayout layout = new BoxLayout(spaceTablePanel, BoxLayout.PAGE_AXIS);
-    	spaceTablePanel.setLayout(layout);
+    	JPanel finishedGoodsTablePanel = new JPanel();
     	JLabel label = new JLabel("(Semi-)Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	finishedGoodsTableModel = new FinishedGoodsTableModel();
     	finishedGoodsTable = new JTable(finishedGoodsTableModel);
+    	finishedGoodsTable.setAutoResizeMode(HEIGHT);
     	JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
     	finishedGoodsTable.setFillsViewportHeight(true);
-    	spaceTablePanel.add(label);
-    	spaceTablePanel.add(scrollPane);
-    	return spaceTablePanel;
+    	finishedGoodsTablePanel.setLayout(new BoxLayout(finishedGoodsTablePanel, BoxLayout.Y_AXIS));
+    	finishedGoodsTablePanel.add(label);
+    	finishedGoodsTablePanel.add(scrollPane);
+    	return finishedGoodsTablePanel;
     }
-    
+
 	private void buildCreationPanel() {
 		CreationListener listener = new CreationListener();
     	JPanel container = new JPanel();
@@ -209,18 +207,18 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	@Override
 	public void addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
-		spaceDataTableModel.addRow(carPart.getObjectData());
+		partsDataTableModel.addRow(carPart.getObjectData());
 	}
 	
 	@Override
 	public void updatePart(ICarPart carPart) {
-		spaceDataTableModel.updateRow(carPart.getObjectData());
+		partsDataTableModel.updateRow(carPart.getObjectData());
 	}
 	
 	@Override
 	public void removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " removed from warehouse");
-		spaceDataTableModel.deleteRow(carPart.getObjectData());
+		partsDataTableModel.deleteRow(carPart.getObjectData());
 	}
 
 	@Override
