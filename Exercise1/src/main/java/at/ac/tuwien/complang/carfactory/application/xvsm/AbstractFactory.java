@@ -82,11 +82,19 @@ public abstract class AbstractFactory implements IProducer, IFactory {
 			}
 			System.out.println("All done. Average time to produce: " + total / (double) originalCount + " seconds.");
 			AbstractFactory.this.running = false;
+			finished();
 		}
-
 	}
 
 	public boolean isRunning() {
 		return running;
 	}
+	
+	/**
+	 * This function is called after the factory has produced
+	 * the specified amount of parts. By default it does nothing,
+	 * but this method can be overridden, to perform implementation
+	 * specific task (such as cleaning up or disconnecting resources).
+	 */
+	public void finished() { }
 }
