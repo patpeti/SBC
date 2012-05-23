@@ -14,6 +14,7 @@ public abstract class JmsAbstractFactory extends Observable implements IFactory,
 	private boolean running = false;
 	private Thread thread;
 	private IQueueListener listener;
+	protected double errorRate;
 
 	public JmsAbstractFactory() {
 		super();
@@ -39,12 +40,13 @@ public abstract class JmsAbstractFactory extends Observable implements IFactory,
 		this.running = false;
 	}
 
-	public void init(int count) throws IllegalStateException {
+	public void init(int count, double errorRate) throws IllegalStateException {
 		if(running) {
 			throw new IllegalStateException("Factory must be stopped first");
 		}
 
 		this.count = count;
+		this.errorRate = errorRate;
 
 		//Prepare TimerTask
 		thread = new Thread(new Producer());

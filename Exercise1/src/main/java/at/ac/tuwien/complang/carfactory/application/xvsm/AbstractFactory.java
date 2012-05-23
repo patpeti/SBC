@@ -13,9 +13,9 @@ public abstract class AbstractFactory extends Observable implements IProducer, I
 	private int count;
 	private boolean running = false;
 	private Thread thread;
-	private IProducer producer;
 	private Capi capi;
 	private ContainerReference cref;
+	protected double errorRate;
 	public static long carPartId = 1;
 	
 	public AbstractFactory(Capi capi, ContainerReference cref) {
@@ -52,11 +52,12 @@ public abstract class AbstractFactory extends Observable implements IProducer, I
 		this.running = false;
 	}
 	
-	public void init(int count) throws IllegalStateException {
+	public void init(int count, double errorRate) throws IllegalStateException {
 		if(running) {
 			throw new IllegalStateException("Factory must be stopped first");
 		}
 		this.count = count;
+		this.errorRate = errorRate;
 		//Prepare TimerTask
 		thread = new Thread(new Producer());
 	}

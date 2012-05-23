@@ -28,6 +28,7 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.panels.StatusLight;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
+import javax.swing.SpinnerNumberModel;
 
 public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
@@ -35,7 +36,9 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	private static final long serialVersionUID = -6151830798597607052L;
 
 	//Fields
-	private JSpinner bodyCountSpinner, wheelCountSpinner, motorCountSpinner;
+	private JSpinner bodyCountSpinner, bodyErrorRateSpinner,
+		wheelCountSpinner, wheelErrorRateSpinner,
+		motorCountSpinner, motorErrorRateSpinner;
 	private JPanel tableContainer;
 	
 	private IFacade factoryFacade;
@@ -111,9 +114,9 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
         JPanel producerPanel = new JPanel();
         GridBagLayout gbl_producerPanel = new GridBagLayout();
-        gbl_producerPanel.columnWidths = new int[]{29, 216, 188, 0};
+        gbl_producerPanel.columnWidths = new int[]{39, 216, 100, 100, 0};
         gbl_producerPanel.rowHeights = new int[]{34, 34, 34, 0};
-        gbl_producerPanel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
+        gbl_producerPanel.columnWeights = new double[]{1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
         gbl_producerPanel.rowWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
         producerPanel.setLayout(gbl_producerPanel);
         JButton createMotorFactoryButton = new JButton("Create Motor Factory");
@@ -126,7 +129,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
         
         bodyFactoryStatus = new StatusLight();
         GridBagConstraints gbc_bodyFactoryStatus = new GridBagConstraints();
-        gbc_bodyFactoryStatus.insets = new Insets(5, 0, 0, 0);
+        gbc_bodyFactoryStatus.insets = new Insets(5, 5, 5, 5);
         gbc_bodyFactoryStatus.fill = GridBagConstraints.BOTH;
         gbc_bodyFactoryStatus.gridx = 0;
         gbc_bodyFactoryStatus.gridy = 0;
@@ -152,9 +155,18 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
         createWheelFactoryButton.setActionCommand("wheel");
         createWheelFactoryButton.addActionListener(listener);
         
+        bodyErrorRateSpinner = new JSpinner();
+        bodyErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+        GridBagConstraints gbc_bodyErrorRateSpinner = new GridBagConstraints();
+        gbc_bodyErrorRateSpinner.fill = GridBagConstraints.BOTH;
+        gbc_bodyErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
+        gbc_bodyErrorRateSpinner.gridx = 3;
+        gbc_bodyErrorRateSpinner.gridy = 0;
+        producerPanel.add(bodyErrorRateSpinner, gbc_bodyErrorRateSpinner);
+        
         wheelFactoryStatus = new StatusLight();
         GridBagConstraints gbc_wheelFactoryStatus = new GridBagConstraints();
-        gbc_wheelFactoryStatus.insets = new Insets(5, 0, 0, 0);
+        gbc_wheelFactoryStatus.insets = new Insets(5, 5, 5, 5);
         gbc_wheelFactoryStatus.fill = GridBagConstraints.BOTH;
         gbc_wheelFactoryStatus.gridx = 0;
         gbc_wheelFactoryStatus.gridy = 1;
@@ -175,9 +187,18 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
         gbc_wheelCountSpinner.gridy = 1;
         producerPanel.add(wheelCountSpinner, gbc_wheelCountSpinner);
         
+        wheelErrorRateSpinner = new JSpinner();
+        wheelErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+        GridBagConstraints gbc_wheelErrorRateSpinner = new GridBagConstraints();
+        gbc_wheelErrorRateSpinner.fill = GridBagConstraints.BOTH;
+        gbc_wheelErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
+        gbc_wheelErrorRateSpinner.gridx = 3;
+        gbc_wheelErrorRateSpinner.gridy = 1;
+        producerPanel.add(wheelErrorRateSpinner, gbc_wheelErrorRateSpinner);
+        
         motorFactoryStatus = new StatusLight();
         GridBagConstraints gbc_motorFactoryStatus = new GridBagConstraints();
-        gbc_motorFactoryStatus.insets = new Insets(5, 0, 0, 0);
+        gbc_motorFactoryStatus.insets = new Insets(5, 5, 5, 5);
         gbc_motorFactoryStatus.fill = GridBagConstraints.BOTH;
         gbc_motorFactoryStatus.gridx = 0;
         gbc_motorFactoryStatus.gridy = 2;
@@ -199,6 +220,15 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
         producerPanel.add(motorCountSpinner, gbc_motorCountSpinner);
         container.add(label);
         container.add(producerPanel);
+        
+        motorErrorRateSpinner = new JSpinner();
+        motorErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+        GridBagConstraints gbc_motorErrorRateSpinner = new GridBagConstraints();
+        gbc_motorErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
+        gbc_motorErrorRateSpinner.fill = GridBagConstraints.BOTH;
+        gbc_motorErrorRateSpinner.gridx = 3;
+        gbc_motorErrorRateSpinner.gridy = 2;
+        producerPanel.add(motorErrorRateSpinner, gbc_motorErrorRateSpinner);
         padding.add(container);
         getContentPane().add(padding, BorderLayout.NORTH);
 	}
@@ -249,27 +279,30 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 			String command = e.getActionCommand();
 			if(command.equals("body")) {
 				int value = (Integer) bodyCountSpinner.getValue();
+				double errorRate = (Double) bodyErrorRateSpinner.getValue();
 				IFactory bodyFactory = factoryFacade.getInstance(ProducerType.BODY);
 				if(!bodyFactory.isRunning()) {
-					bodyFactory.init(value);
+					bodyFactory.init(value, errorRate);
 					bodyFactory.start();
 					bodyFactory.addObserver(ProductionUI.this);
 					bodyFactoryStatus.setActive();
 				}
 			} else if(command.equals("wheel")) {
-				int value = (Integer) wheelCountSpinner.getValue();
+				int amount = (Integer) wheelCountSpinner.getValue();
+				double errorRate = (Double) wheelErrorRateSpinner.getValue();
 				IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
 				if(!wheelFactory.isRunning()) {
-					wheelFactory.init(value);
+					wheelFactory.init(amount, errorRate);
 					wheelFactory.start();
 					wheelFactory.addObserver(ProductionUI.this);
 					wheelFactoryStatus.setActive();
 				}
 			} else if(command.equals("motor")) {
-				int value = (Integer) motorCountSpinner.getValue();
+				int amount = (Integer) motorCountSpinner.getValue();
+				double errorRate = (Double) motorErrorRateSpinner.getValue();
 				IFactory motorFactory = factoryFacade.getInstance(ProducerType.MOTOR);
 				if(!motorFactory.isRunning()) {
-					motorFactory.init(value);
+					motorFactory.init(amount, errorRate);
 					motorFactory.start();
 					motorFactory.addObserver(ProductionUI.this);
 					motorFactoryStatus.setActive();

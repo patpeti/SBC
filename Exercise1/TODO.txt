@@ -1,15 +1,15 @@
  1. Update GUI: 
-	* UI must fit on Notebook Screen (add JScrollPane)
+	* UI must fit on Notebook Screen (add JScrollPane) [DONE]
 	* Update UI to show if part is defect
-	* Add parameter to producers for set the error rate for each producer.
+	* Add parameter to producers for set the error rate for each producer. [DONE]
  2. Produce defect parts:
 	* Add boolean for each entity: isDefect
 	* Also save for each car if it is defect
- 3. Create one container per part and for car -- check
+ 3. Create one container per part and for car [DONE]
 	* Clean up coordinators
 	* Add one container for Tasks (FIFO Order for tasks)
 	* Add one container for defect cars
- 4. Solve ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle IDs
+ 4. Solve XVSM ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle IDs
  5. Make sure that more than one painter, assembler and supervisor can run
  6. Add taskId field to Car [DONE]
  7. Create a new worker to perform testing:

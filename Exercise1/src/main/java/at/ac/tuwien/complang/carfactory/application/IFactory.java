@@ -5,7 +5,7 @@ import java.util.Observer;
 public interface IFactory {
 	void start();
 	void stop();
-	void init(int count);
+	void init(int amount, double errorRate);
 	boolean isRunning();
 	/**
 	 * Used to register a java.util.Observer that will
