@@ -9,18 +9,19 @@
 	* Clean up coordinators
 	* Add one container for Tasks (FIFO Order for tasks)
 	* Add one container for defect cars
- 4. Solve ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle ids
+ 4. Solve ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle IDs
  5. Make sure that more than one painter, assembler and supervisor can run
- 6. Add taskId field to Car
+ 6. Add taskId field to Car [DONE]
  7. Create a new worker to perform testing:
 	* ui.xvsm.StartUpTester [DONE]
 	* ui.jms.StartUpTester [DONE]
 	* businesslogic.xvsm.Tester
 	* businesslogic.jms.Tester
  8. Add transactions for painter, supervisor and tester
- 9. Motor: Add field for power
-10. Override the AbstractFactory.finished() method in all
-    JMS Factories to disconnect from the message queue
+ 9. Motor: Add field for power [DONE]
+10. Override the AbstractFactory.finished() method 
+	in all JMS Factories [DONE] 
+    and disconnect from the message queue
 	
 Final:
 	* Create a Powerpoint

@@ -15,6 +15,7 @@ public class Motor implements Serializable, ICarPart {
 	//Fields
 	private long id;
 	private long pid; //ID of the producer
+	private MotorType power; //the power of the motor 
 	
 	public Motor(long pid) {
 		this.id = AbstractFactory.carPartId;
@@ -37,4 +38,12 @@ public class Motor implements Serializable, ICarPart {
 	public CarPartType getType() {
 		return this.type;
 }
+
+	public MotorType getPower() {
+		return power;
+	}
+
+	public void setPower(MotorType power) {
+		this.power = power;
+	}
 }
