@@ -73,6 +73,12 @@ public class JmsPainter extends JmsAbstractWorker {
 					if(objectMessage == null) {
 						objectMessage = (ObjectMessage) bodyConsumer.receive(1);
 					}
+					if(objectMessage == null) {
+						//Sleep 500ms if both message queues are empty
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) { }
+					}
 				}
 				Serializable object = (Serializable) objectMessage.getObject();
 				if(object instanceof Car) {
@@ -80,7 +86,6 @@ public class JmsPainter extends JmsAbstractWorker {
 					if(car.getPaintState() == PaintState.PAINTED) {
 						throw new RuntimeException("PAINTED cars should only be in the painted car queue");
 					}
-					car.setPaintState(PaintState.PAINTED);
 					car.setColor(pid, color);
 					MessageProducer messageProducer;
 					try {
@@ -93,7 +98,7 @@ public class JmsPainter extends JmsAbstractWorker {
 				} else if (object instanceof Body) {
 					Body body = (Body) object;
 					if(body.getPaintState() == PaintState.PAINTED) {
-						throw new RuntimeException("PAINTED cars should only be in the painted car queue");
+						throw new RuntimeException("PAINTED bodies should only be in the painted bodies queue");
 					}
 					body.setPaintState(PaintState.PAINTED);
 					body.setColor(pid, color);
@@ -107,7 +112,6 @@ public class JmsPainter extends JmsAbstractWorker {
 					}
 				}
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
