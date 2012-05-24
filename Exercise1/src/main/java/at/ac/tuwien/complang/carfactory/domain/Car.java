@@ -21,13 +21,11 @@ public class Car implements Serializable, ICarPart {
     private long taskId; //ID of the task for which this car was produced
     private Motor motor;
     private Body body;
-    private PaintState paintState;
     private Wheel[] wheels = new Wheel[4];
     
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
-    	this.paintState = PaintState.UNPAINTED;
     	this.id = AbstractFactory.carPartId;
 		AbstractFactory.carPartId++;
     	this.pid = pid;
@@ -49,7 +47,6 @@ public class Car implements Serializable, ICarPart {
         return this.body.getColor();
     }
     public void setColor(long pid, Color color) {
-    	this.paintState = PaintState.PAINTED;
     	this.body.setColor(pid, color);
     }
 
@@ -129,10 +126,6 @@ public class Car implements Serializable, ICarPart {
 
 	public PaintState getPaintState() {
 		return this.body.getPaintState();
-	}
-
-	public void setPaintState(PaintState paintState) {
-		this.paintState = paintState;
 	}
 
 	public long getTaskId() {
