@@ -8,6 +8,7 @@ import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 public class Motor implements Serializable, ICarPart {
 	private static final long serialVersionUID = 1L;
 	private static final CarPartType type = CarPartType.MOTOR;
+	private boolean isDefect;
 
 	//Static fields
 //	private static long next_id = 0;
@@ -32,11 +33,11 @@ public class Motor implements Serializable, ICarPart {
 	}
 	
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getType(), pid, ""};
+		return new Object[] {id, this.getType(), pid, isDefect ? "Defect" : ""};
 	}
 	
 	public CarPartType getType() {
-		return this.type;
+		return Motor.type;
 }
 
 	public MotorType getPower() {

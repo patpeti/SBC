@@ -55,11 +55,13 @@ public class Body implements Serializable, ICarPart {
 	}
 
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getType(), pid, (color != null) ? "Painted" : "No Color"};
+		String note = (color != null) ? "Painted" : "No Color";
+		note += isDefect ? ", Defect" : "";
+		return new Object[] {id, this.getType(), pid, note};
 	}
 
 	public CarPartType getType() {
-			return this.type;
+			return Body.type;
 	}
 
 	public PaintState getPaintState() {
