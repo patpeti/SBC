@@ -20,28 +20,41 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private ActiveMQConnectionFactory connectionFactory;
 
 	public JmsBodyFactory(long id, IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);
+		connectionFactory = new ActiveMQConnectionFactory();
+
+	}
+	
+	private void connect() {
+		try {
+			connection = connectionFactory.createConnection();
+			connection.start();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void produce() {
 		Body body = new Body(id);
 		System.out.println("Produced a body with ID: " + body.getId());
 		System.out.println("writing Body into jms...");
-		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
 		try {
-			connection = conFac.createConnection();
-			connection.start();
+			if(connection == null) {
+				connect();
+			}
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue queue = session.createQueue(QueueConstants.BODYQUEUE);
 			MessageProducer msgProducer = session.createProducer(queue);
 			//object message
 			msgProducer.send(session.createObjectMessage(body));
-			connection.close();
 			getListener().onObjectWrittenInQueue(body);
+			session.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -60,5 +73,13 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 	public void finished() {
 		setChanged();
 		notifyObservers("BODY");
+		try {
+			connection.close();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			connection = null;
+		}
 	}
 }
