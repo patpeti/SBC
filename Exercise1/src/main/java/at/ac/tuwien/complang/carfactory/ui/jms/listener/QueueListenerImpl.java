@@ -55,25 +55,31 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			if(part instanceof Car) {
 				System.out.println("Car (" + part.getId() + ") was received, im going to tell the GUI...");
 				Car car = (Car) part;
+				Body body = car.getBody();
+				Wheel[] wheels = car.getWheels();
+				Motor motor = car.getMotor();
 				if(!car.hasColor()) {
 					gui.addCar(car);
-					//TODO: remove parts...
-					Body body = car.getBody();
-					Wheel[] wheels = car.getWheels();
-					Motor motor = car.getMotor();
 					gui.removePart(body);
 					gui.removePart(motor);
 					for(Wheel wheel : wheels) {
 						gui.removePart(wheel);
 					}
 				} else {
-					gui.addOrUpdateCar(car);
+					//We need to know here if the car is already in the data model of the ui. Because it could be,
+					//that we receive a car object here which was already in the data model (as unpainted car) or 
+					//it could also be that we receive a car that was build with a painted body part and is thus 
+					//already painted. In the later case, we still need to remove the parts from the data model,
+					//that were used by the car.
+					if(!gui.updateCar(car)) {
+						gui.addCar(car);
+						gui.removePart(body);
+						gui.removePart(motor);
+						for(Wheel wheel : wheels) {
+							gui.removePart(wheel);
+						}
+					}
 				}
-				//update the semi/finished table model with the car object
-				//If we receive a car, we must backtrack the parts used in the car to know what we shouljad remove from the parts list
-				//1. Car is not complete and not painted (from the carTopic)
-				//2. Car is painted but not completed (from the paintedCarTopic)
-				//3. Car is painted and completed (from the finishedCarTopic). This case has no representation in the GUI yet!
 			} else {
 				// The only ICarPart object we can receive which is not a car, 
 				// is a painted body, in this case, we need to update the body in 

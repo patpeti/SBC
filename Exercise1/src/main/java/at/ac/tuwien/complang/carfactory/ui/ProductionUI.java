@@ -235,42 +235,37 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
 
 	@Override
-	public void addPart(ICarPart carPart) {
+	public boolean addPart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
-		partsDataTableModel.addRow(carPart.getObjectData());
+		return partsDataTableModel.addRow(carPart.getObjectData());
 	}
 	
 	@Override
-	public void updatePart(ICarPart carPart) {
-		partsDataTableModel.updateRow(carPart.getObjectData());
+	public boolean updatePart(ICarPart carPart) {
+		return partsDataTableModel.updateRow(carPart.getObjectData());
 	}
 	
 	@Override
-	public void removePart(ICarPart carPart) {
+	public boolean removePart(ICarPart carPart) {
 		System.out.println("#GUI# : CarPart " + carPart.getId() + " removed from warehouse");
-		partsDataTableModel.deleteRow(carPart.getObjectData());
+		return partsDataTableModel.deleteRow(carPart.getObjectData());
 	}
 
 	@Override
-	public void addCar(Car car) {
+	public boolean addCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " added to warehouse");
-		finishedGoodsTableModel.addRow(car.getObjectData());
+		return finishedGoodsTableModel.addRow(car.getObjectData());
 	}
 	
 	@Override
-	public void removeCar(Car car) {
+	public boolean removeCar(Car car) {
 		System.out.println("#GUI# : Car " + car.getId() + " removed from warehouse");
-		finishedGoodsTableModel.removeRow(car.getObjectData());
+		return finishedGoodsTableModel.removeRow(car.getObjectData());
 	}
 	
 	@Override
-	public void updateCar(Car car) {
-		finishedGoodsTableModel.updateRow(car.getObjectData());
-	}
-	
-	@Override
-	public void addOrUpdateCar(Car car) {
-		finishedGoodsTableModel.addOrUpdateRow(car.getObjectData());
+	public boolean updateCar(Car car) {
+		return finishedGoodsTableModel.updateRow(car.getObjectData());
 	}
 
 	class CreationListener implements ActionListener {

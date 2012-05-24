@@ -47,25 +47,36 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		}
 	}
 
-	public synchronized void addRow(Object[] dates) {
+	public synchronized boolean addRow(Object[] dates) {
 		data.add(dates);
 		int row = data.indexOf(dates);
-		fireTableRowsInserted(row, row);
+		if(row != -1) {
+			fireTableRowsInserted(row, row);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public synchronized void removeRow(Object[] objectData) {
+	public synchronized boolean removeRow(Object[] objectData) {
 		for(Object[] object : data) {
 			if(object[0].equals(objectData[0])) {
 				int index = data.indexOf(object);
 				data.remove(object);
 				fireTableRowsDeleted(index, index);
-				return;
+				return true;
 			}
 		}
 		System.out.println("Could not remove object from finished products");
+		return false;
 	}
 	
-	public synchronized void updateRow(Object[] objectData) {
+	/**
+	 * Updates the row which stores the respective data
+	 * @param objectData The Data show store in the TableDataModel.
+	 * @return Returns true if the row was successfully updated, false otherwise.
+	 */
+	public synchronized boolean updateRow(Object[] objectData) {
 		int index = -1;
 		for(Object[] object : data) {
 			if(object[0].equals(objectData[0])) {
@@ -76,25 +87,9 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		if(index != -1) {
 			data.set(index, objectData);
 			fireTableRowsUpdated(index, index);
-		}
-	}
-
-	public void addOrUpdateRow(Object[] objectData) {
-		// TODO Auto-generated method stub
-		int index = -1;
-		for(Object[] object : data) {
-			if(object[0].equals(objectData[0])) {
-				index = data.indexOf(object);
-				break;
-			}
-		}
-		if(index != -1) {
-			data.set(index, objectData);
-			fireTableRowsUpdated(index, index);
+			return true;
 		} else {
-			data.add(objectData);
-			int row = data.indexOf(objectData);
-			fireTableRowsInserted(row, row);
+			return false;
 		}
 	}
 }

@@ -11,12 +11,11 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
  */
 public interface IFactoryData {
 	//Car Methods
-	void addCar(Car car);
-	void removeCar(Car car);
-	void updateCar(Car car);
-	void addOrUpdateCar(Car car);
+	boolean addCar(Car car);
+	boolean removeCar(Car car);
+	boolean updateCar(Car car);
 	//Part Methods
-	void addPart(ICarPart carPart);
-	void removePart(ICarPart carPart);
-	void updatePart(ICarPart carPart);
+	boolean addPart(ICarPart carPart);
+	boolean removePart(ICarPart carPart);
+	boolean updatePart(ICarPart carPart);
 }
