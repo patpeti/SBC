@@ -11,6 +11,7 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ConnectionClosedException;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
@@ -123,6 +124,16 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			}
 			System.out.println("[QueueListener] Listener attached (listening for messages on all queues)");
 		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void disconnect() {
+		try {
+			connection.close();
+			System.out.println("Shutdown complete.");
+		} catch (JMSException e) {
+			if(e instanceof ConnectionClosedException) return;
 			e.printStackTrace();
 		}
 	}

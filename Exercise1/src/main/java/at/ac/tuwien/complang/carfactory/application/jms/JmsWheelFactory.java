@@ -39,9 +39,10 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue queue = session.createQueue(QueueConstants.WHEELQUEUE);
 			MessageProducer msgProducer = session.createProducer(queue);
+			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
+			getListener().onObjectWrittenInQueue(wheel);
 			msgProducer.send(session.createObjectMessage(wheel));
 			connection.close();
-			getListener().onObjectWrittenInQueue(wheel); //notify GUI
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

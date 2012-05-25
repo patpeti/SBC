@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 
+import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -9,6 +10,7 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
@@ -38,15 +40,16 @@ public class JmsAssembler extends JmsAbstractWorker {
 	}
 
 	public void startWorkLoop() {
-		while(true) {
+		running = true;
+		while(running) {
 			//produce some cars
-			Body body = getOneBody();
-			Motor motor = getOneMotor();
-			Wheel[] wheels = getFourWheels();
-			Car car = new Car(pid, body, motor, wheels);
-			//write the car to the queue
-			MessageProducer messageProducer;
 			try {
+				Body body = getOneBody();
+				Motor motor = getOneMotor();
+				Wheel[] wheels = getFourWheels();
+				Car car = new Car(pid, body, motor, wheels);
+				//write the car to the queue
+				MessageProducer messageProducer;
 				if(car.hasColor()) {
 					messageProducer = session.createProducer(paintedCarTopic);
 					messageProducer.send(session.createObjectMessage(car));
@@ -57,18 +60,25 @@ public class JmsAssembler extends JmsAbstractWorker {
 					System.out.println("One unpainted car produced with id: " + car.getId());
 				}
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
+				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
 			}
 		}
 		//disconnect from queue
-		//disconnect(); //TODO: implement the conditions for which the assembler terminates
+		disconnect();
+		shutdownComplete = true;
+		synchronized(runningMutex) {
+			runningMutex.notifyAll();
+		}
 	}
 
 	@Override
 	protected void connectToQueues() {
 		//Connect to all queues that are required by the assembler
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+		ActiveMQPrefetchPolicy policy = new ActiveMQPrefetchPolicy();
+		policy.setQueuePrefetch(0); //Do not previously fetch any messages from the queue
+		connectionFactory.setPrefetchPolicy(policy);
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
@@ -90,54 +100,38 @@ public class JmsAssembler extends JmsAbstractWorker {
 		}
 	}
 	
-	private Body getOneBody() {
+	private Body getOneBody() throws JMSException {
 		ObjectMessage message = null;
-		try {
-			while(message == null) {
-				message = (ObjectMessage) bodyConsumer.receive(10);
-				if(message == null) {
-					message = (ObjectMessage) paintedBodyConsumer.receive(10);
-				}
+		while(message == null) {
+			message = (ObjectMessage) bodyConsumer.receive(10);
+			if(message == null) {
+				message = (ObjectMessage) paintedBodyConsumer.receive(10);
 			}
-			Body body = (Body) message.getObject();
-			System.out.println("Received Body: " + body.getId());
-			return body;
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		return null;
+		Body body = (Body) message.getObject();
+		System.out.println("Received Body: " + body.getId());
+		return body;
 	}
 
-	private Wheel[] getFourWheels() {
+	private Wheel[] getFourWheels() throws JMSException {
 		ObjectMessage message;
 		Wheel[] wheels = new Wheel[4];
-		try {
-			for(int i=0; i<4; i++) {
-				message = (ObjectMessage) wheelConsumer.receive();
-				Wheel wheel = (Wheel) message.getObject();
-				System.out.println("Received Wheel: " + wheel.getId());
-				wheels[i] = wheel;
-			}
-			return wheels;
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for(int i=0; i<4; i++) {
+			message = (ObjectMessage) wheelConsumer.receive();
+			if(message == null) throw new IllegalStateException("Connection was closed.");
+			Wheel wheel = (Wheel) message.getObject();
+			System.out.println("Received Wheel: " + wheel.getId());
+			wheels[i] = wheel;
 		}
-		return null;
+		return wheels;
 	}
 	
-	private Motor getOneMotor() {
+	private Motor getOneMotor() throws JMSException {
 		ObjectMessage message;
-		try {
-			message = (ObjectMessage) motorConsumer.receive();
-			Motor motor = (Motor) message.getObject();
-			System.out.println("Received Motor: " + motor.getId());
-			return motor;
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		message = (ObjectMessage) motorConsumer.receive();
+		if(message == null) throw new IllegalStateException("Connection was closed.");
+		Motor motor = (Motor) message.getObject();
+		System.out.println("Received Motor: " + motor.getId());
+		return motor;
 	}
 }

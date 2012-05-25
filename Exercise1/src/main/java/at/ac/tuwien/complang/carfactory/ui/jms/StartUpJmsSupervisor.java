@@ -1,17 +1,38 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
+import java.io.IOException;
+
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsSupervisor;
 
 public class StartUpJmsSupervisor {
 
 	//Static Fields
-	static int id;
+	private static int id;
+	private static JmsSupervisor supervisor;
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		JmsSupervisor supervisor = new JmsSupervisor(id);
+		supervisor = new JmsSupervisor(id);
+		Thread worker = new Thread(supervisor);
 		supervisor.initialize();
-		supervisor.startWorkLoop();
+		worker.start();
+		System.out.println("Supervisor has started in background.");
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Shutting down gracefully, please wait.");
+				supervisor.shutdown();
+			}
+		});
+		//The following lines are needed to be able to kill the program from within eclipse.
+		try {
+			System.out.println("Press enter to terminate application");
+			System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 	
 	private static void parseArguments(String[] args) {

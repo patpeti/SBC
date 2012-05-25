@@ -1,18 +1,38 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import java.awt.Color;
+import java.io.IOException;
 
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsPainter;
 
 public class StartUpJmsPainter {
-	static int id;
-	static Color color;
+	private static int id;
+	private static Color color;
+	private static JmsPainter painter; 
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		JmsPainter painter = new JmsPainter(id, color);
+		painter = new JmsPainter(id, color);
+		Thread worker = new Thread(painter);
 		painter.initialize();
-		painter.startWorkLoop(); //currently the loop needs to be terminated by pressing CTRL+C
+		worker.start();
+		System.out.println("Painter has started in background.");
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Shutting down gracefully, please wait.");
+				painter.shutdown();
+			}
+		});
+		//The following lines are needed to be able to kill the program from within eclipse.
+		try {
+			System.out.println("Press enter to terminate application");
+			System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 	
 	private static void parseArguments(String[] args) {
