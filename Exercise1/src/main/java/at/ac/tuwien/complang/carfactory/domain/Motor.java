@@ -6,17 +6,16 @@ import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
 
 public class Motor implements Serializable, ICarPart {
-	private static final long serialVersionUID = 1L;
-	private static final CarPartType type = CarPartType.MOTOR;
-	private boolean isDefect;
 
 	//Static fields
-//	private static long next_id = 0;
+	private static final long serialVersionUID = 1L;
+	private static final CarPartType type = CarPartType.MOTOR;
 	
 	//Fields
 	private long id;
 	private long pid; //ID of the producer
-	private MotorType power; //the power of the motor 
+	private MotorType power; //the power of the motor
+	private boolean isDefect;
 	
 	public Motor(long pid) {
 		this.id = AbstractFactory.carPartId;
