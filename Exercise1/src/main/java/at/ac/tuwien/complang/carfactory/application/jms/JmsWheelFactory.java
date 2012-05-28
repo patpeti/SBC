@@ -29,6 +29,10 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Wheel wheel = new Wheel(id);
+		double random = Math.random();
+		if(random < errorRate) {
+			wheel.setDefect(true);
+		}
 		System.out.println("Produced a wheel with ID: " + wheel.getId());
 		
 		System.out.println("writing wheel into jms...");

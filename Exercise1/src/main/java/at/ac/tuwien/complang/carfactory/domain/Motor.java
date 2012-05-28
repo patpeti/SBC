@@ -47,4 +47,12 @@ public class Motor implements Serializable, ICarPart {
 	public void setPower(MotorType power) {
 		this.power = power;
 	}
+
+	public boolean isDefect() {
+		return isDefect;
+	}
+
+	public void setDefect(boolean isDefect) {
+		this.isDefect = isDefect;
+	}
 }

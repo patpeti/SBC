@@ -29,6 +29,10 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Motor motor = new Motor(id);
+		double random = Math.random();
+		if(random < errorRate) {
+			motor.setDefect(true);
+		}
 		System.out.println("Produced a motor with id: " + motor.getId());
 		
 		System.out.println("writing Motor into jms...");

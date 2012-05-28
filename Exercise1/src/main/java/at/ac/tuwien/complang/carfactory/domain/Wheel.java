@@ -37,4 +37,12 @@ public class Wheel implements Serializable, ICarPart {
 	public CarPartType getType() {
 		return Wheel.type;
 	}
+
+	public boolean isDefect() {
+		return isDefect;
+	}
+
+	public void setDefect(boolean isDefect) {
+		this.isDefect = isDefect;
+	}
 }

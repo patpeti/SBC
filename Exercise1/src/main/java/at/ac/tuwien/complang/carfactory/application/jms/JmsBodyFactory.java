@@ -42,6 +42,10 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Body body = new Body(id);
+		double random = Math.random();
+		if(random < errorRate) {
+			body.setDefect(true);
+		}
 		System.out.println("Produced a body with ID: " + body.getId());
 		System.out.println("writing Body into jms...");
 		try {
