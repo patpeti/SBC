@@ -43,9 +43,11 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	//Fields
 	private JSpinner bodyCountSpinner, bodyErrorRateSpinner,
 		wheelCountSpinner, wheelErrorRateSpinner,
-		motorCountSpinner, motorErrorRateSpinner;
+		motorCountSpinner, motorErrorRateSpinner,
+		amountSpinner; //for the task creation
 	private JPanel tableContainer;
-	
+	private JComboBox powerTypeCombo, colorCombo;
+
 	private IFacade factoryFacade;
 	private JTable partsTable, finishedGoodsTable;
 	private SpaceDataTableModel partsDataTableModel;
@@ -89,15 +91,15 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		gbl_taskPanel.columnWeights = new double[]{Double.MIN_VALUE, 0.0, 0.0, 0.0};
 		gbl_taskPanel.rowWeights = new double[]{Double.MIN_VALUE};
 		taskPanel.setLayout(gbl_taskPanel);
-		JComboBox typeCombo = new JComboBox();
-		typeCombo.setModel(new DefaultComboBoxModel(MotorType.values()));
+		powerTypeCombo = new JComboBox();
+		powerTypeCombo.setModel(new DefaultComboBoxModel(MotorType.values()));
 		GridBagConstraints gbc_typeCombo = new GridBagConstraints();
 		gbc_typeCombo.insets = new Insets(0, 0, 0, 5);
 		gbc_typeCombo.gridy = 0;
 		gbc_typeCombo.gridx = 0;
 		gbc_typeCombo.fill = GridBagConstraints.BOTH;
-		taskPanel.add(typeCombo, gbc_typeCombo);
-		JComboBox colorCombo = new JComboBox();
+		taskPanel.add(powerTypeCombo, gbc_typeCombo);
+		colorCombo = new JComboBox();
 		colorCombo.setModel(new DefaultComboBoxModel(new String[] {"RED", "GREEN", "BLUE"}));
 		GridBagConstraints gbc_colorCombo = new GridBagConstraints();
 		gbc_colorCombo.insets = new Insets(0, 0, 0, 5);
@@ -106,16 +108,17 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		gbc_colorCombo.fill = GridBagConstraints.BOTH;
 		taskPanel.add(colorCombo, gbc_colorCombo);
 		
-		JSpinner countSpinner = new JSpinner();
-		countSpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		amountSpinner = new JSpinner();
+		amountSpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		GridBagConstraints gbc_countSpinner = new GridBagConstraints();
 		gbc_countSpinner.fill = GridBagConstraints.BOTH;
 		gbc_countSpinner.insets = new Insets(0, 0, 0, 5);
 		gbc_countSpinner.gridx = 2;
 		gbc_countSpinner.gridy = 0;
-		taskPanel.add(countSpinner, gbc_countSpinner);
+		taskPanel.add(amountSpinner, gbc_countSpinner);
 		
 		JButton startTaskButton = new JButton("Start Task");
+		startTaskButton.setActionCommand("task");
 		GridBagConstraints gbc_startTaskButton = new GridBagConstraints();
 		gbc_startTaskButton.fill = GridBagConstraints.BOTH;
 		gbc_startTaskButton.gridx = 3;
@@ -364,10 +367,11 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		public void actionPerformed(ActionEvent event) {
 			String command = event.getActionCommand();
 			if(command.equals("task")) {
-				MotorType type;
-				String colorString;
-				int amount;
-				//TODO
+				MotorType type = (MotorType) powerTypeCombo.getSelectedItem();
+				String colorString = (String) colorCombo.getSelectedItem();
+				int amount = (Integer) amountSpinner.getValue();
+				//TODO: pass values to some kind of task controller which then creates the
+				//       task object and writes it into the space
 			}
 		}
 	}
