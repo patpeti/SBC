@@ -10,6 +10,7 @@ import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 
 public class SpaceListener implements NotificationListener {
@@ -38,6 +39,9 @@ public class SpaceListener implements NotificationListener {
 				} else if (entry.getValue() instanceof ICarPart) { //its not a car but still a carpart
 					ICarPart part = (ICarPart) entry.getValue();
 					data.addPart(part);
+				} else if (entry.getValue() instanceof Task) {
+					Task task = (Task) entry.getValue();
+					data.addTask(task);
 				}
 			}
 		} else if(operation.name().equals("TAKE")) {

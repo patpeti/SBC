@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui;
 
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 
 /**
  * Implemented by the GUI and used to notify the GUI of
@@ -18,4 +19,8 @@ public interface IFactoryData {
 	boolean addPart(ICarPart carPart);
 	boolean removePart(ICarPart carPart);
 	boolean updatePart(ICarPart carPart);
+	//Task Methods
+	boolean addTask(Task task);
+	boolean removeTask(Task task);
+	boolean updateTask(Task task);
 }

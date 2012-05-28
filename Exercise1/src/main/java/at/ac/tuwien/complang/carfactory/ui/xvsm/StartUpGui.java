@@ -47,6 +47,9 @@ public class StartUpGui {
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new QueryCoordinator());
+			List<Coordinator> taskCoordinators = new ArrayList<Coordinator>();
+			taskCoordinators.add(new AnyCoordinator());
+			taskCoordinators.add(new KeyCoordinator());
 			List<Coordinator> optionalCoords = new ArrayList<Coordinator>();
 			optionalCoords.add(new FifoCoordinator());
 			try {
@@ -54,7 +57,7 @@ public class StartUpGui {
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				carContainer = capi.createContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				bodyContainer = capi.createContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
-				taskContainer = capi.createContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				taskContainer = capi.createContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  taskCoordinators, optionalCoords, null);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
@@ -82,6 +85,7 @@ public class StartUpGui {
 			notificationManager.createNotification(containers.get(1), listener, operations, null, null);
 			notificationManager.createNotification(containers.get(2), listener, operations, null, null);
 			notificationManager.createNotification(containers.get(3), listener, operations, null, null);
+			notificationManager.createNotification(taskContainer, listener, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

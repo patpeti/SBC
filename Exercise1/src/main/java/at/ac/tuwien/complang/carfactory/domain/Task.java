@@ -11,6 +11,7 @@ public class Task implements Serializable {
 	//Fields
 	private MotorType motortype;
 	private int amount;
+	private int amountCompleted;
 	private Color color;
 	private long id;
 	
@@ -44,5 +45,34 @@ public class Task implements Serializable {
 
 	public long getId() {
 		return id;
+	}
+
+	public int getAmountCompleted() {
+		return amountCompleted;
+	}
+
+	public void setAmountCompleted(int amountCompleted) {
+		this.amountCompleted = amountCompleted;
+	}
+	
+	public Object[] getObjectData() {
+		String colorString;
+		if(color == null) {
+			colorString = "NONE";
+		} else if(color.equals(Color.RED)) {
+			colorString = "RED";
+		} else if(color.equals(Color.BLUE)) {
+			colorString = "BLUE";
+		} else if(color.equals(Color.GREEN)) {
+			colorString = "GREEN";
+		} else {
+			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
+		}
+		return new Object[] {
+				motortype.getType(),
+				colorString,
+				amount,
+				amountCompleted
+		};
 	}
 }

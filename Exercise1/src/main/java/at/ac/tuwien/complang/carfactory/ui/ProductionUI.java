@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import at.ac.tuwien.complang.carfactory.application.IFacade;
@@ -32,9 +34,11 @@ import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.MotorType;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.ui.panels.StatusLight;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
+import at.ac.tuwien.complang.carfactory.ui.tableModels.TaskDataTableModel;
 
 public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
@@ -50,9 +54,9 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	private JComboBox powerTypeCombo, colorCombo;
 
 	private IFacade factoryFacade;
-	private JTable partsTable, finishedGoodsTable;
 	private SpaceDataTableModel partsDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
+	private TaskDataTableModel taskTableModel;
 	private StatusLight bodyFactoryStatus,wheelFactoryStatus,motorFactoryStatus;
 	private ITaskController taskController;
 
@@ -78,6 +82,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		this.setVisible(true);
 	}
 	private JPanel buildTaskPanel() {
+		CreateTaskListener listener = new CreateTaskListener();
 		JPanel padding = new JPanel(); //outer most panel used for padding around the inner pannels
 		JPanel container= new JPanel(); //container panel with up/down layout
 		BoxLayout layout = new BoxLayout(container, BoxLayout.PAGE_AXIS);
@@ -122,6 +127,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		
 		JButton startTaskButton = new JButton("Start Task");
 		startTaskButton.setActionCommand("task");
+		startTaskButton.addActionListener(listener);
 		GridBagConstraints gbc_startTaskButton = new GridBagConstraints();
 		gbc_startTaskButton.fill = GridBagConstraints.BOTH;
 		gbc_startTaskButton.gridx = 3;
@@ -130,15 +136,21 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		return padding;
 	}
 
-  
-    private void buildTables() {
-    	JPanel partsTable = buildPartsTable();
-    	JPanel finishedGoodsTable = buildFinishedGoodsTable();
-    	tableContainer.add(partsTable);
-    	tableContainer.add(finishedGoodsTable);
-    	getContentPane().add(tableContainer, BorderLayout.CENTER);
-    }
-    
+
+	private void buildTables() {
+		JPanel partsTable = buildPartsTable();
+		JPanel finishedGoodsTable = buildFinishedGoodsTable();
+		JPanel taskTable = buildTaskTable();
+		JPanel container = new JPanel();
+		BoxLayout layout = new BoxLayout(container, BoxLayout.X_AXIS);
+		container.setLayout(layout);
+		container.add(partsTable);
+		container.add(taskTable);
+		tableContainer.add(container);
+		tableContainer.add(finishedGoodsTable);
+		getContentPane().add(tableContainer, BorderLayout.CENTER);
+	}
+
     /**
      * Show the Table for the content of the space
      */
@@ -147,7 +159,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
     	JLabel label = new JLabel("Current Content of the Space");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	partsDataTableModel = new SpaceDataTableModel();
-    	partsTable = new JTable(partsDataTableModel);
+    	JTable partsTable = new JTable(partsDataTableModel);
     	partsTable.setAutoResizeMode(HEIGHT);
     	JScrollPane scrollPane = new JScrollPane(partsTable);
     	partsTable.setFillsViewportHeight(true);
@@ -162,7 +174,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
     	JLabel label = new JLabel("(Semi-)Finished Goods");
     	label.setAlignmentX(CENTER_ALIGNMENT);
     	finishedGoodsTableModel = new FinishedGoodsTableModel();
-    	finishedGoodsTable = new JTable(finishedGoodsTableModel);
+    	JTable finishedGoodsTable = new JTable(finishedGoodsTableModel);
     	finishedGoodsTable.setAutoResizeMode(HEIGHT);
     	JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
     	finishedGoodsTable.setFillsViewportHeight(true);
@@ -171,6 +183,21 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
     	finishedGoodsTablePanel.add(scrollPane);
     	return finishedGoodsTablePanel;
     }
+
+	private JPanel buildTaskTable() {
+		JPanel taskTablePanel = new JPanel();
+		JLabel label = new JLabel("Current Tasks");
+		label.setAlignmentX(CENTER_ALIGNMENT);
+		taskTableModel = new TaskDataTableModel();
+		JTable taskTable = new JTable(taskTableModel);
+		taskTable.setAutoResizeMode(HEIGHT);
+		JScrollPane scrollPane = new JScrollPane(taskTable);
+		taskTable.setFillsViewportHeight(true);
+		taskTablePanel.setLayout(new BoxLayout(taskTablePanel, BoxLayout.Y_AXIS));
+		taskTablePanel.add(label);
+		taskTablePanel.add(scrollPane);
+		return taskTablePanel;
+	}
 
 	private JPanel buildCreationPanel() {
 		CreationListener listener = new CreationListener();
@@ -308,12 +335,12 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	public boolean addPart(ICarPart carPart) {
 		return partsDataTableModel.addRow(carPart.getObjectData());
 	}
-	
+
 	@Override
 	public boolean updatePart(ICarPart carPart) {
 		return partsDataTableModel.updateRow(carPart.getObjectData());
 	}
-	
+
 	@Override
 	public boolean removePart(ICarPart carPart) {
 		return partsDataTableModel.deleteRow(carPart.getObjectData());
@@ -323,15 +350,30 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	public boolean addCar(Car car) {
 		return finishedGoodsTableModel.addRow(car.getObjectData());
 	}
-	
+
 	@Override
 	public boolean removeCar(Car car) {
 		return finishedGoodsTableModel.removeRow(car.getObjectData());
 	}
-	
+
 	@Override
 	public boolean updateCar(Car car) {
 		return finishedGoodsTableModel.updateRow(car.getObjectData());
+	}
+
+	@Override
+	public boolean addTask(Task task) {
+		return taskTableModel.addRow(task.getObjectData());
+	}
+
+	@Override
+	public boolean removeTask(Task task) {
+		return taskTableModel.deleteRow(task.getObjectData());
+	}
+
+	@Override
+	public boolean updateTask(Task task) {
+		return taskTableModel.updateRow(task.getObjectData());
 	}
 
 	class CreationListener implements ActionListener {
@@ -381,6 +423,15 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 					color = Color.GREEN;
 				}
 				int amount = (Integer) amountSpinner.getValue();
+				if(amount <= 0) {
+					JTextField textField = ((JSpinner.DefaultEditor)amountSpinner.getEditor()).getTextField();
+					textField.setBackground(new Color(255, 170, 170));
+					return;
+				}
+				else {
+					JTextField textField = ((JSpinner.DefaultEditor)amountSpinner.getEditor()).getTextField();
+					textField.setBackground(Color.WHITE);
+				}
 				taskController.createTask(type, color, amount);
 			}
 		}

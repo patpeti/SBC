@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.KeyCoordinator;
+import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
@@ -14,6 +15,7 @@ import org.mozartspaces.core.MzsCoreException;
 import at.ac.tuwien.complang.carfactory.application.ITaskController;
 import at.ac.tuwien.complang.carfactory.domain.MotorType;
 import at.ac.tuwien.complang.carfactory.domain.Task;
+import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 
 public class TaskController implements ITaskController {
 	
@@ -38,7 +40,7 @@ public class TaskController implements ITaskController {
 		cordinators.add(KeyCoordinator.newCoordinationData(""+task.getId()));
 		try {
 			capi.write(cref, new Entry(task, cordinators));
-			System.out.println("Task written in space sucessfully");
+			System.out.println("Task " + task.getId() + " written in space sucessfully");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
