@@ -32,7 +32,9 @@ public class Motor implements Serializable, ICarPart {
 	}
 	
 	public Object[] getObjectData() {
-		return new Object[] {id, this.getType(), pid, isDefect ? "Defect" : ""};
+		String note = isDefect ? "Defect, " : "";
+		note += power.toString();
+		return new Object[] {id, this.getType(), pid, note};
 	}
 	
 	public CarPartType getType() {

@@ -41,7 +41,9 @@ public class SpaceListener implements NotificationListener {
 					data.addPart(part);
 				} else if (entry.getValue() instanceof Task) {
 					Task task = (Task) entry.getValue();
-					data.addTask(task);
+					if(!data.updateTask(task)) {
+						data.addTask(task);
+					}
 				}
 			}
 		} else if(operation.name().equals("TAKE")) {

@@ -13,6 +13,7 @@ import org.mozartspaces.core.MzsCoreException;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
 
 public class MotorFactory extends AbstractFactory {
 	
@@ -28,6 +29,8 @@ public class MotorFactory extends AbstractFactory {
 
 	public void produce() {
 		Motor motor = new Motor(id);
+		int randomMotor = (int) (Math.random() * 3);
+		motor.setPower(MotorType.values()[randomMotor]);
 		double random = Math.random();
 		if(random < errorRate) {
 			motor.setDefect(true);

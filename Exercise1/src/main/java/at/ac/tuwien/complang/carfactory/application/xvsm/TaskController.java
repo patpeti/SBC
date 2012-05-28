@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mozartspaces.capi3.CoordinationData;
+import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -20,7 +21,7 @@ public class TaskController implements ITaskController {
 	//Fields
 	private Capi capi;
 	private ContainerReference cref;
-	private static long next_id;
+	private static long next_id = 1;
 	
 	public TaskController(Capi capi, ContainerReference cref) {
 		this.capi = capi;
@@ -34,10 +35,11 @@ public class TaskController implements ITaskController {
 		task.setMotortype(type);
 		task.setColor(color);
 		task.setAmount(amount);
-		List<CoordinationData> cordinators = new ArrayList<CoordinationData>();
-		cordinators.add(KeyCoordinator.newCoordinationData(""+task.getId()));
+		List<CoordinationData> coordinators = new ArrayList<CoordinationData>();
+		coordinators.add(KeyCoordinator.newCoordinationData(""+task.getId()));
+		coordinators.add(FifoCoordinator.newCoordinationData());
 		try {
-			capi.write(cref, new Entry(task, cordinators));
+			capi.write(cref, new Entry(task, coordinators));
 			System.out.println("Task " + task.getId() + " written in space sucessfully");
 		} catch (MzsCoreException e) {
 			e.printStackTrace();

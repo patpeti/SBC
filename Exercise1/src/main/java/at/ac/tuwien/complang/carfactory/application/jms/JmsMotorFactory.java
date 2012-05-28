@@ -10,6 +10,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
 public class JmsMotorFactory extends JmsAbstractFactory {
@@ -42,6 +43,8 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Motor motor = new Motor(id);
+		int randomMotor = (int) (Math.random() * 3);
+		motor.setPower(MotorType.values()[randomMotor]);
 		double random = Math.random();
 		if(random < errorRate) {
 			motor.setDefect(true);
