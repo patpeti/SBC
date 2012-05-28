@@ -18,11 +18,10 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants;
-import org.mozartspaces.core.MzsTimeoutException;
-import org.mozartspaces.core.TransactionException;
-import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.MzsTimeoutException;
+import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
 
 import at.ac.tuwien.complang.carfactory.domain.Car;
