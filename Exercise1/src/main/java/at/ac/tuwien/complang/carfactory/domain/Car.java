@@ -22,7 +22,6 @@ public class Car implements Serializable, ICarPart {
     private Motor motor;
     private Body body;
     private Wheel[] wheels = new Wheel[4];
-    
 
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {

@@ -17,11 +17,18 @@ public class StartUpJmsGui {
 		 * For all queue and topics available, see the application.jms.constants.QueueConstanst Class
 		 */
 		//instantiate global Listener
-		IQueueListener listener = new QueueListenerImpl();
+		final IQueueListener listener = new QueueListenerImpl();
 		listener.connectToQueues();
 		
 		//1. Start the User interface
 		ProductionUI gui = new ProductionUI(JmsFactoryFacade.getInstance(listener));
 		listener.setQueueObserver(gui);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Shutting down gracefully, please wait.");
+				listener.disconnect();
+			}
+		});
 	}
 }

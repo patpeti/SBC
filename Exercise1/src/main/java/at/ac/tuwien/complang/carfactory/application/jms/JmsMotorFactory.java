@@ -29,6 +29,10 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Motor motor = new Motor(id);
+		double random = Math.random();
+		if(random < errorRate) {
+			motor.setDefect(true);
+		}
 		System.out.println("Produced a motor with id: " + motor.getId());
 		
 		System.out.println("writing Motor into jms...");
@@ -39,9 +43,10 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue q = session.createQueue(QueueConstants.MOTORQUEUE);
 			MessageProducer msgProducer = session.createProducer(q);
+			getListener().onObjectWrittenInQueue(motor);
+			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			msgProducer.send(session.createObjectMessage(motor));
 			connection.close();
-			getListener().onObjectWrittenInQueue(motor);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

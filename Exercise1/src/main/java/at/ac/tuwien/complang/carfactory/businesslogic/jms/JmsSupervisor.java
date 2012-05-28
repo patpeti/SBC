@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 
+import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -44,10 +45,12 @@ public class JmsSupervisor extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
-		while(true) {
+		running = true;
+		while(running) {
 			try {
 				//retrieve a car
 				ObjectMessage objectMessage = (ObjectMessage) paintedCarConsumer.receive();
+				if(objectMessage == null) throw new IllegalStateException("Connection was closed.");
 				Car car = (Car) objectMessage.getObject();
 				System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");
 				//set car to complete
@@ -57,9 +60,15 @@ public class JmsSupervisor extends JmsAbstractWorker {
 				messageProducer.send(session.createObjectMessage(car));
 				System.out.println("[Supervisor] Car " + car.getId() + " send to finishedCarQueue.");
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
+				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
 			}
+		}
+		//disconnect from queue
+		disconnect();
+		shutdownComplete = true;
+		synchronized(runningMutex) {
+			runningMutex.notifyAll();
 		}
 	}
 }

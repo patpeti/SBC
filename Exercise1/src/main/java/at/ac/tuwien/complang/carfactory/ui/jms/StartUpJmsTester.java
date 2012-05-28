@@ -1,11 +1,14 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
+import java.io.IOException;
+
 import at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpSupervisor;
 
 public class StartUpJmsTester {
 	
 	//Static Fields
 	private static long id;
+	//private static JmsTester tester;
 	
 	public static void main(String[] args) {
 		/**
@@ -16,7 +19,27 @@ public class StartUpJmsTester {
 		 * 4. write it back into the space
 		 */
 		parseArguments(args);
-		//Initialize tester: Supervisor s = new Supervisor(id);
+		/*tester = new JmsTester(id);
+		Thread worker = new Thread(tester);
+		tester.initialize();
+		worker.start();
+		System.out.println("Tester has started in background.");
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Shutting down gracefully, please wait.");
+				tester.shutdown();
+			}
+		});*/
+		//The following lines are needed to be able to kill the program from within eclipse.
+		try {
+			System.out.println("Press enter to terminate application");
+			System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	private static void parseArguments(String[] args) {

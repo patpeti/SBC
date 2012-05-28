@@ -29,6 +29,11 @@ import at.ac.tuwien.complang.carfactory.ui.panels.StatusLight;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JComboBox;
+import javax.swing.SwingConstants;
+import java.awt.Component;
+import javax.swing.DefaultComboBoxModel;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
 
 public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
@@ -38,9 +43,11 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	//Fields
 	private JSpinner bodyCountSpinner, bodyErrorRateSpinner,
 		wheelCountSpinner, wheelErrorRateSpinner,
-		motorCountSpinner, motorErrorRateSpinner;
+		motorCountSpinner, motorErrorRateSpinner,
+		amountSpinner; //for the task creation
 	private JPanel tableContainer;
-	
+	private JComboBox powerTypeCombo, colorCombo;
+
 	private IFacade factoryFacade;
 	private JTable partsTable, finishedGoodsTable;
 	private SpaceDataTableModel partsDataTableModel;
@@ -53,14 +60,74 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		showUI();
 	}
 
-    private void showUI() {
-    	buildCreationPanel();
-    	buildTables();
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
-    }
-    
+	private void showUI() {
+		JPanel factoryPanel = buildCreationPanel();
+		JPanel taskPanel = buildTaskPanel();
+		JPanel northContainer = new JPanel();
+		BoxLayout layout = new BoxLayout(northContainer, BoxLayout.Y_AXIS);
+		northContainer.setLayout(layout);
+		northContainer.add(factoryPanel);
+		northContainer.add(taskPanel);
+		getContentPane().add(northContainer, BorderLayout.NORTH);
+		buildTables();
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.pack();
+		this.setVisible(true);
+	}
+	private JPanel buildTaskPanel() {
+		JPanel padding = new JPanel(); //outer most panel used for padding around the inner pannels
+		JPanel container= new JPanel(); //container panel with up/down layout
+		BoxLayout layout = new BoxLayout(container, BoxLayout.PAGE_AXIS);
+		container.setLayout(layout);
+		padding.add(container);
+		JLabel label = new JLabel("Create a new Task");
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		container.add(label);
+		JPanel taskPanel = new JPanel();
+		container.add(taskPanel);
+		GridBagLayout gbl_taskPanel = new GridBagLayout();
+		gbl_taskPanel.columnWidths = new int[]{131, 62, 97, 0};
+		gbl_taskPanel.rowHeights = new int[]{0};
+		gbl_taskPanel.columnWeights = new double[]{Double.MIN_VALUE, 0.0, 0.0, 0.0};
+		gbl_taskPanel.rowWeights = new double[]{Double.MIN_VALUE};
+		taskPanel.setLayout(gbl_taskPanel);
+		powerTypeCombo = new JComboBox();
+		powerTypeCombo.setModel(new DefaultComboBoxModel(MotorType.values()));
+		GridBagConstraints gbc_typeCombo = new GridBagConstraints();
+		gbc_typeCombo.insets = new Insets(0, 0, 0, 5);
+		gbc_typeCombo.gridy = 0;
+		gbc_typeCombo.gridx = 0;
+		gbc_typeCombo.fill = GridBagConstraints.BOTH;
+		taskPanel.add(powerTypeCombo, gbc_typeCombo);
+		colorCombo = new JComboBox();
+		colorCombo.setModel(new DefaultComboBoxModel(new String[] {"RED", "GREEN", "BLUE"}));
+		GridBagConstraints gbc_colorCombo = new GridBagConstraints();
+		gbc_colorCombo.insets = new Insets(0, 0, 0, 5);
+		gbc_colorCombo.gridy = 0;
+		gbc_colorCombo.gridx = 1;
+		gbc_colorCombo.fill = GridBagConstraints.BOTH;
+		taskPanel.add(colorCombo, gbc_colorCombo);
+		
+		amountSpinner = new JSpinner();
+		amountSpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		GridBagConstraints gbc_countSpinner = new GridBagConstraints();
+		gbc_countSpinner.fill = GridBagConstraints.BOTH;
+		gbc_countSpinner.insets = new Insets(0, 0, 0, 5);
+		gbc_countSpinner.gridx = 2;
+		gbc_countSpinner.gridy = 0;
+		taskPanel.add(amountSpinner, gbc_countSpinner);
+		
+		JButton startTaskButton = new JButton("Start Task");
+		startTaskButton.setActionCommand("task");
+		GridBagConstraints gbc_startTaskButton = new GridBagConstraints();
+		gbc_startTaskButton.fill = GridBagConstraints.BOTH;
+		gbc_startTaskButton.gridx = 3;
+		gbc_startTaskButton.gridy = 0;
+		taskPanel.add(startTaskButton, gbc_startTaskButton);
+		return padding;
+	}
+
+  
     private void buildTables() {
     	JPanel partsTable = buildPartsTable();
     	JPanel finishedGoodsTable = buildFinishedGoodsTable();
@@ -102,7 +169,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
     	return finishedGoodsTablePanel;
     }
 
-	private void buildCreationPanel() {
+	private JPanel buildCreationPanel() {
 		CreationListener listener = new CreationListener();
     	JPanel container = new JPanel();
     	BoxLayout layout = new BoxLayout(container, BoxLayout.PAGE_AXIS);
@@ -230,13 +297,12 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
         gbc_motorErrorRateSpinner.gridy = 2;
         producerPanel.add(motorErrorRateSpinner, gbc_motorErrorRateSpinner);
         padding.add(container);
-        getContentPane().add(padding, BorderLayout.NORTH);
+        return padding;
 	}
 
 
 	@Override
 	public boolean addPart(ICarPart carPart) {
-		System.out.println("#GUI# : CarPart " + carPart.getId() + " is created");
 		return partsDataTableModel.addRow(carPart.getObjectData());
 	}
 	
@@ -247,19 +313,16 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	
 	@Override
 	public boolean removePart(ICarPart carPart) {
-		System.out.println("#GUI# : CarPart " + carPart.getId() + " removed from warehouse");
 		return partsDataTableModel.deleteRow(carPart.getObjectData());
 	}
 
 	@Override
 	public boolean addCar(Car car) {
-		System.out.println("#GUI# : Car " + car.getId() + " added to warehouse");
 		return finishedGoodsTableModel.addRow(car.getObjectData());
 	}
 	
 	@Override
 	public boolean removeCar(Car car) {
-		System.out.println("#GUI# : Car " + car.getId() + " removed from warehouse");
 		return finishedGoodsTableModel.removeRow(car.getObjectData());
 	}
 	
@@ -272,36 +335,43 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
+			IFactory factory;
+			int amount;
+			double errorRate;
 			if(command.equals("body")) {
-				int value = (Integer) bodyCountSpinner.getValue();
-				double errorRate = (Double) bodyErrorRateSpinner.getValue();
-				IFactory bodyFactory = factoryFacade.getInstance(ProducerType.BODY);
-				if(!bodyFactory.isRunning()) {
-					bodyFactory.init(value, errorRate);
-					bodyFactory.start();
-					bodyFactory.addObserver(ProductionUI.this);
-					bodyFactoryStatus.setActive();
-				}
+				amount = (Integer) bodyCountSpinner.getValue();
+				errorRate = (Double) bodyErrorRateSpinner.getValue();
+				factory = factoryFacade.getInstance(ProducerType.BODY);
+				bodyFactoryStatus.setActive();
 			} else if(command.equals("wheel")) {
-				int amount = (Integer) wheelCountSpinner.getValue();
-				double errorRate = (Double) wheelErrorRateSpinner.getValue();
-				IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
-				if(!wheelFactory.isRunning()) {
-					wheelFactory.init(amount, errorRate);
-					wheelFactory.start();
-					wheelFactory.addObserver(ProductionUI.this);
-					wheelFactoryStatus.setActive();
-				}
+				amount = (Integer) wheelCountSpinner.getValue();
+				errorRate = (Double) wheelErrorRateSpinner.getValue();
+				factory = factoryFacade.getInstance(ProducerType.WHEEL);
+				wheelFactoryStatus.setActive();
 			} else if(command.equals("motor")) {
-				int amount = (Integer) motorCountSpinner.getValue();
-				double errorRate = (Double) motorErrorRateSpinner.getValue();
-				IFactory motorFactory = factoryFacade.getInstance(ProducerType.MOTOR);
-				if(!motorFactory.isRunning()) {
-					motorFactory.init(amount, errorRate);
-					motorFactory.start();
-					motorFactory.addObserver(ProductionUI.this);
-					motorFactoryStatus.setActive();
-				}
+				amount = (Integer) motorCountSpinner.getValue();
+				errorRate = (Double) motorErrorRateSpinner.getValue();
+				factory = factoryFacade.getInstance(ProducerType.MOTOR);
+				motorFactoryStatus.setActive();
+			} else { return; }
+			if(!factory.isRunning()) {
+				factory.init(amount, errorRate);
+				factory.start();
+				factory.addObserver(ProductionUI.this);
+			}
+		}
+	}
+	
+	class CreateTaskListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			String command = event.getActionCommand();
+			if(command.equals("task")) {
+				MotorType type = (MotorType) powerTypeCombo.getSelectedItem();
+				String colorString = (String) colorCombo.getSelectedItem();
+				int amount = (Integer) amountSpinner.getValue();
+				//TODO: pass values to some kind of task controller which then creates the
+				//       task object and writes it into the space
 			}
 		}
 	}

@@ -1,18 +1,39 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
+import java.io.IOException;
+
 import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
 
 public class StartUpJmsAssembler {
 
-	static int id;
+	private static int id;
+	private static JmsAssembler assembler; 
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		JmsAssembler assembler = new JmsAssembler(id);
+		assembler = new JmsAssembler(id);
+		Thread worker = new Thread(assembler);
 		assembler.initialize();
-		assembler.startWorkLoop();
+		worker.start();
+		System.out.println("Assembler has started in background.");
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Shutting down gracefully...");
+				assembler.shutdown();
+			}
+		});
+		//The following lines are needed to be able to kill the program from within eclipse.
+		try {
+			System.out.println("Press enter to terminate application");
+			System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
-	
+
 	private static void parseArguments(String[] args) {
 		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id>";
 		if(args.length != 1) {

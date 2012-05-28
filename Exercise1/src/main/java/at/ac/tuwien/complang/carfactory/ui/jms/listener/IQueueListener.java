@@ -7,4 +7,5 @@ public interface IQueueListener {
 	void onObjectWrittenInQueue(ICarPart carPart);
 	void setQueueObserver(IFactoryData gui);
 	void connectToQueues();
+	void disconnect();
 }

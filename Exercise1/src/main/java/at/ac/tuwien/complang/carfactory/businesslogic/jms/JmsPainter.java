@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 import java.awt.Color;
 import java.io.Serializable;
 
+import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -12,6 +13,7 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
@@ -43,8 +45,10 @@ public class JmsPainter extends JmsAbstractWorker {
 	
 	@Override
 	protected void connectToQueues() {
-		//test get Motor
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+		ActiveMQPrefetchPolicy policy = new ActiveMQPrefetchPolicy();
+		policy.setQueuePrefetch(0);
+		connectionFactory.setPrefetchPolicy(policy);
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
@@ -63,11 +67,13 @@ public class JmsPainter extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
-		//the assembly loop never terminates. As long as the assembler is running, it will paint cars and bodys.
-		while(true) {
+		running = true;
+		loop:
+		while(running) {
 			try {
 				ObjectMessage objectMessage = null;
 				while(objectMessage == null) {
+					if(!running) break loop;
 					//Try to get a car from the car Queue (one which is not yet painted)
 					objectMessage = (ObjectMessage) carConsumer.receive(1);
 					if(objectMessage == null) {
@@ -112,8 +118,15 @@ public class JmsPainter extends JmsAbstractWorker {
 					}
 				}
 			} catch (JMSException e) {
+				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
 			}
+		}
+		//disconnect from queue
+		disconnect();
+		shutdownComplete = true;
+		synchronized(runningMutex) {
+			runningMutex.notifyAll();
 		}
 	}
 }

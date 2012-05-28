@@ -7,6 +7,7 @@ import javax.jms.Queue;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
@@ -27,7 +28,6 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		this.id = id;
 		setListener(listener);
 		connectionFactory = new ActiveMQConnectionFactory();
-
 	}
 	
 	private void connect() {
@@ -42,6 +42,10 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 
 	public void produce() {
 		Body body = new Body(id);
+		double random = Math.random();
+		if(random < errorRate) {
+			body.setDefect(true);
+		}
 		System.out.println("Produced a body with ID: " + body.getId());
 		System.out.println("writing Body into jms...");
 		try {
@@ -52,8 +56,9 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 			Queue queue = session.createQueue(QueueConstants.BODYQUEUE);
 			MessageProducer msgProducer = session.createProducer(queue);
 			//object message
-			msgProducer.send(session.createObjectMessage(body));
+			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(body);
+			msgProducer.send(session.createObjectMessage(body));
 			session.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
