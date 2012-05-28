@@ -18,14 +18,18 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants;
+import org.mozartspaces.core.MzsTimeoutException;
+import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.TransactionReference;
 
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
+import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 public class Supervisor{
 
@@ -39,7 +43,8 @@ public class Supervisor{
 	
 	private Capi capi;
 	private ContainerReference container;
-	private static long pid = 0;
+	private TransactionReference tx;
+	private long pid = 0;
 	
 	public Supervisor(long id) {
 		this.pid = id;
@@ -50,16 +55,35 @@ public class Supervisor{
 	}
 	
 	private void readPaintedCar(){
+		
+		try {
+			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		} catch (MzsCoreException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(FifoCoordinator.newSelector());
 		selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(1));
 		List<ICarPart> parts = null;
+		
 		try {
-			parts = capi.take(container, selectors, RequestTimeout.INFINITE, null);
+			parts = capi.take(container, selectors, SpaceTimeout.INFINITE, tx);
+		} catch (MzsTimeoutException e) {
+			return;
+		} catch (TransactionException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
+		
 		if(parts != null){
 			Car c = (Car) parts.get(0);
 			c.setComplete(pid, true);
@@ -74,8 +98,14 @@ public class Supervisor{
 		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 		try {
 			// Write the finished car back to the space
-			capi.write(container, new Entry(c,cordinator));
+			capi.write(new Entry(c,cordinator), container,SpaceTimeout.INFINITE, tx );
+			capi.commitTransaction(tx);
 		} catch (MzsCoreException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}

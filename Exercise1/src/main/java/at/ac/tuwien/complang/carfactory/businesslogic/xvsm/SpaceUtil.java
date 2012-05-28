@@ -1,6 +1,5 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
-import java.awt.Color;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.MzsConstants;
-import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
@@ -68,23 +66,18 @@ public class SpaceUtil{
 	}
 
 	public List<ICarPart> takeCarPart(String selectorLabel, Integer amount, long timeout, TransactionReference tx){
-		
-		
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
 		List<ICarPart> parts = null;
-		
 		ContainerReference container  = null;
 		if(selectorLabel.equals(CarPartType.BODY.toString())){
 			container = BodyContainer;
 		}else{
 			container = CarContainer;
 		}
-			
 		
 		try {
-			//tx = this.capi.createTransaction(timeout, new URI(SpaceConstants.CONTAINER_URI));
 				try {
 					parts = capi.take(container, selectors, SpaceTimeout.TENSEC, tx);
 				} catch (CountNotMetException ex) {
@@ -101,14 +94,13 @@ public class SpaceUtil{
 		} catch (MzsTimeoutException e) {
 			return null;
 		} catch (TransactionException e) {
+			return null;
+		} catch (MzsCoreException e) {
 			try {
 				capi.rollbackTransaction(tx);
-				return null;
 			} catch (MzsCoreException e1) {
 				e1.printStackTrace();
 			}
-			
-		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
 		if (!parts.isEmpty()) {

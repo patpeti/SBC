@@ -63,7 +63,7 @@ public class Painter extends SpaceUtil {
 			e1.printStackTrace();
 		}
 		
-		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.TENSEC, tx);
+		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.INFINITE, tx);
 		if(carparts != null ){
 			//paint car body write it to space
 			try {
@@ -73,7 +73,7 @@ public class Painter extends SpaceUtil {
 			c.getBody().setColor(pid, this.color);
 			writeCarIntoSpace(c);
 		} else {
-			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.TENSEC, tx);
+			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.INFINITE, tx);
 			//get body paint it write it
 			
 			if(parts != null){
@@ -94,7 +94,7 @@ public class Painter extends SpaceUtil {
 		cordinator.add(LabelCoordinator.newCoordinationData(label));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
 		try {
-			getCapi().write(new Entry(b,cordinator), getBodyContainer(), SpaceTimeout.TENSEC, tx);
+			getCapi().write(new Entry(b,cordinator), getBodyContainer(), SpaceTimeout.INFINITE, tx);
 			getCapi().commitTransaction(tx);
 		} catch (MzsCoreException e) {
 			try {
