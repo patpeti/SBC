@@ -11,10 +11,11 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 
+import at.ac.tuwien.complang.carfactory.application.ITaskController;
 import at.ac.tuwien.complang.carfactory.domain.MotorType;
 import at.ac.tuwien.complang.carfactory.domain.Task;
 
-public class TaskController {
+public class TaskController implements ITaskController {
 	
 	//Fields
 	private Capi capi;
@@ -26,6 +27,7 @@ public class TaskController {
 		this.cref = cref;
 	}
 	
+	@Override
 	public void createTask(MotorType type, Color color, int amount) {
 		Task task = new Task(next_id);
 		next_id++;

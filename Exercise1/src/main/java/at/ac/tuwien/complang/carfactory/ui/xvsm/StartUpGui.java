@@ -23,6 +23,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.xvsm.TaskController;
 import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
@@ -30,17 +31,17 @@ public class StartUpGui {
 
 	public static void main(String[] args) {
 		
-		//1. Create an embedded instance of Mozart spaces on port 9876
+		//1. Create an embedded instance of Mozart spaces
 		MzsCore core = DefaultMzsCore.newInstance(SpaceConstants.SPACE_PORT);
 		Capi capi = new Capi(core);
-		NotificationManager notifMgr = new NotificationManager(core);
-		//2. Initialise a container for each type of data we store in the space (e.g Car, Body, Motor, Wheel) 
+		NotificationManager notificationManager = new NotificationManager(core);
+		//2. Initialise a container for each type of data we store in the space (e.g Car, Body, Motor, Wheel, Task) 
 		ContainerReference motorContainer = null;
 		ContainerReference wheelContainer = null;
 		ContainerReference carContainer = null;
 		ContainerReference bodyContainer = null;
+		ContainerReference taskContainer = null;
 		try {
-			//List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
@@ -53,6 +54,7 @@ public class StartUpGui {
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				carContainer = capi.createContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				bodyContainer = capi.createContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				taskContainer = capi.createContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
@@ -68,17 +70,18 @@ public class StartUpGui {
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
 		//1. Start the User interface
-		ProductionUI gui = new ProductionUI(FactoryFacade.getInstance(capi, containers));
+		TaskController taskController = new TaskController(capi, taskContainer);
+		ProductionUI gui = new ProductionUI(FactoryFacade.getInstance(capi, containers), taskController);
 		Set<Operation> operations = new HashSet<Operation>();
 		operations.add(Operation.DELETE);
 		operations.add(Operation.TAKE);
 		operations.add(Operation.WRITE);
 		SpaceListener listener = new SpaceListener(gui);
 		try {
-			notifMgr.createNotification(containers.get(0), listener, operations, null, null);
-			notifMgr.createNotification(containers.get(1), listener, operations, null, null);
-			notifMgr.createNotification(containers.get(2), listener, operations, null, null);
-			notifMgr.createNotification(containers.get(3), listener, operations, null, null);
+			notificationManager.createNotification(containers.get(0), listener, operations, null, null);
+			notificationManager.createNotification(containers.get(1), listener, operations, null, null);
+			notificationManager.createNotification(containers.get(2), listener, operations, null, null);
+			notificationManager.createNotification(containers.get(3), listener, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

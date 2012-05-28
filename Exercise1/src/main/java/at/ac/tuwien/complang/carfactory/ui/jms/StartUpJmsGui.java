@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.carfactory.ui.jms;
 
+import at.ac.tuwien.complang.carfactory.application.ITaskController;
 import at.ac.tuwien.complang.carfactory.application.jms.JmsFactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.jms.JmsTaskController;
 import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.QueueListenerImpl;
@@ -21,7 +23,8 @@ public class StartUpJmsGui {
 		listener.connectToQueues();
 		
 		//1. Start the User interface
-		ProductionUI gui = new ProductionUI(JmsFactoryFacade.getInstance(listener));
+		ITaskController taskController = new JmsTaskController();
+		ProductionUI gui = new ProductionUI(JmsFactoryFacade.getInstance(listener), taskController);
 		listener.setQueueObserver(gui);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override

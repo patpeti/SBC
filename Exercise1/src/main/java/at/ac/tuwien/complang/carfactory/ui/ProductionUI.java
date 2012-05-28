@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.carfactory.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -26,6 +27,7 @@ import javax.swing.SpinnerNumberModel;
 
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
+import at.ac.tuwien.complang.carfactory.application.ITaskController;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
@@ -52,9 +54,11 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	private SpaceDataTableModel partsDataTableModel;
 	private FinishedGoodsTableModel finishedGoodsTableModel;
 	private StatusLight bodyFactoryStatus,wheelFactoryStatus,motorFactoryStatus;
+	private ITaskController taskController;
 
-	public ProductionUI(IFacade factoryFacade) {
+	public ProductionUI(IFacade factoryFacade, ITaskController taskController) {
 		this.factoryFacade = factoryFacade;
+		this.taskController = taskController;
 		tableContainer = new JPanel(new GridLayout(2, 1));
 		showUI();
 	}
@@ -368,9 +372,16 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 			if(command.equals("task")) {
 				MotorType type = (MotorType) powerTypeCombo.getSelectedItem();
 				String colorString = (String) colorCombo.getSelectedItem();
+				Color color = null;
+				if(colorString.equals("RED")) {
+					color = Color.RED;
+				} else if(colorString.equals("BLUE")) {
+					color = Color.BLUE;
+				} else if(colorString.equals("GREEN")) {
+					color = Color.GREEN;
+				}
 				int amount = (Integer) amountSpinner.getValue();
-				//TODO: pass values to some kind of task controller which then creates the
-				//       task object and writes it into the space
+				taskController.createTask(type, color, amount);
 			}
 		}
 	}
