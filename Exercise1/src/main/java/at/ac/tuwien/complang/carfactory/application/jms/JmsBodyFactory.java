@@ -28,6 +28,7 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		this.id = id;
 		setListener(listener);
 		connectionFactory = new ActiveMQConnectionFactory();
+		
 	}
 	
 	private void connect() {
@@ -39,6 +40,7 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public void produce() {
 		Body body = new Body(id);
@@ -52,14 +54,17 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 			if(connection == null) {
 				connect();
 			}
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			if(session == null){
+				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			}
+//			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue queue = session.createQueue(QueueConstants.BODYQUEUE);
 			MessageProducer msgProducer = session.createProducer(queue);
 			//object message
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(body);
 			msgProducer.send(session.createObjectMessage(body));
-			session.close();
+			
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -80,11 +85,13 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		notifyObservers("BODY");
 		try {
 			connection.close();
+			session.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			connection = null;
+			session = null;
 		}
 	}
 }

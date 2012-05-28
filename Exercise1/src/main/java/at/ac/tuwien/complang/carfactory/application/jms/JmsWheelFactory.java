@@ -52,15 +52,18 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 			if(connection == null) {
 				connect();
 			}
+			if(session == null){
+				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			}
 			connection = connectionFactory.createConnection();
 			connection.start();
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		
 			Queue queue = session.createQueue(QueueConstants.WHEELQUEUE);
 			MessageProducer msgProducer = session.createProducer(queue);
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(wheel);
 			msgProducer.send(session.createObjectMessage(wheel));
-			connection.close();
+//			connection.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -81,10 +84,12 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 		notifyObservers("WHEEL");
 		try {
 			connection.close();
+			session.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			session = null;
 			connection = null;
 		}
 	}
