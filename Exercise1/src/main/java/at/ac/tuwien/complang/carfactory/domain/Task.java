@@ -8,6 +8,7 @@ public class Task {
 	private MotorType motortype;
 	private int amount;
 	private Color color;
+	private long id;
 	
 	public MotorType getMotortype() {
 		return motortype;
