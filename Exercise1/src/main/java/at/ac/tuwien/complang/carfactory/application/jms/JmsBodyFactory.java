@@ -7,7 +7,6 @@ import javax.jms.Queue;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;

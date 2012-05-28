@@ -1,6 +1,7 @@
 package at.ac.tuwien.complang.carfactory.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,28 +13,26 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 
 import at.ac.tuwien.complang.carfactory.application.IFacade;
 import at.ac.tuwien.complang.carfactory.application.IFactory;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
 import at.ac.tuwien.complang.carfactory.ui.panels.StatusLight;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JComboBox;
-import javax.swing.SwingConstants;
-import java.awt.Component;
-import javax.swing.DefaultComboBoxModel;
-import at.ac.tuwien.complang.carfactory.domain.MotorType;
 
 public class ProductionUI extends JFrame implements IFactoryData, Observer {
 

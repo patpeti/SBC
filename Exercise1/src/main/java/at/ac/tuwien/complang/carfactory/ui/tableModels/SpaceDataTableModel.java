@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 public class SpaceDataTableModel extends AbstractTableModel {
+	private static final long serialVersionUID = -119642846884075704L;
 	private static final String[] SPACE_CONTENT_COLUMNS = { "ID", "PartName",
 			"PID", "Note" };
 	private List<Object[]> data = new ArrayList<Object[]>();
@@ -42,7 +43,7 @@ public class SpaceDataTableModel extends AbstractTableModel {
 		}
 	}
 
-	public Class getColumnClass(int c) {
+	public Class<? extends Object> getColumnClass(int c) {
 		Object object = getValueAt(0, c);
 		if(object == null) {
 			return Object.class;
