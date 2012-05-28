@@ -23,6 +23,10 @@ public class Car implements Serializable, ICarPart {
     private Body body;
     private Wheel[] wheels = new Wheel[4];
 
+    private boolean completenessTested = false;
+    private boolean defectTested = false;
+    private boolean defect = false;
+    
     //Constructors
     public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
     	this.id = AbstractFactory.carPartId;
@@ -134,4 +138,30 @@ public class Car implements Serializable, ICarPart {
 	public void setTaskId(long taskId) {
 		this.taskId = taskId;
 	}
+
+	public boolean isCompletenessTested() {
+		return completenessTested;
+	}
+
+	public void setCompletenessTested(boolean completenessTested) {
+		this.completenessTested = completenessTested;
+	}
+
+	public boolean isDefectTested() {
+		return defectTested;
+	}
+
+	public void setDefectTested(boolean defectTested) {
+		this.defectTested = defectTested;
+	}
+
+	public boolean isDefect() {
+		return defect;
+	}
+
+	public void setDefect(boolean defect) {
+		this.defect = defect;
+	}
+	
+	
 }
