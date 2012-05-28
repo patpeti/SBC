@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
+import java.awt.Color;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ public class SpaceUtil{
 	}
 
 	public List<ICarPart> takeCarPart(String selectorLabel, Integer amount, long timeout, TransactionReference tx){
+		
+		
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(LabelCoordinator.newSelector(selectorLabel, MzsConstants.Selecting.COUNT_MAX));
 		selectors.add(AnyCoordinator.newSelector(amount));
@@ -81,19 +84,13 @@ public class SpaceUtil{
 			
 		
 		try {
-			if (timeout == 0) {
+			//tx = this.capi.createTransaction(timeout, new URI(SpaceConstants.CONTAINER_URI));
 				try {
-					parts = capi.take(container, selectors, RequestTimeout.ZERO, tx);
+					parts = capi.take(container, selectors, SpaceTimeout.TENSEC, tx);
 				} catch (CountNotMetException ex) {
 					return null;
 				}
-			} else if (timeout == SpaceTimeout.ZERO_WITHEXCEPTION) {
-				parts = capi.take(container, selectors, RequestTimeout.ZERO, tx);
-			} else if (timeout == SpaceTimeout.INFINITE) {
-				parts = capi.take(container, selectors, RequestTimeout.INFINITE, tx);
-			} else {
-				parts = capi.take(container, selectors, timeout, tx);
-			}
+			
 		} catch (CountNotMetException ex) {
 			System.err.println("Not enough object found");
 			try {
@@ -102,9 +99,15 @@ public class SpaceUtil{
 				e.printStackTrace();
 			}
 		} catch (MzsTimeoutException e) {
-			e.printStackTrace();
+			return null;
 		} catch (TransactionException e) {
-			e.printStackTrace();
+			try {
+				capi.rollbackTransaction(tx);
+				return null;
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
+			
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

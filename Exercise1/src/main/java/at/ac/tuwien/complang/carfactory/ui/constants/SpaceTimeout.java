@@ -8,5 +8,7 @@ public class SpaceTimeout {
     public final static long INFINITE = -1;
     //no waiting + exception if time limit reached
     public final static long ZERO_WITHEXCEPTION = -2;
+    
+    public final static long TENSEC = 10000;
 	
 }

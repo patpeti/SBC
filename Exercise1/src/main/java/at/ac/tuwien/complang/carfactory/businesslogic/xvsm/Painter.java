@@ -1,6 +1,8 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
 import java.awt.Color;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +12,13 @@ import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.TransactionReference;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
@@ -33,7 +37,7 @@ public class Painter extends SpaceUtil {
 	 * We use this to relax the update intervals of the UI, so that there is no
 	 * flickering, which happens, when a part is taken and written back immediately. */
 	public static final long TIME_TO_PAINT = 1400L; //time in milliseconds
-	
+	private TransactionReference tx;
 	private Color color;
 	
 	public Painter(long id, Color color) {
@@ -50,7 +54,16 @@ public class Painter extends SpaceUtil {
 		try {
 			Thread.sleep(TIME_TO_PAINT/2);
 		} catch (InterruptedException e) { }
-		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.ZERO, null);
+		
+		try {
+			tx = getCapi().createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		} catch (MzsCoreException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		
+		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.TENSEC, tx);
 		if(carparts != null ){
 			//paint car body write it to space
 			try {
@@ -60,7 +73,7 @@ public class Painter extends SpaceUtil {
 			c.getBody().setColor(pid, this.color);
 			writeCarIntoSpace(c);
 		} else {
-			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.ZERO, null);
+			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.TENSEC, tx);
 			//get body paint it write it
 			
 			if(parts != null){
@@ -75,29 +88,45 @@ public class Painter extends SpaceUtil {
 	}
 
 	private void writeBodyIntoSpace(Body b) {
+		
+		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+		String label =  SpaceLabels.PAINTEDBODY;
+		cordinator.add(LabelCoordinator.newCoordinationData(label));
+		cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
 		try {
-			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-			String label =  SpaceLabels.PAINTEDBODY;
-			cordinator.add(LabelCoordinator.newCoordinationData(label));
-			cordinator.add(KeyCoordinator.newCoordinationData(""+b.getId()));
-			getCapi().write(getBodyContainer(), new Entry(b,cordinator));
-			System.out.println("[Painter] Body " + b.getId() + " Painted and written in space");
+			getCapi().write(new Entry(b,cordinator), getBodyContainer(), SpaceTimeout.TENSEC, tx);
+			getCapi().commitTransaction(tx);
 		} catch (MzsCoreException e) {
+			try {
+				getCapi().rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
+		System.out.println("[Painter] Body " + b.getId() + " Painted and written in space");
+	
 	}
 
 	private void writeCarIntoSpace(Car c) {
+
+		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+		String label =  SpaceLabels.PAINTEDCAR;
+		cordinator.add(LabelCoordinator.newCoordinationData(label));
+		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+		cordinator.add(FifoCoordinator.newCoordinationData());
 		try {
-			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-			String label =  SpaceLabels.PAINTEDCAR;
-			cordinator.add(LabelCoordinator.newCoordinationData(label));
-			cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
-			cordinator.add(FifoCoordinator.newCoordinationData());
-			getCapi().write(getCarContainer(), new Entry(c,cordinator));
-			System.out.println("[Painter] Car " + c.getId() + " painted and written in space");
+			getCapi().write( new Entry(c,cordinator), getCarContainer(), SpaceTimeout.TENSEC, tx);
+			getCapi().commitTransaction(tx);
 		} catch (MzsCoreException e) {
+			try {
+				getCapi().rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
+		System.out.println("[Painter] Car " + c.getId() + " painted and written in space");
+
 	}
 }
