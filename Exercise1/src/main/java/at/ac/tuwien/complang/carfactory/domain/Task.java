@@ -69,6 +69,7 @@ public class Task implements Serializable {
 			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
 		}
 		return new Object[] {
+				id,
 				motortype.getType(),
 				colorString,
 				amount,
