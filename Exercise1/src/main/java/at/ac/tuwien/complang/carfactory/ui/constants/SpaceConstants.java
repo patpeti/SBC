@@ -8,6 +8,7 @@ public class SpaceConstants {
 	public static final String MOTORCONTAINER_NAME = "motorcontainer";
 	public static final String WHEELCONTAINER_NAME = "wheelcontainer";
 	public static final String BODYCONTAINER_NAME = "bodycontainer";
+	public static final String CARIDCAONTAINER_NAME = "caridcontainer";
 	public static final int SPACE_PORT = 9876;	
 
 }

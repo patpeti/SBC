@@ -63,7 +63,7 @@ public class Painter extends SpaceUtil {
 			e1.printStackTrace();
 		}
 		
-		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.INFINITE, tx);
+		List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), new Integer(1), SpaceTimeout.ZERO, tx);
 		if(carparts != null ){
 			//paint car body write it to space
 			try {
@@ -73,7 +73,7 @@ public class Painter extends SpaceUtil {
 			c.getBody().setColor(pid, this.color);
 			writeCarIntoSpace(c);
 		} else {
-			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.INFINITE, tx);
+			List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), new Integer(1), SpaceTimeout.ZERO, tx);
 			//get body paint it write it
 			
 			if(parts != null){

@@ -12,10 +12,12 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
@@ -23,6 +25,7 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
+import at.ac.tuwien.complang.carfactory.domain.CarId;
 import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 
@@ -39,6 +42,7 @@ public class StartUpGui {
 		ContainerReference wheelContainer = null;
 		ContainerReference carContainer = null;
 		ContainerReference bodyContainer = null;
+		ContainerReference carIdContainer = null;
 		try {
 			//List<AnyCoordinator> coords = Arrays.asList(new AnyCoordinator());
 			List<Coordinator> coords = new ArrayList<Coordinator>();
@@ -48,11 +52,21 @@ public class StartUpGui {
 			coords.add(new QueryCoordinator());
 			List<Coordinator> optionalCoords = new ArrayList<Coordinator>();
 			optionalCoords.add(new FifoCoordinator());
+			
+			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
+			carIdCoords.add(new LifoCoordinator());
+			
 			try {
 				motorContainer = capi.createContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				carContainer = capi.createContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				bodyContainer = capi.createContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
+				carIdContainer = capi.createContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,carIdCoords, null, null);
+				//init first id
+				CarId firstId = new CarId();
+				firstId.setCarID(100000);
+				capi.write(carIdContainer,new Entry(firstId));
+				
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				System.exit(1);
@@ -67,6 +81,7 @@ public class StartUpGui {
 		containers.add(carContainer);
 		containers.add(motorContainer);
 		containers.add(wheelContainer);
+		containers.add(carIdContainer);
 		//1. Start the User interface
 		ProductionUI gui = new ProductionUI(FactoryFacade.getInstance(capi, containers));
 		Set<Operation> operations = new HashSet<Operation>();
@@ -79,10 +94,13 @@ public class StartUpGui {
 			notifMgr.createNotification(containers.get(1), listener, operations, null, null);
 			notifMgr.createNotification(containers.get(2), listener, operations, null, null);
 			notifMgr.createNotification(containers.get(3), listener, operations, null, null);
+			notifMgr.createNotification(containers.get(4), listener, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
+
+	
 }

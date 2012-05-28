@@ -79,7 +79,7 @@ public class SpaceUtil{
 		
 		try {
 				try {
-					parts = capi.take(container, selectors, SpaceTimeout.TENSEC, tx);
+					parts = capi.take(container, selectors, SpaceTimeout.ZERO, tx);
 				} catch (CountNotMetException ex) {
 					return null;
 				}
