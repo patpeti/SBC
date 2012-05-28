@@ -20,13 +20,24 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private ActiveMQConnectionFactory connectionFactory;
 
 	public JmsWheelFactory(long id, IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);
+		connectionFactory = new ActiveMQConnectionFactory();
 	}
 
+	private void connect() {
+		try {
+			connection = connectionFactory.createConnection();
+			connection.start();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void produce() {
 		Wheel wheel = new Wheel(id);
 		double random = Math.random();
@@ -38,6 +49,9 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 		System.out.println("writing wheel into jms...");
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
+			if(connection == null) {
+				connect();
+			}
 			connection = connectionFactory.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -65,5 +79,13 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 	public void finished() {
 		setChanged();
 		notifyObservers("WHEEL");
+		try {
+			connection.close();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			connection = null;
+		}
 	}
 }

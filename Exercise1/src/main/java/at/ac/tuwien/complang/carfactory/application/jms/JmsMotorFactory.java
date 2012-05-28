@@ -20,12 +20,25 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private ActiveMQConnectionFactory connectionFactory;
 
+	
 	public JmsMotorFactory(long id,  IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);
+		connectionFactory = new ActiveMQConnectionFactory();
 	}
+	
+	private void connect() {
+		try {
+			connection = connectionFactory.createConnection();
+			connection.start();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 	public void produce() {
 		Motor motor = new Motor(id);
@@ -38,6 +51,9 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 		System.out.println("writing Motor into jms...");
 		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
 		try {
+			if(connection == null) {
+				connect();
+			}
 			connection = conFac.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -61,9 +77,18 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 		return TIME_IN_SEC;
 	}
 	
+	
 	@Override
 	public void finished() {
 		setChanged();
 		notifyObservers("MOTOR");
+		try {
+			connection.close();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			connection = null;
+		}
 	}
 }
