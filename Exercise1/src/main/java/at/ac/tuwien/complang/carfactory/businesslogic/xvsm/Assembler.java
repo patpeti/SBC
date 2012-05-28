@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.Matchmaker;
 import org.mozartspaces.capi3.Matchmakers;
 import org.mozartspaces.capi3.Property;
@@ -38,6 +40,7 @@ import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
+import at.ac.tuwien.complang.carfactory.domain.CarId;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
@@ -53,9 +56,10 @@ public class Assembler{
 	private ContainerReference MotorContainer;
 	private ContainerReference WheelContainer;
 	private ContainerReference BodyContainer;
+	private ContainerReference CarIdContainer;
 	
 	public static long pid = 0;
-	public static long carId = 100000;
+	//public static long carId = 100000;
 
 	private Body body;
 	private Wheel[] fourWheels = new Wheel[4];
@@ -104,8 +108,36 @@ public class Assembler{
 	
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
+		long carId = 0;
+		//TODO read next car ID
+		List<Selector> idselectors = new ArrayList<Selector>();
+		idselectors.add(LifoCoordinator.newSelector());
+		try{
+		List<CarId> spaceId = capi.take(CarIdContainer,idselectors,SpaceTimeout.ZERO,tx);
+		if(spaceId.size() != 0)	carId = spaceId.get(0).getCarID() + 1; //increase ID
+	
+		
 		c.setId(carId);
-		carId++;
+		
+		//write increase ID back into space
+		
+		List<CoordinationData> idcoords = new ArrayList<CoordinationData>();
+		idcoords.add(LifoCoordinator.newCoordinationData());
+		CarId id = new CarId();
+		id.setCarID(carId);
+		
+			capi.write(new Entry(id,idcoords), CarIdContainer, SpaceTimeout.INFINITE, tx);
+		} catch (MzsCoreException e1) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e) {
+				e.printStackTrace();
+			}
+			e1.printStackTrace();
+		}
+		
+		
+		
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 			String label =  CarPartType.CAR.toString();
@@ -209,12 +241,14 @@ public class Assembler{
 			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());
+			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
+			carIdCoords.add(new LifoCoordinator());
 			try {
 				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				
+				this.CarIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
