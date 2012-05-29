@@ -11,7 +11,12 @@ public class Task implements Serializable {
 	//Fields
 	private MotorType motortype;
 	private int amount;
-	private int amountCompleted;
+	/**
+	 * The completed members
+	 */
+	private int amountCompleted; //written by supervisor
+	private int carAmount; //written by assembler, indicates how many cars have been assembled with the required motor type.
+	private int paintAmount; //written by painter, indicates how many cars/bodies have been painted.
 	private Color color;
 	private long id;
 	
@@ -50,10 +55,6 @@ public class Task implements Serializable {
 	public int getAmountCompleted() {
 		return amountCompleted;
 	}
-
-	public void setAmountCompleted(int amountCompleted) {
-		this.amountCompleted = amountCompleted;
-	}
 	
 	public Object[] getObjectData() {
 		String colorString;
@@ -75,5 +76,45 @@ public class Task implements Serializable {
 				amount,
 				amountCompleted
 		};
+	}
+
+	/**
+	 * @return Returns the amount of painted object. If this is
+	 * less than the getAmount value, the painter needs to paint
+	 * more cars/bodies.
+	 */
+	public int getCarAmount() {
+		return carAmount;
+	}
+
+	/**
+	 * Increase the amount of assembled cars by amount. Afterwards
+	 * the new number of completed cars is the minimum of paintAmount
+	 * and carAmount.
+	 * @param amount The amount of cars that have been completed.
+	 */
+	public void increaseCarAmount(int amount) {
+		this.carAmount += amount;
+		amountCompleted = Math.min(carAmount, paintAmount);
+	}
+
+	/**
+	 * @return Returns the amount of painted object. If this is
+	 * less than the getAmount value, the painter needs to paint
+	 * more cars/bodies.
+	 */
+	public int getPaintAmount() {
+		return paintAmount;
+	}
+
+	/**
+	 * Increase the amount of assembled cars by amount. Afterwards
+	 * the new number of completed cars is the minimum of paintAmount
+	 * and carAmount.
+	 * @param amount The amount of cars that have been completed.
+	 */
+	public void increasePaintAmount(int amount) {
+		this.paintAmount += amount;
+		amountCompleted = Math.min(carAmount, paintAmount);
 	}
 }

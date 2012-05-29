@@ -7,6 +7,7 @@ import java.util.List;
 import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
+import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
@@ -37,6 +38,7 @@ public class TaskController implements ITaskController {
 		task.setAmount(amount);
 		List<CoordinationData> coordinators = new ArrayList<CoordinationData>();
 		coordinators.add(KeyCoordinator.newCoordinationData(""+task.getId()));
+		coordinators.add(LabelCoordinator.newCoordinationData(color.toString()));
 		coordinators.add(FifoCoordinator.newCoordinationData());
 		try {
 			capi.write(cref, new Entry(task, coordinators));

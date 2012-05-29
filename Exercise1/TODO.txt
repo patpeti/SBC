@@ -6,14 +6,17 @@
 	* Add boolean for each entity: isDefect [DONE]
 	* Also save for each car if it is defect
  3. Create one container per part and for car [DONE]
-	* Clean up coordinators
-	* Add one container for Tasks (FIFO Order for tasks)
+	* Clean up coordinators [REJECTED]
+	* Add one container for Tasks (FIFO Order for tasks) [DONE]
 	* Add one container for defect cars
- 4. Solve XVSM ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle IDs
- 5. Make sure that more than one
- 	* painter (needs round robin distribution of parts),
+ 4. Solve XVSM ID Problem, if assembler is restarted then there is an ID conflict. We need to add a global object in the space to handle IDs [DONE]
+ 5. Make sure that more than one worker can start (XVSM and JMS):
+ 	* painter XVSM [DONE]
+ 	* assembler XVSM [DONE]
+ 	* supervisor XVSM [DONE]
+ 	* painter JMS (needs round robin distribution of parts)
  	* assembler (topics are non persistent currently) and
- 	* supervisor 
+ 	* supervisor
  	can run
  6. Add taskId field to Car [DONE]
  7. Create a new worker to perform testing:
@@ -22,13 +25,13 @@
 	* businesslogic.xvsm.Tester
 	* businesslogic.jms.Tester
  8. Add transactions for:
- 	* painter,
- 	* supervisor and
+ 	* painter [DONE]
+ 	* supervisor [DONE]
  	* tester
  9. Motor: Add field for power [DONE]
 10. Override the AbstractFactory.finished() method 
 	in all JMS Factories [DONE] 
-    and disconnect from the message queue
+    and disconnect from the message queue [DONE]
 	
 Final:
 	* Create a Powerpoint
