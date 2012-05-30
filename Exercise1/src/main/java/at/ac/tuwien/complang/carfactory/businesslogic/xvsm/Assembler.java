@@ -1,6 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.xvsm;
 
-import java.io.Serializable;
+import java.awt.Color;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -43,6 +43,8 @@ import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.CarId;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
@@ -57,6 +59,7 @@ public class Assembler{
 	private ContainerReference WheelContainer;
 	private ContainerReference BodyContainer;
 	private ContainerReference CarIdContainer;
+	private ContainerReference TaskContainer;
 	
 	public static long pid = 0;
 	//public static long carId = 100000;
@@ -65,6 +68,10 @@ public class Assembler{
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
 	private TransactionReference tx;
+	private Task task;
+	
+	private MotorType preferredMotor;
+	private Color preferredBodyColor;
 
 	public Assembler(long id){
 		/**
@@ -85,6 +92,27 @@ public class Assembler{
 	
 	public void doAssemble(){
 		System.out.println("[Assembler] New loop");
+		
+		//read Task
+		task = null;
+		preferredBodyColor = null;
+		preferredMotor = null;
+		task = getTaskFromSpace();
+		if(task != null){
+			//if there is task set preferations (body, motor)
+			preferredBodyColor = task.getColor();
+			preferredMotor = task.getMotortype();
+			//if preferation is set and car written -> update Task counters (write task into space)
+		}else{
+		
+		//if no task set ..do normal loop:
+		defaultWork();
+		
+		
+		}
+	}
+	
+	private void defaultWork() {
 		if(this.motor == null){
 			System.out.println("[Assembler] motor was null");
 			getOneMotor();
@@ -104,8 +132,22 @@ public class Assembler{
 			//create Car
 			createCar();
 		}
+		
+		
 	}
-	
+
+	private Task getTaskFromSpace() {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(FifoCoordinator.newSelector(1));
+		Task t = null;
+		try {
+			t = (Task) capi.read(TaskContainer, selectors, SpaceTimeout.ZERO, null).get(0);
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+		return t;
+	}
+
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
 		long carId = 0;
@@ -243,12 +285,15 @@ public class Assembler{
 			coords.add(new FifoCoordinator());
 			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
 			carIdCoords.add(new LifoCoordinator());
+			List<Coordinator> taskCoords = new ArrayList<Coordinator>();
+			taskCoords.add(new FifoCoordinator());
 			try {
 				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.CarIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
+				this.TaskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), taskCoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
