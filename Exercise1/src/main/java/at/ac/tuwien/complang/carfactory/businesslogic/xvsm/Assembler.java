@@ -14,6 +14,7 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
+import org.mozartspaces.capi3.KeyCoordinator.KeySelector;
 import org.mozartspaces.capi3.LabelCoordinator;
 import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.Matchmaker;
@@ -68,10 +69,7 @@ public class Assembler{
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
 	private TransactionReference tx;
-	private Task task;
 	
-	private MotorType preferredMotor;
-	private Color preferredBodyColor;
 
 	public Assembler(long id){
 		/**
@@ -94,24 +92,125 @@ public class Assembler{
 		System.out.println("[Assembler] New loop");
 		
 		//read Task
-		task = null;
-		preferredBodyColor = null;
-		preferredMotor = null;
-		task = getTaskFromSpace();
+
+		Task task = getTaskFromSpace();
 		if(task != null){
 			//if there is task set preferations (body, motor)
-			preferredBodyColor = task.getColor();
-			preferredMotor = task.getMotortype();
+			preferredLoop(task);
 			//if preferation is set and car written -> update Task counters (write task into space)
 		}else{
-		
-		//if no task set ..do normal loop:
-		defaultWork();
-		
-		
+			//if no task set ..do normal loop:
+			defaultWork();
 		}
 	}
 	
+	private void preferredLoop(Task t) {
+		if(t == null) return; //leave loop if no other Task can be found
+		try{
+		TransactionReference tx1 = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		Motor m = getPreferredMotor(t.getMotortype(),tx1);
+		Body b = getPreferredBody(t.getColor(),tx1);
+		Wheel[] wheels =  getFourWheels(tx1);
+		assemblePreferredCar(m,b, wheels,t,tx1); //assemble car and update Task
+		//if one element missing -> TransactionException is thrown
+		}catch(TransactionException e){
+			//rollback - automatically?
+			preferredLoop(readNextTask(t));
+		}catch(MzsCoreException e){
+			System.err.println("Dear future me, in the past you hoped that you will never see this text coming");
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+			
+	}
+
+	private Task readNextTask(Task t) {
+		// assume Tasks are in FIFO order and bigger key value means older Task
+		// get task with bigger key then the key of the input task
+		//if nothing found return null -> terminates preferredLoop
+		
+		List<Selector> taskSelectors = new ArrayList<Selector>();
+		taskSelectors.add(AnyCoordinator.newSelector());
+		List<Task> tListe = new ArrayList<Task>();
+		TransactionReference tx2 = null;
+		try {
+			tx2 = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		} catch (MzsCoreException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			tListe = capi.read(TaskContainer, taskSelectors, SpaceTimeout.TENSEC, tx2);
+		} catch (MzsCoreException e) {
+			return null;
+		}
+		
+		if(!tListe.isEmpty() ){
+			//assume elements are in FIFO order in the beginning old Tasks with low ids /in the end young Tasks with high ids
+			for(Task iTask : tListe){
+				if(iTask.getId()>t.getId()) return iTask;
+			}
+			return null;
+		}else{
+			return null;
+		}
+
+	}
+
+	private void assemblePreferredCar(Motor m, Body b, Wheel[] wheels, Task t, TransactionReference tx1) throws MzsCoreException, TransactionException{
+		//create the car
+		Car c = new Car(pid, b, m, wheels);
+		
+		//write car into space (which labels?, coordinators?)
+	
+		//get ID from space
+		long carId = 0;
+		//TODO read next car ID
+		List<Selector> idselectors = new ArrayList<Selector>();
+		idselectors.add(LifoCoordinator.newSelector());
+		List<CarId> spaceId = capi.take(CarIdContainer,idselectors,SpaceTimeout.ZERO,tx1);
+		if(spaceId.size() != 0)	carId = spaceId.get(0).getCarID() + 1; //increase ID
+		
+		c.setId(carId);
+		
+		//write increase ID back into space
+		
+		List<CoordinationData> idcoords = new ArrayList<CoordinationData>();
+		idcoords.add(LifoCoordinator.newCoordinationData());
+		CarId id = new CarId();
+		id.setCarID(carId);
+		
+		capi.write(new Entry(id,idcoords), CarIdContainer, SpaceTimeout.INFINITE, tx);
+	
+		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+		String label =  CarPartType.CAR.toString();
+		if(this.body.getColor() != null) label = SpaceLabels.PAINTEDCAR;
+		cordinator.add(LabelCoordinator.newCoordinationData(label));
+		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+		cordinator.add(FifoCoordinator.newCoordinationData());
+		capi.write(new Entry(c,cordinator),CarContainer,SpaceTimeout.TENSEC,tx1 );
+		System.out.println("[PreferredAssembler]*Car " + c.getId() + " created");
+		
+		//update task
+		
+		//take task
+		List<Selector> sel = new ArrayList<Selector>();
+		sel.add(KeyCoordinator.newSelector(""+t.getId()));
+		Task takenTask = (Task) capi.take(TaskContainer, sel, SpaceTimeout.TENSEC, tx1).get(0);
+		takenTask.increaseCarAmount(1);
+		
+		//write task
+		List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
+		taskCoords.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+		taskCoords.add(FifoCoordinator.newCoordinationData());
+		capi.write(TaskContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask,taskCoords));
+		
+		capi.commitTransaction(tx1);
+	}
+
 	private void defaultWork() {
 		if(this.motor == null){
 			System.out.println("[Assembler] motor was null");
@@ -143,10 +242,12 @@ public class Assembler{
 		try {
 			t = (Task) capi.read(TaskContainer, selectors, SpaceTimeout.ZERO, null).get(0);
 		} catch (MzsCoreException e) {
-			e.printStackTrace();
+			System.err.println("Error while trying to get the first task from the space");
+			return null;
 		}
 		return t;
 	}
+	
 
 	private void createCar() {
 		Car c = new Car(pid,this.body,this.motor,this.fourWheels);
@@ -193,7 +294,49 @@ public class Assembler{
 			e.printStackTrace();
 		}
 	}
+	
+	private Motor getPreferredMotor(MotorType motortype, TransactionReference tx1) throws MzsCoreException,TransactionException {
+		Motor tempMotor = null;
+		
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("*", "power");
+		query = new Query().filter(prop.equalTo(motortype));
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(QueryCoordinator.newSelector(query));
+		selectors.add(AnyCoordinator.newSelector(1));
+		
+		tempMotor = (Motor) capi.take(MotorContainer, selectors, SpaceTimeout.TENSEC, tx1).get(0);
+		
+		return tempMotor;
+	}
 
+	
+	private Body getPreferredBody(Color color, TransactionReference tx1) throws MzsCoreException,TransactionException {
+		Body tempBody = null;
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("*", "color");
+		query = new Query().filter(prop.equalTo(color));
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(QueryCoordinator.newSelector(query));
+		selectors.add(AnyCoordinator.newSelector(1));
+		
+		try{
+		tempBody = (Body) capi.take(BodyContainer, selectors, SpaceTimeout.ZERO, null).get(0);
+		}catch(CountNotMetException e){
+			System.out.println("[PreferredAssembler] Painted Body Not found");
+		}
+		
+		if(tempBody == null){
+			selectors.clear();
+			selectors.add(AnyCoordinator.newSelector(1));
+			tempBody = (Body) capi.take(BodyContainer, selectors, SpaceTimeout.TENSEC, tx1).get(0);
+		}
+		
+		return tempBody;
+	}
+	
 	public void getOneMotor() {
 		
 		List<ICarPart> motors = this.takeCarPart(CarPartType.MOTOR, new Integer(1), SpaceTimeout.INFINITE, tx);
@@ -211,6 +354,18 @@ public class Assembler{
 			e.printStackTrace();
 		}
 		System.out.println("[Assembler] *Motor taken");
+	}
+	
+	private Wheel[] getFourWheels(TransactionReference tx1) throws MzsCoreException, TransactionException {
+		Wheel[] tempWheels = new Wheel[4];
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(AnyCoordinator.newSelector(4));
+		List<ICarPart> wheels = capi.take(WheelContainer, selectors, SpaceTimeout.TENSEC, tx1);
+		int i = 0;
+		for(ICarPart w : wheels){
+			tempWheels[i] = (Wheel) w;
+		}
+		return tempWheels;
 	}
 	
 	public void getFourWheels(){
@@ -287,6 +442,7 @@ public class Assembler{
 			carIdCoords.add(new LifoCoordinator());
 			List<Coordinator> taskCoords = new ArrayList<Coordinator>();
 			taskCoords.add(new FifoCoordinator());
+			taskCoords.add(new QueryCoordinator());
 			try {
 				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
