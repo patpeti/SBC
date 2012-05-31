@@ -34,11 +34,13 @@ public class Tester {
 	
 	private Capi capi;
 	private ContainerReference container;
+	private ContainerReference defectContainer;
 	private TransactionReference tx;
+	private TesterType type;
 
 	public Tester(TesterType type) {
 		initSpace();
-		
+		this.type = type;
 		if(type == TesterType.COMPLETETESTER){
 			//do completetestloop
 			while(true){
@@ -164,6 +166,19 @@ public class Tester {
 	}
 	
 	private void writeCarIntoSpace(Car car) {
+		if(car.isCompletenessTested() && car.isDefectTested() && car.isDefect()){
+			//write car into defectlager
+		try{	
+			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+			cordinator.add(KeyCoordinator.newCoordinationData(""+car.getId()));
+			cordinator.add(FifoCoordinator.newCoordinationData());
+			capi.write(new Entry(car,cordinator),container,SpaceTimeout.TENSEC, tx );
+			capi.commitTransaction(tx);
+			System.out.println("[Tester]*Car " + car.getId() + " written in defectlager");
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+		}else{
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 			String label =  CarPartType.CAR.toString();
@@ -173,11 +188,11 @@ public class Tester {
 			cordinator.add(FifoCoordinator.newCoordinationData());
 			capi.write(new Entry(car,cordinator),container,SpaceTimeout.TENSEC, tx );
 			capi.commitTransaction(tx);
-			System.out.println("[Assembler]*Car " + car.getId() + " created");
+			System.out.println("[Tester]*Car " + car.getId() + " tested: "+this.type);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-		
+		}
 	}
 
 	private void initSpace(){
@@ -190,9 +205,13 @@ public class Tester {
 //			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
-			coords.add(new FifoCoordinator());						
+			coords.add(new FifoCoordinator());		
+			List<Coordinator> defcoords = new ArrayList<Coordinator>();
+			defcoords.add(new FifoCoordinator());	
+			defcoords.add(new KeyCoordinator());
 			try {
 				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.defectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defcoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();

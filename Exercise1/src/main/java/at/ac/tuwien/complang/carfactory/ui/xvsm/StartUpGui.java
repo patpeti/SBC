@@ -62,7 +62,8 @@ public class StartUpGui {
 			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
 			carIdCoords.add(new LifoCoordinator());
 			List<Coordinator> defectCoords = new ArrayList<Coordinator>();
-			defectCoords.add(new QueryCoordinator());
+			defectCoords.add(new FifoCoordinator());
+			defectCoords.add(new KeyCoordinator());
 			try {
 				motorContainer = capi.createContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);

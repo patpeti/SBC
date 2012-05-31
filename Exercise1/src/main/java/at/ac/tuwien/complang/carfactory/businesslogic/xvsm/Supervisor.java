@@ -11,7 +11,6 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
-import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
@@ -20,14 +19,19 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants;
+import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
 
+import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
@@ -47,19 +51,102 @@ public class Supervisor{
 	private ContainerReference BodyContainer;
 	private ContainerReference MotorContainer;
 	private ContainerReference WheelContainer;
-	private ContainerReference CarIdContainer;
-	
+	private ContainerReference DefectContainer;
 	private TransactionReference tx;
 	private long pid = 0;
+	
 	
 	public Supervisor(long id) {
 		this.pid = id;
 		initSpace();
 		while(true){
 			readPaintedCar();
+			recylceDefectedCar();
 		}
 	}
 	
+	private void recylceDefectedCar() {
+		try {
+			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		} catch (MzsCoreException e1) {
+			e1.printStackTrace();
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+		
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(FifoCoordinator.newSelector(1));
+		List<ICarPart> parts = null;
+		
+		try {
+			parts = capi.take(DefectContainer, selectors, SpaceTimeout.INFINITE, tx);
+		} catch (MzsTimeoutException e) {
+			return;
+		} catch (TransactionException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+		
+		if(parts != null){
+			Car c = (Car) parts.get(0);
+			
+			Body b = c.getBody();
+			Motor m = c.getMotor();
+			Wheel w1,w2,w3,w4;
+			w1 = c.getWheels()[0];
+			w2 = c.getWheels()[1];
+			w3 = c.getWheels()[2];
+			w4 = c.getWheels()[3];
+			
+			if(!b.isDefect()) writePartBackInSpace(b,tx);
+			if(!m.isDefect()) writePartBackInSpace(m,tx);
+			if(!w1.isDefect()) writePartBackInSpace(w1,tx);
+			if(!w2.isDefect()) writePartBackInSpace(w2,tx);
+			if(!w3.isDefect()) writePartBackInSpace(w3,tx);
+			if(!w4.isDefect()) writePartBackInSpace(w4,tx);
+			
+			try {
+				capi.commitTransaction(tx);
+			} catch (MzsCoreException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	private void writePartBackInSpace(ICarPart part, TransactionReference tx2) {
+		ContainerReference c = null;
+		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+		cordinator.add(KeyCoordinator.newCoordinationData(""+part.getId()));
+		if(part instanceof Body){
+			c = BodyContainer;
+			if(((Body)part).getColor() == null){
+				cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
+			}
+			else{
+				cordinator.add(LabelCoordinator.newCoordinationData(SpaceLabels.PAINTEDBODY));
+			}
+			
+		}else if(part instanceof Motor){
+			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.MOTOR.toString()));
+			c = MotorContainer;
+		}else if(part instanceof Wheel){
+			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
+			c = WheelContainer;
+		}
+		try {
+			capi.write(c,SpaceTimeout.TENSEC,tx2,new Entry(part, cordinator));
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
 	private void readPaintedCar(){
 		
 		try {
@@ -128,16 +215,16 @@ public class Supervisor{
 			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());
-			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
-			carIdCoords.add(new LifoCoordinator());
+			List<Coordinator> defectCoords = new ArrayList<Coordinator>();
+			defectCoords.add(new FifoCoordinator());
+			defectCoords.add(new KeyCoordinator());
 			
 			try {
 				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.CarIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
-				
+				this.DefectContainer = capi.createContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,defectCoords, null, null);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
