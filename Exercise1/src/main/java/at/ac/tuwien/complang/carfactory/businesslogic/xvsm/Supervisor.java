@@ -109,7 +109,7 @@ public class Supervisor{
 			if(!w2.isDefect()) writePartBackInSpace(w2,tx);
 			if(!w3.isDefect()) writePartBackInSpace(w3,tx);
 			if(!w4.isDefect()) writePartBackInSpace(w4,tx);
-			
+			System.out.println("Car with id: " + c.getId() + " is recycled");
 			try {
 				capi.commitTransaction(tx);
 			} catch (MzsCoreException e) {
