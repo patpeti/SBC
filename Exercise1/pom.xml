@@ -19,7 +19,11 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mozartspaces</groupId>
+			<artifactId>mozartspaces-core</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.mozartspaces</groupId>
 			<artifactId>mozartspaces-runtime</artifactId>
