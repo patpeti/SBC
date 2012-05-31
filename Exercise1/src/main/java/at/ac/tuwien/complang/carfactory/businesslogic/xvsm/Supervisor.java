@@ -11,6 +11,8 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
@@ -41,7 +43,12 @@ public class Supervisor{
 	 */
 	
 	private Capi capi;
-	private ContainerReference container;
+	private ContainerReference CarContainer;
+	private ContainerReference BodyContainer;
+	private ContainerReference MotorContainer;
+	private ContainerReference WheelContainer;
+	private ContainerReference CarIdContainer;
+	
 	private TransactionReference tx;
 	private long pid = 0;
 	
@@ -70,7 +77,7 @@ public class Supervisor{
 		List<ICarPart> parts = null;
 		
 		try {
-			parts = capi.take(container, selectors, SpaceTimeout.INFINITE, tx);
+			parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
 		} catch (MzsTimeoutException e) {
 			return;
 		} catch (TransactionException e) {
@@ -97,7 +104,7 @@ public class Supervisor{
 		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 		try {
 			// Write the finished car back to the space
-			capi.write(new Entry(c,cordinator), container,SpaceTimeout.INFINITE, tx );
+			capi.write(new Entry(c,cordinator), CarContainer,SpaceTimeout.INFINITE, tx );
 			capi.commitTransaction(tx);
 		} catch (MzsCoreException e) {
 			try {
@@ -112,16 +119,25 @@ public class Supervisor{
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-	
-		this.container = null;
+		//notifMgr = new NotificationManager(core);		
+		
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
+			coords.add(new QueryCoordinator());
 			coords.add(new KeyCoordinator());
-			coords.add(new FifoCoordinator());						
+			coords.add(new FifoCoordinator());
+			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
+			carIdCoords.add(new LifoCoordinator());
+			
 			try {
-				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.CarIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
+				
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
@@ -132,7 +148,6 @@ public class Supervisor{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		System.out.println("[SpaceUtil]: Space initiated ");
 		
 	}
 

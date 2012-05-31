@@ -45,6 +45,7 @@ public class StartUpGui {
 		ContainerReference bodyContainer = null;
 		ContainerReference taskContainer = null;
 		ContainerReference carIdContainer = null;
+		ContainerReference defectContainer = null;
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
@@ -60,6 +61,8 @@ public class StartUpGui {
 			optionalCoords.add(new FifoCoordinator());
 			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
 			carIdCoords.add(new LifoCoordinator());
+			List<Coordinator> defectCoords = new ArrayList<Coordinator>();
+			defectCoords.add(new QueryCoordinator());
 			try {
 				motorContainer = capi.createContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
@@ -67,6 +70,7 @@ public class StartUpGui {
 				bodyContainer = capi.createContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				taskContainer = capi.createContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  taskCoordinators, null, null);
 				carIdContainer = capi.createContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,carIdCoords, null, null);
+				defectContainer = capi.createContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,defectCoords, null, null);
 				//init first id
 				CarId firstId = new CarId();
 				firstId.setCarID(100000);
