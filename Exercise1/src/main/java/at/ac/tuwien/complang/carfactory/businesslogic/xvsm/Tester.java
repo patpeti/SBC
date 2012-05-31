@@ -172,7 +172,7 @@ public class Tester {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 			cordinator.add(KeyCoordinator.newCoordinationData(""+car.getId()));
 			cordinator.add(FifoCoordinator.newCoordinationData());
-			capi.write(new Entry(car,cordinator),container,SpaceTimeout.TENSEC, tx );
+			capi.write(new Entry(car,cordinator),defectContainer,SpaceTimeout.TENSEC, tx );
 			capi.commitTransaction(tx);
 			System.out.println("[Tester]*Car " + car.getId() + " written in defectlager");
 		} catch (MzsCoreException e) {
