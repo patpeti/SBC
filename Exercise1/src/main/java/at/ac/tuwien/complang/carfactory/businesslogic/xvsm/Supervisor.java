@@ -11,6 +11,10 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.Matchmaker;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
@@ -60,12 +64,18 @@ public class Supervisor{
 		this.pid = id;
 		initSpace();
 		while(true){
-			readPaintedCar();
-			recylceDefectedCar();
+			
+			readTestedCar();
+			
+//			readPaintedCar();
+//			recylceDefectedCar();
 		}
 	}
 	
-	private void recylceDefectedCar() {
+	private void readTestedCar() {
+		
+		
+		
 		try {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
@@ -75,11 +85,27 @@ public class Supervisor{
 		}
 		
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(FifoCoordinator.newSelector(1));
+		selectors.add(FifoCoordinator.newSelector());
+		selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
+		selectors.add(AnyCoordinator.newSelector(1));
+		
+		Query query = null;
+		Property prop = null;
+		Property prop2 = null;
+		List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
+		Matchmaker[] array = new Matchmaker[2];
+		prop = Property.forName("*", "completenessTested");
+		prop2 = Property.forName("*", "defectTested");
+		matchmakers.add(prop.equalTo(true));
+		matchmakers.add(prop2.equalTo(true));
+		query = new Query().filter((Matchmakers.and(matchmakers.toArray(array)))  );
+		
+		selectors.add(QueryCoordinator.newSelector(query));
+		
 		List<ICarPart> parts = null;
 		
 		try {
-			parts = capi.take(DefectContainer, selectors, SpaceTimeout.INFINITE, tx);
+			parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
 		} catch (MzsTimeoutException e) {
 			return;
 		} catch (TransactionException e) {
@@ -94,30 +120,61 @@ public class Supervisor{
 		
 		if(parts != null){
 			Car c = (Car) parts.get(0);
-			
-			Body b = c.getBody();
-			Motor m = c.getMotor();
-			Wheel w1,w2,w3,w4;
-			w1 = c.getWheels()[0];
-			w2 = c.getWheels()[1];
-			w3 = c.getWheels()[2];
-			w4 = c.getWheels()[3];
-			
-			if(!b.isDefect()) writePartBackInSpace(b,tx);
-			if(!m.isDefect()) writePartBackInSpace(m,tx);
-			if(!w1.isDefect()) writePartBackInSpace(w1,tx);
-			if(!w2.isDefect()) writePartBackInSpace(w2,tx);
-			if(!w3.isDefect()) writePartBackInSpace(w3,tx);
-			if(!w4.isDefect()) writePartBackInSpace(w4,tx);
-			System.out.println("Car with id: " + c.getId() + " is recycled");
-			try {
-				capi.commitTransaction(tx);
-			} catch (MzsCoreException e) {
-				e.printStackTrace();
+			c.setComplete(pid, true);
+			if(c.isDefect()){
+				writeDefectedCar(c);
+				recycleCar(c);
+			}else{
+				writeCar(c);
 			}
+			System.out.println("Supervised car " + c.getId());
+		}
+	}
+
+	private void writeDefectedCar(Car c) {
+		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+		cordinator.add(FifoCoordinator.newCoordinationData());
+		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
+		try {
+			// Write the finished car back to the space
+			capi.write(new Entry(c,cordinator), DefectContainer,SpaceTimeout.INFINITE, tx );
+			capi.commitTransaction(tx);
+		} catch (MzsCoreException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
 		}
 		
 	}
+
+	private void recycleCar(Car c) {
+				
+		Body b = c.getBody();
+		Motor m = c.getMotor();
+		Wheel w1,w2,w3,w4;
+		w1 = c.getWheels()[0];
+		w2 = c.getWheels()[1];
+		w3 = c.getWheels()[2];
+		w4 = c.getWheels()[3];
+		
+		if(!b.isDefect()) writePartBackInSpace(b,tx);
+		if(!m.isDefect()) writePartBackInSpace(m,tx);
+		if(!w1.isDefect()) writePartBackInSpace(w1,tx);
+		if(!w2.isDefect()) writePartBackInSpace(w2,tx);
+		if(!w3.isDefect()) writePartBackInSpace(w3,tx);
+		if(!w4.isDefect()) writePartBackInSpace(w4,tx);
+		System.out.println("Car with id: " + c.getId() + " is recycled");
+		
+		try {
+			capi.commitTransaction(tx);
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	private void writePartBackInSpace(ICarPart part, TransactionReference tx2) {
 		ContainerReference c = null;
@@ -147,43 +204,6 @@ public class Supervisor{
 		
 	}
 
-	private void readPaintedCar(){
-		
-		try {
-			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
-		} catch (MzsCoreException e1) {
-			e1.printStackTrace();
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-		}
-		
-		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(FifoCoordinator.newSelector());
-		selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
-		selectors.add(AnyCoordinator.newSelector(1));
-		List<ICarPart> parts = null;
-		
-		try {
-			parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
-		} catch (MzsTimeoutException e) {
-			return;
-		} catch (TransactionException e) {
-			try {
-				capi.rollbackTransaction(tx);
-			} catch (MzsCoreException e1) {
-				e1.printStackTrace();
-			}
-		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		}
-		
-		if(parts != null){
-			Car c = (Car) parts.get(0);
-			c.setComplete(pid, true);
-			writeCar(c);
-			System.out.println("Supervised car " + c.getId());
-		}
-	}
 
 	private void writeCar(Car c) {
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
@@ -240,3 +260,97 @@ public class Supervisor{
 
 	
 }
+
+
+//private void readPaintedCar(){
+//
+//try {
+//	tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+//} catch (MzsCoreException e1) {
+//	e1.printStackTrace();
+//} catch (URISyntaxException e1) {
+//	e1.printStackTrace();
+//}
+//
+//List<Selector> selectors = new ArrayList<Selector>();
+//selectors.add(FifoCoordinator.newSelector());
+//selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
+//selectors.add(AnyCoordinator.newSelector(1));
+//List<ICarPart> parts = null;
+//
+//try {
+//	parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
+//} catch (MzsTimeoutException e) {
+//	return;
+//} catch (TransactionException e) {
+//	try {
+//		capi.rollbackTransaction(tx);
+//	} catch (MzsCoreException e1) {
+//		e1.printStackTrace();
+//	}
+//} catch (MzsCoreException e) {
+//	e.printStackTrace();
+//}
+//
+//if(parts != null){
+//	Car c = (Car) parts.get(0);
+//	c.setComplete(pid, true);
+//	writeCar(c);
+//	System.out.println("Supervised car " + c.getId());
+//}
+//}
+
+
+//	private void recylceDefectedCar() {
+//		try {
+//			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+//		} catch (MzsCoreException e1) {
+//			e1.printStackTrace();
+//		} catch (URISyntaxException e1) {
+//			e1.printStackTrace();
+//		}
+//		
+//		List<Selector> selectors = new ArrayList<Selector>();
+//		selectors.add(FifoCoordinator.newSelector(1));
+//		List<ICarPart> parts = null;
+//		
+//		try {
+//			parts = capi.take(DefectContainer, selectors, SpaceTimeout.INFINITE, tx);
+//		} catch (MzsTimeoutException e) {
+//			return;
+//		} catch (TransactionException e) {
+//			try {
+//				capi.rollbackTransaction(tx);
+//			} catch (MzsCoreException e1) {
+//				e1.printStackTrace();
+//			}
+//		} catch (MzsCoreException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		if(parts != null){
+//			Car c = (Car) parts.get(0);
+//			
+//			Body b = c.getBody();
+//			Motor m = c.getMotor();
+//			Wheel w1,w2,w3,w4;
+//			w1 = c.getWheels()[0];
+//			w2 = c.getWheels()[1];
+//			w3 = c.getWheels()[2];
+//			w4 = c.getWheels()[3];
+//			
+//			if(!b.isDefect()) writePartBackInSpace(b,tx);
+//			if(!m.isDefect()) writePartBackInSpace(m,tx);
+//			if(!w1.isDefect()) writePartBackInSpace(w1,tx);
+//			if(!w2.isDefect()) writePartBackInSpace(w2,tx);
+//			if(!w3.isDefect()) writePartBackInSpace(w3,tx);
+//			if(!w4.isDefect()) writePartBackInSpace(w4,tx);
+//			System.out.println("Car with id: " + c.getId() + " is recycled");
+//			try {
+//				capi.commitTransaction(tx);
+//			} catch (MzsCoreException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//	}

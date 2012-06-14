@@ -11,6 +11,9 @@ import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
@@ -34,7 +37,7 @@ public class Tester {
 	
 	private Capi capi;
 	private ContainerReference container;
-	private ContainerReference defectContainer;
+	//private ContainerReference defectContainer;
 	private TransactionReference tx;
 	private TesterType type;
 
@@ -66,6 +69,14 @@ public class Tester {
 		}
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(FifoCoordinator.newSelector(1));
+		//add queryCoordinator so that we get cars that are not tested yet
+				
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("*", "defectTested");
+		query = new Query().filter(prop.equalTo(false));
+		selectors.add(QueryCoordinator.newSelector(query));
+		
 		List<Car> cars = new ArrayList<Car>();
 		try {
 			cars = capi.take(container, selectors, SpaceTimeout.INFINITE, tx);
@@ -109,6 +120,16 @@ public class Tester {
 		}
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(FifoCoordinator.newSelector(1));
+		
+		// add queryCoordinator so that we get cars that are not tested yet
+		
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("*", "completenessTested");
+		query = new Query().filter(prop.equalTo(false));
+		selectors.add(QueryCoordinator.newSelector(query));
+		
+		
 		List<Car> cars = new ArrayList<Car>();
 		try {
 			cars = capi.take(container, selectors, SpaceTimeout.INFINITE, tx);
@@ -166,19 +187,21 @@ public class Tester {
 	}
 	
 	private void writeCarIntoSpace(Car car) {
-		if(car.isCompletenessTested() && car.isDefectTested() && car.isDefect()){
-			//write car into defectlager
-		try{	
-			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-			cordinator.add(KeyCoordinator.newCoordinationData(""+car.getId()));
-			cordinator.add(FifoCoordinator.newCoordinationData());
-			capi.write(new Entry(car,cordinator),defectContainer,SpaceTimeout.TENSEC, tx );
-			capi.commitTransaction(tx);
-			System.out.println("[Tester]*Car " + car.getId() + " written in defectlager");
-		} catch (MzsCoreException e) {
-			e.printStackTrace();
-		}
-		}else{
+//		if(car.isCompletenessTested() && car.isDefectTested() && car.isDefect()){
+//			//write car into defectlager.. NO 
+//		try{	
+//			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
+//			cordinator.add(KeyCoordinator.newCoordinationData(""+car.getId()));
+//			cordinator.add(FifoCoordinator.newCoordinationData());
+//			capi.write(new Entry(car,cordinator),defectContainer,SpaceTimeout.TENSEC, tx );
+//			capi.commitTransaction(tx);
+//			System.out.println("[Tester]*Car " + car.getId() + " written in defectlager");
+//		} catch (MzsCoreException e) {
+//			e.printStackTrace();
+//		}
+//		}else{
+		
+		//WRITE CAR ALWAYS IN THE CARCONTAINER AFTER TEST... DEFECTCONTAINER IS USED BY SUPERVISOR
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 			String label =  CarPartType.CAR.toString();
@@ -192,7 +215,7 @@ public class Tester {
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-		}
+//		}
 	}
 
 	private void initSpace(){
@@ -205,13 +228,14 @@ public class Tester {
 //			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
-			coords.add(new FifoCoordinator());		
-			List<Coordinator> defcoords = new ArrayList<Coordinator>();
-			defcoords.add(new FifoCoordinator());	
-			defcoords.add(new KeyCoordinator());
+			coords.add(new FifoCoordinator());	
+			coords.add(new QueryCoordinator());
+//			List<Coordinator> defcoords = new ArrayList<Coordinator>();
+//			defcoords.add(new FifoCoordinator());	
+//			defcoords.add(new KeyCoordinator());
 			try {
 				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.defectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defcoords, null, capi);
+				//this.defectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defcoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
