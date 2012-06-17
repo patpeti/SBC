@@ -21,7 +21,8 @@ public class StartUpAssembler {
 
 		parseArguments(args);
 		Assembler assembler = new Assembler(id);
-		assembler.doWork();
+		while(true) assembler.doAssemble();
+		//assembler.doWork();
 	}
 
 	private static void parseArguments(String[] args) {

@@ -106,6 +106,7 @@ public class StartUpGui {
 			notificationManager.createNotification(containers.get(3), listener, operations, null, null);
 			notificationManager.createNotification(taskContainer, listener, operations, null, null);
 			notificationManager.createNotification(carIdContainer, listener, operations, null, null);
+			notificationManager.createNotification(defectContainer, listener, operations, null, null);
 		
 		} catch (MzsCoreException e) {
 			e.printStackTrace();

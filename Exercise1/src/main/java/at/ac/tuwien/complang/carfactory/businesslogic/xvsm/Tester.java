@@ -211,7 +211,7 @@ public class Tester {
 			cordinator.add(FifoCoordinator.newCoordinationData());
 			capi.write(new Entry(car,cordinator),container,SpaceTimeout.TENSEC, tx );
 			capi.commitTransaction(tx);
-			System.out.println("[Tester]*Car " + car.getId() + " tested: "+this.type);
+			System.out.println("[Tester]*Car " + car.getId() + " tested: "+this.type+" Defect: " + car.isDefect());
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}

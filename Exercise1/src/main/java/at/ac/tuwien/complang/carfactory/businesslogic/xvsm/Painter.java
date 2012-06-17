@@ -74,9 +74,10 @@ public class Painter {
 		try {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 			//1. Take the Task object from the space
-			Task task = getTask();
+			//Task task = getTask();
+			Task task = null;
 			//2a. Take a car from the space
-			List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), SpaceTimeout.ZERO, tx);
+			List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), SpaceTimeout.ZERO, null);
 			if(carparts != null ) {
 				//paint car body and write it to space
 				try {
@@ -90,7 +91,7 @@ public class Painter {
 				}
 			} else {
 				//2b. if it is still null take a body from space
-				List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), SpaceTimeout.ZERO, tx);
+				List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), SpaceTimeout.ZERO, null);
 				//get body paint it write it
 				if(parts != null) {
 					try {
@@ -104,6 +105,7 @@ public class Painter {
 					}
 				}
 			}
+//			capi.commitTransaction(tx);
 		} catch (MzsCoreException e1) {
 			try {
 				capi.rollbackTransaction(tx);
@@ -125,13 +127,7 @@ public class Painter {
 			entities = capi.take(taskContainer, selectors, 0, tx);
 			if(entities != null) return (Task) entities.get(0);
 		} catch (CountNotMetException ex) {
-			System.err.println("Not enough object found");
-			try {
-				capi.rollbackTransaction(tx);
-				return null;
-			} catch (MzsCoreException e) {
-				e.printStackTrace();
-			}
+			return null;
 		} catch (MzsTimeoutException e) {
 			return null;
 		} catch (TransactionException e) {
@@ -158,24 +154,18 @@ public class Painter {
 				parts = capi.take(carContainer, selectors, timeout, tx);
 			}
 		} catch (CountNotMetException ex) {
-			System.err.println("Not enough object found");
-			try {
-				capi.rollbackTransaction(tx);
-				return null;
-			} catch (MzsCoreException e) {
-				e.printStackTrace();
-			}
+			return null;
 		} catch (MzsTimeoutException e) {
 			return null;
 		} catch (TransactionException e) {
 			return null;
 		} catch (MzsCoreException e) {
-			try {
-				capi.rollbackTransaction(tx);
-			} catch (MzsCoreException e1) {
-				e1.printStackTrace();
-			}
-			e.printStackTrace();
+//			try {
+//				capi.rollbackTransaction(tx);
+//			} catch (MzsCoreException e1) {
+//				e1.printStackTrace();
+//			}
+//			e.printStackTrace();
 		}
 		if (parts != null && !parts.isEmpty()) {
 			return parts;

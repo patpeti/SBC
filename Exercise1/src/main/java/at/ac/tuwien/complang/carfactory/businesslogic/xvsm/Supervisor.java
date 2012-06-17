@@ -124,10 +124,12 @@ public class Supervisor{
 			if(c.isDefect()){
 				writeDefectedCar(c);
 				recycleCar(c);
+				System.out.println("Car defected and recycled " + c.getId());
 			}else{
 				writeCar(c);
+				System.out.println("Supervised car " + c.getId());
 			}
-			System.out.println("Supervised car " + c.getId());
+			
 		}
 	}
 
@@ -138,7 +140,7 @@ public class Supervisor{
 		try {
 			// Write the finished car back to the space
 			capi.write(new Entry(c,cordinator), DefectContainer,SpaceTimeout.INFINITE, tx );
-			capi.commitTransaction(tx);
+			//capi.commitTransaction(tx);
 		} catch (MzsCoreException e) {
 			try {
 				capi.rollbackTransaction(tx);
@@ -244,7 +246,7 @@ public class Supervisor{
 				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.DefectContainer = capi.createContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,defectCoords, null, null);
+				this.DefectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defectCoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
