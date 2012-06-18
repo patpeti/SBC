@@ -94,16 +94,16 @@ public class JmsTester extends JmsAbstractWorker {
 		connectionFactory.setPrefetchPolicy(policy);
 		try {
 			connection = connectionFactory.createConnection();
-			connection.setClientID("painter" + this.pid);
+			connection.setClientID("tester" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			//Read by the completeness tester
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
-			this.paintedCarConsumer = session.createDurableSubscriber(this.paintedCarTopic, "tester" + this.pid);
+			this.paintedCarConsumer = session.createDurableSubscriber(this.paintedCarTopic, "paintedCars");
 			//Read by the defect Tester, Written to by the completeness tester
 			this.completenessTestedCarTopic = session.createTopic(QueueConstants.COMPLETENESS_TESTED_TOPIC);
-			this.completenessTestedConsumer = session.createDurableSubscriber(this.completenessTestedCarTopic, "tester" + this.pid);
+			this.completenessTestedConsumer = session.createDurableSubscriber(this.completenessTestedCarTopic, "completenessTester");
 			//Written to by the defect tester
 			this.defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
 			System.out.println("Queues connected");

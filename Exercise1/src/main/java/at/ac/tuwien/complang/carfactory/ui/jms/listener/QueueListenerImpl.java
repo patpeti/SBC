@@ -35,7 +35,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	//Fields
 	private Session session;
 	private Connection connection;
-	private Topic paintedBodyTopic, carTopic, paintedCarTopic;
+	private Topic paintedBodyTopic, carTopic, paintedCarTopic, defectTestedCarTopic, completenessTestedCarTopic;
 	private Queue finishedCarQueue;
 	private IFactoryData gui;
 	
@@ -117,6 +117,12 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			MessageConsumer carConsumer = session.createConsumer(this.carTopic);
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
 			MessageConsumer paintedCarConsumer = session.createConsumer(this.paintedCarTopic);
+			
+			this.defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
+			MessageConsumer defectTestedCarConsumer = session.createConsumer(this.defectTestedCarTopic);
+			this.completenessTestedCarTopic = session.createTopic(QueueConstants.COMPLETENESS_TESTED_TOPIC);
+			MessageConsumer completenessTestedCarTopic = session.createConsumer(this.completenessTestedCarTopic);
+			
 			this.finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
 			MessageConsumer finishedCarConsumer = session.createConsumer(this.finishedCarQueue);
 			System.out.println("[QueueListener] Queues connected");
@@ -124,6 +130,8 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 				paintedBodyConsumer.setMessageListener(this);
 				carConsumer.setMessageListener(this);
 				paintedCarConsumer.setMessageListener(this);
+				defectTestedCarConsumer.setMessageListener(this);
+				completenessTestedCarTopic.setMessageListener(this);
 				finishedCarConsumer.setMessageListener(this);
 				//session.setMessageListener(this);
 			} catch (JMSException e) {

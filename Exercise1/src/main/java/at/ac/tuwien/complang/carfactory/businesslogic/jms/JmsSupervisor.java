@@ -18,9 +18,9 @@ public class JmsSupervisor extends JmsAbstractWorker {
 
 	//Fields
 	private Session session;
-	private Topic paintedCarTopic;
+	private Topic defectTestedCarTopic;
 	private Queue finishedCarQueue;
-	private MessageConsumer paintedCarConsumer;
+	private MessageConsumer defectTestedCarConsumer;
 	
 	public JmsSupervisor(long pid) {
 		super(pid);
@@ -36,8 +36,8 @@ public class JmsSupervisor extends JmsAbstractWorker {
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
-			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
-			this.paintedCarConsumer = session.createDurableSubscriber(this.paintedCarTopic, "supervisor" + this.pid);
+			this.defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
+			this.defectTestedCarConsumer = session.createDurableSubscriber(this.defectTestedCarTopic, "defectTestedCars");
 			this.finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
@@ -50,7 +50,7 @@ public class JmsSupervisor extends JmsAbstractWorker {
 		while(running) {
 			try {
 				//retrieve a car
-				ObjectMessage objectMessage = (ObjectMessage) paintedCarConsumer.receive();
+				ObjectMessage objectMessage = (ObjectMessage) defectTestedCarConsumer.receive();
 				if(objectMessage == null) throw new IllegalStateException("Connection was closed.");
 				Car car = (Car) objectMessage.getObject();
 				System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");

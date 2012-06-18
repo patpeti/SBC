@@ -9,7 +9,7 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 2551634081569657375L;
 	private static final String[] SPACE_CONTENT_COLUMNS = {
 		"CarID",
-		"PID",
+		"AssemblerID",
 		"Completeness T",
 		"Defect T",
 		"SupervisorID",

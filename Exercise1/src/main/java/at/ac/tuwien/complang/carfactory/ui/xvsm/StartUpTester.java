@@ -23,7 +23,7 @@ public class StartUpTester {
 	}
 
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id> --type<String> [defectTester,completenessTester])";
+		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id> --type=<String> [defectTester, completenessTester])";
 		if(args.length != 2) {
 			System.out.println(usage);
 			System.exit(1);
