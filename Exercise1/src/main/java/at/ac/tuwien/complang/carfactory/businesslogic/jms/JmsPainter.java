@@ -51,6 +51,7 @@ public class JmsPainter extends JmsAbstractWorker {
 		connectionFactory.setPrefetchPolicy(policy);
 		try {
 			connection = connectionFactory.createConnection();
+			connection.setClientID("painter" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
@@ -58,8 +59,8 @@ public class JmsPainter extends JmsAbstractWorker {
 			this.bodyConsumer = session.createConsumer(bodyQueue);
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
-			this.carConsumer = session.createConsumer(carTopic);
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
+			this.carConsumer = session.createDurableSubscriber(this.carTopic, "painter" + this.pid);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
