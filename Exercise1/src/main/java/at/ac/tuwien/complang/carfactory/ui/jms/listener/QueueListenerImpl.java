@@ -18,6 +18,7 @@ import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 import at.ac.tuwien.complang.carfactory.ui.IFactoryData;
 
@@ -40,8 +41,14 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	
 	public QueueListenerImpl() { }
 
+	@Override
 	public void onObjectWrittenInQueue(ICarPart carPart) {
 		gui.addPart(carPart);
+	}
+	
+	@Override
+	public void onTaskWrittenInQueue(Task task) {
+		gui.addTask(task);
 	}
 
 	public void setQueueObserver(IFactoryData gui) {
@@ -95,6 +102,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 		}
 	}
 	
+	@Override
 	public void connectToQueues() {
 		//connect to queues
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
@@ -128,6 +136,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 		}
 	}
 	
+	@Override
 	public void disconnect() {
 		try {
 			connection.close();

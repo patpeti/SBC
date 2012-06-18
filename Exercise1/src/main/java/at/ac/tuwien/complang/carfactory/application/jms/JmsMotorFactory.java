@@ -24,7 +24,7 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	private ActiveMQConnectionFactory connectionFactory;
 
 	
-	public JmsMotorFactory(long id,  IQueueListener listener) {
+	public JmsMotorFactory(long id, IQueueListener listener) {
 		super();
 		this.id = id;
 		setListener(listener);

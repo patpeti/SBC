@@ -8,4 +8,5 @@ public class QueueConstants {
 	public static final String CARTOPIC = "CARTOPIC"; //Subscribers are: GUI and Painter
 	public static final String PAINTEDCARTOPIC = "PAINTEDCARTOPIC"; //Subscribers are: GUI and Supervisor
 	public static final String FINISHEDCARQUEUE = "FINISHEDCARQUEUE"; //Only accessed by GUI
+	public static final String TASKQUEUE = "TASKQUEUE"; //Queue in which all tasks are written
 }
