@@ -1,10 +1,11 @@
  1. Update GUI: 
+	* Add additional fields to the car table: Task Id, tester Ids
 	* UI must fit on Notebook Screen (add JScrollPane) [DONE]
 	* Update UI to show if part is defect [DONE]
 	* Add parameter to producers for set the error rate for each producer. [DONE]
  2. Produce defect parts:
 	* Add boolean for each entity: isDefect [DONE]
-	* Also save for each car if it is defect
+	* Also save for each car if it is defect [DONE]
  3. Create one container per part and for car [DONE]
 	* Clean up coordinators [REJECTED]
 	* Add one container for Tasks (FIFO Order for tasks) [DONE]
@@ -15,7 +16,7 @@
  	* assembler XVSM [DONE]
  	* supervisor XVSM [DONE]
  	* painter JMS (needs round robin distribution of parts)
- 	* assembler (topics are non persistent currently) and
+ 	* assembler (topics are non persistent currently [DONE]) and
  	* supervisor
  	can run
  6. Add taskId field to Car [DONE]
