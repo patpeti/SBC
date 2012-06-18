@@ -35,7 +35,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 		 * 3. receive 4 wheels (from wheelQueue)
 		 * 4. receive a motor (from motorQueue)
 		 * 5. assemble them into a car object (create a new car object and set the parts)
-		 * 6. save the car object into the right queue (depending on wether it is painted or not)
+		 * 6. save the car object into the right queue (depending on whether it is painted or not)
 		 */
 	}
 
@@ -91,9 +91,9 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
 			this.bodyConsumer = session.createConsumer(this.bodyQueue);
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
-			this.paintedBodyConsumer = session.createConsumer(this.paintedBodyTopic);
-			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
-			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
+			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "assembler" + this.pid);
+			this.carTopic = session.createTopic(QueueConstants.CARTOPIC); //Write only
+			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC); //Write only
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();

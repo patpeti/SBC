@@ -22,8 +22,8 @@ public class JmsSupervisor extends JmsAbstractWorker {
 	private Queue finishedCarQueue;
 	private MessageConsumer paintedCarConsumer;
 	
-	public JmsSupervisor(long id) {
-		super(id);
+	public JmsSupervisor(long pid) {
+		super(pid);
 	}
 	
 	@Override
@@ -32,11 +32,12 @@ public class JmsSupervisor extends JmsAbstractWorker {
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
 			connection = connectionFactory.createConnection();
+			connection.setClientID("supervisor" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
-			this.paintedCarConsumer = session.createConsumer(paintedCarTopic);
+			this.paintedCarConsumer = session.createDurableSubscriber(this.paintedCarTopic, "supervisor" + this.pid);
 			this.finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
