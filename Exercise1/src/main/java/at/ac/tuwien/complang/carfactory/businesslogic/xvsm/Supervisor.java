@@ -89,8 +89,8 @@ public class Supervisor{
 		Property prop2 = null;
 		List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
 		Matchmaker[] array = new Matchmaker[2];
-		prop = Property.forName("*", "isComplete_pid");
-		prop2 = Property.forName("*", "isDefectTested_pid");
+		prop = Property.forName("isComplete_pid");
+		prop2 = Property.forName("isDefectTested_pid");
 		matchmakers.add(prop.notEqualTo(new Long(-1)));
 		matchmakers.add(prop2.notEqualTo(new Long(-1)));
 		query = new Query().filter((Matchmakers.and(matchmakers.toArray(array)))  );
@@ -255,99 +255,4 @@ public class Supervisor{
 		
 	}
 
-	
 }
-
-
-//private void readPaintedCar(){
-//
-//try {
-//	tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
-//} catch (MzsCoreException e1) {
-//	e1.printStackTrace();
-//} catch (URISyntaxException e1) {
-//	e1.printStackTrace();
-//}
-//
-//List<Selector> selectors = new ArrayList<Selector>();
-//selectors.add(FifoCoordinator.newSelector());
-//selectors.add(LabelCoordinator.newSelector(SpaceLabels.PAINTEDCAR, MzsConstants.Selecting.COUNT_MAX));
-//selectors.add(AnyCoordinator.newSelector(1));
-//List<ICarPart> parts = null;
-//
-//try {
-//	parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
-//} catch (MzsTimeoutException e) {
-//	return;
-//} catch (TransactionException e) {
-//	try {
-//		capi.rollbackTransaction(tx);
-//	} catch (MzsCoreException e1) {
-//		e1.printStackTrace();
-//	}
-//} catch (MzsCoreException e) {
-//	e.printStackTrace();
-//}
-//
-//if(parts != null){
-//	Car c = (Car) parts.get(0);
-//	c.setComplete(pid, true);
-//	writeCar(c);
-//	System.out.println("Supervised car " + c.getId());
-//}
-//}
-
-
-//	private void recylceDefectedCar() {
-//		try {
-//			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
-//		} catch (MzsCoreException e1) {
-//			e1.printStackTrace();
-//		} catch (URISyntaxException e1) {
-//			e1.printStackTrace();
-//		}
-//		
-//		List<Selector> selectors = new ArrayList<Selector>();
-//		selectors.add(FifoCoordinator.newSelector(1));
-//		List<ICarPart> parts = null;
-//		
-//		try {
-//			parts = capi.take(DefectContainer, selectors, SpaceTimeout.INFINITE, tx);
-//		} catch (MzsTimeoutException e) {
-//			return;
-//		} catch (TransactionException e) {
-//			try {
-//				capi.rollbackTransaction(tx);
-//			} catch (MzsCoreException e1) {
-//				e1.printStackTrace();
-//			}
-//		} catch (MzsCoreException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		if(parts != null){
-//			Car c = (Car) parts.get(0);
-//			
-//			Body b = c.getBody();
-//			Motor m = c.getMotor();
-//			Wheel w1,w2,w3,w4;
-//			w1 = c.getWheels()[0];
-//			w2 = c.getWheels()[1];
-//			w3 = c.getWheels()[2];
-//			w4 = c.getWheels()[3];
-//			
-//			if(!b.isDefect()) writePartBackInSpace(b,tx);
-//			if(!m.isDefect()) writePartBackInSpace(m,tx);
-//			if(!w1.isDefect()) writePartBackInSpace(w1,tx);
-//			if(!w2.isDefect()) writePartBackInSpace(w2,tx);
-//			if(!w3.isDefect()) writePartBackInSpace(w3,tx);
-//			if(!w4.isDefect()) writePartBackInSpace(w4,tx);
-//			System.out.println("Car with id: " + c.getId() + " is recycled");
-//			try {
-//				capi.commitTransaction(tx);
-//			} catch (MzsCoreException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		
-//	}
