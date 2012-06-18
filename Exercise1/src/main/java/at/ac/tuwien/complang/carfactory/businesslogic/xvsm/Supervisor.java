@@ -44,18 +44,18 @@ public class Supervisor{
 
 	/**
 	 * Workflow:
-	 * 1. Connect to the Mozard space
-	 * 2. Take a car from the Mozard space and verify its completed
+	 * 1. Connect to the Mozart space
+	 * 2. Take a car from the Mozart space and verify its completed
 	 * 3. Set the complete flag for the car
 	 * 4. write it back into the space 		
 	 */
 	
 	private Capi capi;
-	private ContainerReference CarContainer;
-	private ContainerReference BodyContainer;
-	private ContainerReference MotorContainer;
-	private ContainerReference WheelContainer;
-	private ContainerReference DefectContainer;
+	private ContainerReference carContainer;
+	private ContainerReference bodyContainer;
+	private ContainerReference motorContainer;
+	private ContainerReference wheelContainer;
+	private ContainerReference defectContainer;
 	private TransactionReference tx;
 	private long pid = 0;
 	
@@ -89,10 +89,10 @@ public class Supervisor{
 		Property prop2 = null;
 		List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
 		Matchmaker[] array = new Matchmaker[2];
-		prop = Property.forName("*", "completenessTested");
-		prop2 = Property.forName("*", "defectTested");
-		matchmakers.add(prop.equalTo(true));
-		matchmakers.add(prop2.equalTo(true));
+		prop = Property.forName("*", "isComplete_pid");
+		prop2 = Property.forName("*", "isDefectTested_pid");
+		matchmakers.add(prop.notEqualTo(-1));
+		matchmakers.add(prop2.notEqualTo(-1));
 		query = new Query().filter((Matchmakers.and(matchmakers.toArray(array)))  );
 		
 		selectors.add(QueryCoordinator.newSelector(query));
@@ -100,7 +100,7 @@ public class Supervisor{
 		List<ICarPart> parts = null;
 		
 		try {
-			parts = capi.take(CarContainer, selectors, SpaceTimeout.INFINITE, tx);
+			parts = capi.take(carContainer, selectors, SpaceTimeout.INFINITE, tx);
 		} catch (MzsTimeoutException e) {
 			return;
 		} catch (TransactionException e) {
@@ -116,7 +116,7 @@ public class Supervisor{
 		if(parts != null){
 			Car c = (Car) parts.get(0);
 			c.setFinished(pid, true);
-			if(c.isDefect()){
+			if(c.isDefect() || !c.isComplete()){
 				writeDefectedCar(c);
 				recycleCar(c);
 				System.out.println("Car defected and recycled " + c.getId());
@@ -134,7 +134,7 @@ public class Supervisor{
 		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 		try {
 			// Write the finished car back to the space
-			capi.write(new Entry(c,cordinator), DefectContainer,SpaceTimeout.INFINITE, tx );
+			capi.write(new Entry(c,cordinator), defectContainer,SpaceTimeout.INFINITE, tx );
 			//capi.commitTransaction(tx);
 		} catch (MzsCoreException e) {
 			try {
@@ -178,7 +178,7 @@ public class Supervisor{
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(KeyCoordinator.newCoordinationData(""+part.getId()));
 		if(part instanceof Body){
-			c = BodyContainer;
+			c = bodyContainer;
 			if(((Body)part).getColor() == null){
 				cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
 			}
@@ -188,10 +188,10 @@ public class Supervisor{
 			
 		}else if(part instanceof Motor){
 			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.MOTOR.toString()));
-			c = MotorContainer;
+			c = motorContainer;
 		}else if(part instanceof Wheel){
 			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
-			c = WheelContainer;
+			c = wheelContainer;
 		}
 		try {
 			capi.write(c,SpaceTimeout.TENSEC,tx2,new Entry(part, cordinator));
@@ -208,7 +208,7 @@ public class Supervisor{
 		cordinator.add(KeyCoordinator.newCoordinationData(""+c.getId()));
 		try {
 			// Write the finished car back to the space
-			capi.write(new Entry(c,cordinator), CarContainer,SpaceTimeout.INFINITE, tx );
+			capi.write(new Entry(c,cordinator), carContainer,SpaceTimeout.INFINITE, tx );
 			capi.commitTransaction(tx);
 		} catch (MzsCoreException e) {
 			try {
@@ -237,11 +237,11 @@ public class Supervisor{
 			defectCoords.add(new KeyCoordinator());
 			
 			try {
-				this.CarContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.BodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.MotorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.WheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.DefectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defectCoords, null, capi);
+				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.motorContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.wheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.defectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defectCoords, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
