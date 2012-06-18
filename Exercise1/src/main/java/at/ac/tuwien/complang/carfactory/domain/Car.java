@@ -16,9 +16,9 @@ public class Car implements Serializable, ICarPart {
 	//Fields
 	private long id;  //ID of the Car
 
-	private long isComplete_pid; //ID of the completeness tester
-	private long isDefectTested_pid; //ID of the defect tester
-	private long isFinished_pid; //ID of the supervisor
+	private long isComplete_pid = -1; //ID of the completeness tester
+	private long isDefectTested_pid = -1; //ID of the defect tester
+	private long isFinished_pid = -1; //ID of the supervisor
 	private long pid; //ID of the assembler which produced the car
 	private long taskId; //ID of the task for which this car was produced
 	private Motor motor;

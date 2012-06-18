@@ -19,7 +19,7 @@ public class StartUpTester {
 		 */
 		parseArguments(args);
 		//Initialize tester: 
-		Tester t = new Tester(type);
+		Tester t = new Tester(type, id);
 	}
 
 	private static void parseArguments(String[] args) {

@@ -34,7 +34,6 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
 
-//TODO: Needs to extend the abstract worker class!!!
 public class Tester {
 	
 	private Capi capi;
@@ -42,10 +41,12 @@ public class Tester {
 	//private ContainerReference defectContainer;
 	private TransactionReference tx;
 	private TesterType type;
+	private long tid;
 
-	public Tester(TesterType type) {
+	public Tester(TesterType type, long id) {
 		initSpace();
 		this.type = type;
+		this.tid = id;
 		if(type == TesterType.COMPLETETESTER) {
 			//do completetestloop
 			while(true) {
@@ -63,7 +64,7 @@ public class Tester {
 
 	private void doDefectTest() {
 		try {
-			tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
@@ -74,8 +75,8 @@ public class Tester {
 		//add queryCoordinator so that we get cars that are not tested yet
 		Query query = null;
 		Property prop = null;
-		prop = Property.forName("*", "defectTested");
-		query = new Query().filter(prop.equalTo(false));
+		prop = Property.forName("*", "isDefectTested_pid");
+		query = new Query().filter(prop.equalTo(-1));
 		selectors.add(QueryCoordinator.newSelector(query));
 		
 		List<Car> cars = new ArrayList<Car>();
@@ -94,16 +95,12 @@ public class Tester {
 		}
 		if(cars.size() == 0) return;
 		Car car = cars.get(0);
-		//TODO: I really dont understand whats happening in the next few lines, need refectoring and fixing ~Sebastian
-		/*if(testDefect(car)){
-			
-			if(car.isDefect()) ;//do nothing -> car still defect
-			//else car.setDefect(false);
-			
+		//TODO semantic WTF
+		if(testDefect(car)){ 
+			car.setDefect(tid, false);
 		}else{
-			car.setDefectTested(true);
-			car.setDefect(true);
-		}*/
+			car.setDefect(tid, true);
+		}
 		writeCarIntoSpace(car);
 		
 		
@@ -114,7 +111,7 @@ public class Tester {
 
 	private void doCompletenessTest() {
 		try {
-			tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
@@ -127,8 +124,8 @@ public class Tester {
 		
 		Query query = null;
 		Property prop = null;
-		prop = Property.forName("*", "completenessTested");
-		query = new Query().filter(prop.equalTo(false));
+		prop = Property.forName("*", "isComplete_pid");
+		query = new Query().filter(prop.equalTo(-1));
 		selectors.add(QueryCoordinator.newSelector(query));
 		
 		
@@ -148,13 +145,11 @@ public class Tester {
 		}
 		if(cars.size() == 0) return;
 		Car car = cars.get(0);
-		//TODO: Refactor, clean up? I dont understand whats going on ~Sebastian
-		/*if(testCompleteness(car)){
-			if(car.isDefect()) ;//do nothing -> car still defect
-			else car.setDefect(this.pid, false);
+		if(testCompleteness(car)){
+			car.setComplete(tid, true);
 		}else{
-			car.setDefect(true);
-		}*/
+			car.setComplete(tid, false);
+		}
 		writeCarIntoSpace(car);
 		
 	}
@@ -187,20 +182,7 @@ public class Tester {
 	}
 	
 	private void writeCarIntoSpace(Car car) {
-//		if(car.isCompletenessTested() && car.isDefectTested() && car.isDefect()){
-//			//write car into defectlager.. NO 
-//		try{	
-//			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
-//			cordinator.add(KeyCoordinator.newCoordinationData(""+car.getId()));
-//			cordinator.add(FifoCoordinator.newCoordinationData());
-//			capi.write(new Entry(car,cordinator),defectContainer,SpaceTimeout.TENSEC, tx );
-//			capi.commitTransaction(tx);
-//			System.out.println("[Tester]*Car " + car.getId() + " written in defectlager");
-//		} catch (MzsCoreException e) {
-//			e.printStackTrace();
-//		}
-//		}else{
-		
+
 		//WRITE CAR ALWAYS IN THE CARCONTAINER AFTER TEST... DEFECTCONTAINER IS USED BY SUPERVISOR
 		try {
 			List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
@@ -215,7 +197,7 @@ public class Tester {
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		}
-//		}
+
 	}
 
 	private void initSpace(){
