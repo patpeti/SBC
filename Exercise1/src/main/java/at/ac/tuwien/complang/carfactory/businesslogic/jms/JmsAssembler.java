@@ -81,7 +81,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 		connectionFactory.setPrefetchPolicy(policy);
 		try {
 			connection = connectionFactory.createConnection();
-			connection.setClientID("assembler" + this.pid);
+			connection.setClientID("assembler_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
@@ -92,7 +92,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
 			this.bodyConsumer = session.createConsumer(this.bodyQueue);
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
-			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "assembler" + this.pid);
+			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "paintedBodySubscriber");
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC); //Write only
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC); //Write only
 			System.out.println("Queues connected");

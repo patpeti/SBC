@@ -61,7 +61,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 		try {
 			ICarPart part = (ICarPart) objectMessage.getObject();
 			if(part instanceof Car) {
-				System.out.println("Car (" + part.getId() + ") was received, im going to tell the GUI...");
+				System.out.println("Car (" + part.getId() + ") was received, im going to update the GUI.");
 				Car car = (Car) part;
 				Body body = car.getBody();
 				Wheel[] wheels = car.getWheels();

@@ -32,7 +32,7 @@ public class JmsSupervisor extends JmsAbstractWorker {
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
 			connection = connectionFactory.createConnection();
-			connection.setClientID("supervisor" + this.pid);
+			connection.setClientID("supervisor_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
