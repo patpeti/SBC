@@ -4,7 +4,6 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -43,8 +42,9 @@ public class JmsTester extends JmsAbstractWorker {
 			e.printStackTrace();
 		}
 		//2. Test the car
+		boolean testOk = false;
 		if(car != null) {
-			boolean testOk = testDefect(car);
+			testOk = testDefect(car);
 			car.setDefect(this.pid, testOk);
 		}
 		//3. Write it to the topic for completnessTestedCars
@@ -54,6 +54,7 @@ public class JmsTester extends JmsAbstractWorker {
 			message.setObject(car);
 			MessageProducer producer = session.createProducer(this.defectTestedCarTopic);
 			producer.send(message);
+			System.out.println("[Defect Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "DEFECT"));
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -70,8 +71,9 @@ public class JmsTester extends JmsAbstractWorker {
 			e.printStackTrace();
 		}
 		//2. Test the car
+		boolean testOk = false;
 		if(car != null) {
-			boolean testOk = testCompleteness(car);
+			testOk = testCompleteness(car);
 			car.setComplete(this.pid, testOk);
 		}
 		//3. Write it to the topic for completnessTestedCars
@@ -81,6 +83,7 @@ public class JmsTester extends JmsAbstractWorker {
 			message.setObject(car);
 			MessageProducer producer = session.createProducer(this.completenessTestedCarTopic);
 			producer.send(message);
+			System.out.println("[Completeness Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "UNCOMPLETE"));
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
