@@ -33,6 +33,8 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceLabels;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 
+
+//TODO: Needs to extend the abstract worker class!!!
 public class Tester {
 	
 	private Capi capi;
@@ -44,12 +46,12 @@ public class Tester {
 	public Tester(TesterType type) {
 		initSpace();
 		this.type = type;
-		if(type == TesterType.COMPLETETESTER){
+		if(type == TesterType.COMPLETETESTER) {
 			//do completetestloop
-			while(true){
+			while(true) {
 				doCompletenessTest();
 			}
-		}else if(type == TesterType.DEFECTTESTER){
+		}else if(type == TesterType.DEFECTTESTER) {
 			while(true){
 				doDefectTest();
 			}
@@ -70,7 +72,6 @@ public class Tester {
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(FifoCoordinator.newSelector(1));
 		//add queryCoordinator so that we get cars that are not tested yet
-				
 		Query query = null;
 		Property prop = null;
 		prop = Property.forName("*", "defectTested");
@@ -93,15 +94,16 @@ public class Tester {
 		}
 		if(cars.size() == 0) return;
 		Car car = cars.get(0);
-		if(testDefect(car)){
-			car.setDefectTested(true);
+		//TODO: I really dont understand whats happening in the next few lines, need refectoring and fixing ~Sebastian
+		/*if(testDefect(car)){
+			
 			if(car.isDefect()) ;//do nothing -> car still defect
-			else car.setDefect(false);
+			//else car.setDefect(false);
 			
 		}else{
 			car.setDefectTested(true);
 			car.setDefect(true);
-		}
+		}*/
 		writeCarIntoSpace(car);
 		
 		
@@ -146,15 +148,13 @@ public class Tester {
 		}
 		if(cars.size() == 0) return;
 		Car car = cars.get(0);
-		if(testCompleteness(car)){
-			car.setCompletenessTested(true);
+		//TODO: Refactor, clean up? I dont understand whats going on ~Sebastian
+		/*if(testCompleteness(car)){
 			if(car.isDefect()) ;//do nothing -> car still defect
-			else car.setDefect(false);
-			
+			else car.setDefect(this.pid, false);
 		}else{
-			car.setDefectTested(true);
 			car.setDefect(true);
-		}
+		}*/
 		writeCarIntoSpace(car);
 		
 	}
@@ -173,15 +173,15 @@ public class Tester {
 		return testOk;
 	}
 
-	private boolean testDefect(Car c) {
+	private boolean testDefect(Car car) {
 		//none of the parts is defected
 		boolean testOk = true;
-		if(c.getBody().isDefect()) testOk = false;
-		if(c.getMotor().isDefect()) testOk = false;
-		if(c.getWheels()[0].isDefect()) testOk = false;
-		if(c.getWheels()[1].isDefect()) testOk = false;
-		if(c.getWheels()[2].isDefect()) testOk = false;
-		if(c.getWheels()[3].isDefect()) testOk = false;
+		if(car.getBody().isDefect()) testOk = false;
+		if(car.getMotor().isDefect()) testOk = false;
+		if(car.getWheels()[0].isDefect()) testOk = false;
+		if(car.getWheels()[1].isDefect()) testOk = false;
+		if(car.getWheels()[2].isDefect()) testOk = false;
+		if(car.getWheels()[3].isDefect()) testOk = false;
 		
 		return testOk;
 	}

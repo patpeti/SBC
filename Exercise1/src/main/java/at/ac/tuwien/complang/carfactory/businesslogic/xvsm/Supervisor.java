@@ -64,18 +64,13 @@ public class Supervisor{
 		this.pid = id;
 		initSpace();
 		while(true){
-			
 			readTestedCar();
-			
 //			readPaintedCar();
 //			recylceDefectedCar();
 		}
 	}
 	
 	private void readTestedCar() {
-		
-		
-		
 		try {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
@@ -120,7 +115,7 @@ public class Supervisor{
 		
 		if(parts != null){
 			Car c = (Car) parts.get(0);
-			c.setComplete(pid, true);
+			c.setFinished(pid, true);
 			if(c.isDefect()){
 				writeDefectedCar(c);
 				recycleCar(c);

@@ -55,7 +55,7 @@ public class JmsSupervisor extends JmsAbstractWorker {
 				Car car = (Car) objectMessage.getObject();
 				System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");
 				//set car to complete
-				car.setComplete(pid, true);
+				car.setFinished(pid, true);
 				//write car to completed queue
 				MessageProducer messageProducer = session.createProducer(finishedCarQueue);
 				messageProducer.send(session.createObjectMessage(car));

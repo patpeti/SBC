@@ -7,8 +7,17 @@ import javax.swing.table.AbstractTableModel;
 
 public class FinishedGoodsTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 2551634081569657375L;
-	private static final String[] SPACE_CONTENT_COLUMNS = { "CarID", "PID", "SupervisorID",
-			"BodyID", "BodyPID", "BodyColor", "PainterID", "MotorID", "MotorPID", "WHEEL1ID", "WHEEL1PID", "WHEEL2ID", "WHEEL2PID", "WHEEL3ID", "WHEEL3PID", "WHEEL4ID", "WHEEL4PID" };
+	private static final String[] SPACE_CONTENT_COLUMNS = {
+		"CarID",
+		"PID",
+		"Completeness T",
+		"Defect T",
+		"SupervisorID",
+		"BodyID","BodyPID", //Body ID + PID
+		"BodyColor", "PainterID", //Color + Painter
+		"MotorID", "MotorPID", //Motor ID + PID
+		"WHEEL PID", "WHEEL1ID", "WHEEL2ID", "WHEEL3ID", "WHEEL4ID" // Wheel PID + ID 1-4
+	};
 	private List<Object[]> data = new ArrayList<Object[]>();
 
 	public FinishedGoodsTableModel() { }

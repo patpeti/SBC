@@ -12,62 +12,67 @@ public class Car implements Serializable, ICarPart {
 	//Static Fields
 	private static final long serialVersionUID = 1L;
 	private static final CarPartType type = CarPartType.CAR;
-	
+
 	//Fields
-    private boolean isComplete; //Whether assembly is complete
-    private long isComplete_pid; //ID of the supervisor
-    private long id;  //ID of the Car
-    private long pid; //ID of the worker which produced the car
-    private long taskId; //ID of the task for which this car was produced
-    private Motor motor;
-    private Body body;
-    private Wheel[] wheels = new Wheel[4];
+	private long id;  //ID of the Car
 
-    private boolean completenessTested = false;
-    private boolean defectTested = false;
-    private boolean defect = false;
-    
-    //Constructors
-    public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
-    	this.id = AbstractFactory.carPartId;
+	private long isComplete_pid; //ID of the completeness tester
+	private long isDefectTested_pid; //ID of the defect tester
+	private long isFinished_pid; //ID of the supervisor
+	private long pid; //ID of the assembler which produced the car
+	private long taskId; //ID of the task for which this car was produced
+	private Motor motor;
+	private Body body;
+	private Wheel[] wheels = new Wheel[4];
+
+	private boolean isComplete = false; //Set by the completeness tester. True if all parts are there and the body is painted.
+	private boolean defect = false; //If any of the parts has a defect
+	private boolean isFinished = false; //Set by the supervisor to indicate that the car is finished and can be delivered
+	private boolean completenessTested = false; //??? Obsolete ???
+	private boolean defectTested = false; //??? Obsolete ???
+
+	//Constructors
+	public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
+		this.id = AbstractFactory.carPartId;
 		AbstractFactory.carPartId++;
-    	this.pid = pid;
-    	this.body = body;
-    	this.motor = motor;
-    	this.wheels = wheels;
+		this.pid = pid;
+		this.body = body;
+		this.motor = motor;
+		this.wheels = wheels;
 	}
-        
-    //Getter / Setter
-    public boolean isComplete() {
-        return isComplete;
-    }
-    public void setComplete(long pid, boolean isComplete) {
-    	this.isComplete_pid = pid;
-        this.isComplete = isComplete;
-    }
-    
-    public Color getColor() {
-        return this.body.getColor();
-    }
-    public void setColor(long pid, Color color) {
-    	this.body.setColor(pid, color);
-    }
 
-    public boolean hasColor() {
-        return body.getColor() != null;
-    }
-	
-	public long getPainterId() {
-		return body.getPainterId();
+	//Getter / Setter
+	/**
+	 * The color is derived from the body
+	 */
+	public Color getColor() {
+		if(body == null) return null;
+		return this.body.getColor();
 	}
-    
-    public long getId() {
-        return id;
-    }
-    
-    public void setId(long id) {
-        this.id = id;
-    }
+	
+	/**
+	 * The color is derived from the body
+	 */
+	public void setColor(long pid, Color color) {
+		this.body.setColor(pid, color);
+	}
+
+	/**
+	 * The hasColor field is derived from the body
+	 * @return
+	 */
+	public boolean hasColor() {
+		if(body == null) return false;
+		return body.getColor() != null;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public Motor getMotor() {
 		return motor;
@@ -82,12 +87,28 @@ public class Car implements Serializable, ICarPart {
 	}
 
 	public long getSupervisorId() {
-		return isComplete_pid;
+		return isFinished_pid;
 	}
-	
+
 	public long getAssemblerId() {
 		return pid;
 	}
+	
+	public long getCompletenessTesterId() {
+		return isComplete_pid;
+	}
+	
+	public long getDefectTesterId() {
+		return isDefectTested_pid;
+	}
+	
+	/**
+	 * Derived from the body
+	 */
+	public long getPainterId() {
+		return body.getPainterId();
+	}
+	
 
 	public long getPid() {
 		return getAssemblerId();
@@ -107,20 +128,24 @@ public class Car implements Serializable, ICarPart {
 		} else {
 			colorString = String.format("(%d, %d, %d)", color.getRed(), color.getGreen(), color.getBlue());
 		}
-		return new Object[] {id, pid,
-				this.isComplete_pid,
+		return new Object[] {
+				id,
+				pid, //Assembler
+				this.isComplete_pid, //Completeness Tester
+				this.isDefectTested_pid, //Defect Tester
+				this.isFinished_pid, //Supervisor
 				body.getId(), body.getPid(),
-				colorString, body.getPainterId(),
+				colorString, body.getPainterId(), //Painter
 				motor.getId(), motor.getPid(),
-				wheels[0].getId(),
 				wheels[0].getPid(),
+				wheels[0].getId(),
+				//wheels[1].getPid(), //Comment out the other three ids, because in our setup there is only one wheel producer.				
 				wheels[1].getId(),
-				wheels[1].getPid(),
+				//wheels[2].getPid(),
 				wheels[2].getId(),
-				wheels[2].getPid(),
+				//wheels[3].getPid(),
 				wheels[3].getId(),
-				wheels[3].getPid(),
-			};
+		};
 	}
 
 	public CarPartType getType() {
@@ -139,29 +164,33 @@ public class Car implements Serializable, ICarPart {
 		this.taskId = taskId;
 	}
 
-	public boolean isCompletenessTested() {
-		return completenessTested;
-	}
-
-	public void setCompletenessTested(boolean completenessTested) {
-		this.completenessTested = completenessTested;
-	}
-
-	public boolean isDefectTested() {
-		return defectTested;
-	}
-
-	public void setDefectTested(boolean defectTested) {
-		this.defectTested = defectTested;
-	}
-
+	//For the defect tester
 	public boolean isDefect() {
 		return defect;
 	}
 
-	public void setDefect(boolean defect) {
+	public void setDefect(long pid, boolean defect) {
+		this.isDefectTested_pid = pid;
 		this.defect = defect;
 	}
 	
-	
+	//For the completeness tester
+	public boolean isComplete() {
+		return isComplete;
+	}
+
+	public void setComplete(long pid, boolean isComplete) {
+		this.isComplete_pid = pid;
+		this.isComplete = isComplete;
+	}
+
+	//For the supervisor
+	public boolean isFinished() {
+		return isFinished;
+	}
+
+	public void setFinished(long pid, boolean isFinished) {
+		this.isFinished_pid = pid;
+		this.isFinished = isFinished;
+	}
 }
