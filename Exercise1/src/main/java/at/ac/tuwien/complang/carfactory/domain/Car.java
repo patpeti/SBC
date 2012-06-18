@@ -28,8 +28,6 @@ public class Car implements Serializable, ICarPart {
 	private boolean isComplete = false; //Set by the completeness tester. True if all parts are there and the body is painted.
 	private boolean defect = false; //If any of the parts has a defect
 	private boolean isFinished = false; //Set by the supervisor to indicate that the car is finished and can be delivered
-	private boolean completenessTested = false; //??? Obsolete ???
-	private boolean defectTested = false; //??? Obsolete ???
 
 	//Constructors
 	public Car(long pid, Body body, Motor motor, Wheel[] wheels) {
