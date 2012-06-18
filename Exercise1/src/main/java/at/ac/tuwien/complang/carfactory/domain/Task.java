@@ -51,9 +51,17 @@ public class Task implements Serializable {
 	public long getId() {
 		return id;
 	}
-
-	public int getAmountCompleted() {
-		return amountCompleted;
+	
+	/**
+	 * @return Returns true if the amount of painted and produced parts
+	 * is equal or greater than the required amount. 
+	 */
+	public boolean isFinished() {
+		if(amount >= paintAmount && amount >= carAmount) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public Object[] getObjectData() {
@@ -88,19 +96,16 @@ public class Task implements Serializable {
 	}
 
 	/**
-	 * Increase the amount of assembled cars by amount. Afterwards
-	 * the new number of completed cars is the minimum of paintAmount
-	 * and carAmount.
-	 * @param amount The amount of cars that have been completed.
+	 * Increase the amount of assembled cars by amount.
+	 * @param amount The amount of cars that have been assembled.
 	 */
 	public void increaseCarAmount(int amount) {
 		this.carAmount += amount;
-		amountCompleted = Math.min(carAmount, paintAmount);
 	}
 
 	/**
-	 * @return Returns the amount of painted object. If this is
-	 * less than the getAmount value, the painter needs to paint
+	 * @return Returns the amount of painted objects. If this is
+	 * less than the getAmount() value, the painter needs to paint
 	 * more cars/bodies.
 	 */
 	public int getPaintAmount() {
@@ -108,13 +113,10 @@ public class Task implements Serializable {
 	}
 
 	/**
-	 * Increase the amount of assembled cars by amount. Afterwards
-	 * the new number of completed cars is the minimum of paintAmount
-	 * and carAmount.
-	 * @param amount The amount of cars that have been completed.
+	 * Increase the amount of painted cars by amount.
+	 * @param amount The amount of cars that have been painted.
 	 */
 	public void increasePaintAmount(int amount) {
 		this.paintAmount += amount;
-		amountCompleted = Math.min(carAmount, paintAmount);
 	}
 }
