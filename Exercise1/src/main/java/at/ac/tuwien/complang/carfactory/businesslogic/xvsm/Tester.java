@@ -64,21 +64,21 @@ public class Tester {
 
 	private void doDefectTest() {
 		try {
-			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(FifoCoordinator.newSelector(1));
+		
 		//add queryCoordinator so that we get cars that are not tested yet
 		Query query = null;
 		Property prop = null;
-		prop = Property.forName("*", "isDefectTested_pid");
-		query = new Query().filter(prop.equalTo(-1));
+		prop = Property.forName("isDefectTested_pid");
+		query = new Query().filter(prop.equalTo(new Long(-1)));
 		selectors.add(QueryCoordinator.newSelector(query));
-		
+		selectors.add(FifoCoordinator.newSelector(1));
 		List<Car> cars = new ArrayList<Car>();
 		try {
 			cars = capi.take(container, selectors, SpaceTimeout.INFINITE, tx);
@@ -111,23 +111,23 @@ public class Tester {
 
 	private void doCompletenessTest() {
 		try {
-			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
 		List<Selector> selectors = new ArrayList<Selector>();
-		selectors.add(FifoCoordinator.newSelector(1));
+		
 		
 		// add queryCoordinator so that we get cars that are not tested yet
 		
 		Query query = null;
 		Property prop = null;
-		prop = Property.forName("*", "isComplete_pid");
-		query = new Query().filter(prop.equalTo(-1));
+		prop = Property.forName("isComplete_pid");
+		query = new Query().filter(prop.equalTo(new Long(-1)));
 		selectors.add(QueryCoordinator.newSelector(query));
-		
+		selectors.add(FifoCoordinator.newSelector(1));
 		
 		List<Car> cars = new ArrayList<Car>();
 		try {

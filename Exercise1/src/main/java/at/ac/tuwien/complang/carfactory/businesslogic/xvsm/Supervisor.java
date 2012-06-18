@@ -91,8 +91,8 @@ public class Supervisor{
 		Matchmaker[] array = new Matchmaker[2];
 		prop = Property.forName("*", "isComplete_pid");
 		prop2 = Property.forName("*", "isDefectTested_pid");
-		matchmakers.add(prop.notEqualTo(-1));
-		matchmakers.add(prop2.notEqualTo(-1));
+		matchmakers.add(prop.notEqualTo(new Long(-1)));
+		matchmakers.add(prop2.notEqualTo(new Long(-1)));
 		query = new Query().filter((Matchmakers.and(matchmakers.toArray(array)))  );
 		
 		selectors.add(QueryCoordinator.newSelector(query));
