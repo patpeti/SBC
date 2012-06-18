@@ -15,7 +15,7 @@ import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 public class JmsWheelFactory extends JmsAbstractFactory {
 
 	//Static Fields
-	private static final int TIME_IN_SEC = 3;
+	private static final int TIME_IN_SEC = 2;
 	//Fields
 	private long id; //The ID of this producer
 	private Connection connection = null;
