@@ -18,6 +18,13 @@ public interface IFactoryData {
 	//Part Methods
 	boolean addPart(ICarPart carPart);
 	boolean removePart(ICarPart carPart);
+	/**
+	 * Updates a part object in the data model.
+	 * @param carPart The part which should be updated.
+	 * @return Should return true if the part could be
+	 * updated and false if the part was not found
+	 * in the data model. 
+	 */
 	boolean updatePart(ICarPart carPart);
 	//Task Methods
 	boolean addTask(Task task);

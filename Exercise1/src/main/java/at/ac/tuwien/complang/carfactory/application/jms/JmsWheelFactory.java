@@ -3,8 +3,8 @@ package at.ac.tuwien.complang.carfactory.application.jms;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -58,8 +58,8 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 			connection = connectionFactory.createConnection();
 			connection.start();
 		
-			Queue queue = session.createQueue(QueueConstants.WHEELQUEUE);
-			MessageProducer msgProducer = session.createProducer(queue);
+			Topic topic = session.createTopic(QueueConstants.WHEELTOPIC);
+			MessageProducer msgProducer = session.createProducer(topic);
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(wheel);
 			msgProducer.send(session.createObjectMessage(wheel));

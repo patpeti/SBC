@@ -54,7 +54,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
 	private IFacade factoryFacade;
 	private SpaceDataTableModel partsDataTableModel;
-	private FinishedGoodsTableModel finishedGoodsTableModel;
+	private FinishedGoodsTableModel finishedGoodsTableModel, defectCarsTableModel;
 	private TaskDataTableModel taskTableModel;
 	private StatusLight bodyFactoryStatus,wheelFactoryStatus,motorFactoryStatus;
 	private ITaskController taskController;
@@ -193,11 +193,11 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		JPanel defectCarsTablePanel = new JPanel();
 		JLabel label = new JLabel("Defect Cars");
 		label.setAlignmentX(CENTER_ALIGNMENT);
-		finishedGoodsTableModel = new FinishedGoodsTableModel();
-		JTable finishedGoodsTable = new JTable(finishedGoodsTableModel);
-		finishedGoodsTable.setAutoResizeMode(HEIGHT);
-		JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
-		finishedGoodsTable.setFillsViewportHeight(true);
+		defectCarsTableModel = new FinishedGoodsTableModel();
+		JTable defectCarsTable = new JTable(defectCarsTableModel);
+		defectCarsTable.setAutoResizeMode(HEIGHT);
+		JScrollPane scrollPane = new JScrollPane(defectCarsTable);
+		defectCarsTable.setFillsViewportHeight(true);
 		defectCarsTablePanel.setLayout(new BoxLayout(defectCarsTablePanel, BoxLayout.Y_AXIS));
 		defectCarsTablePanel.add(label);
 		defectCarsTablePanel.add(scrollPane);

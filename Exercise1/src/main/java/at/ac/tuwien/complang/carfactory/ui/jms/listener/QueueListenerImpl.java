@@ -35,7 +35,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	//Fields
 	private Session session;
 	private Connection connection;
-	private Topic paintedBodyTopic, carTopic, paintedCarTopic, defectTestedCarTopic, completenessTestedCarTopic;
+	private Topic motorTopic, bodyTopic, wheelTopic, paintedBodyTopic, carTopic, paintedCarTopic, defectTestedCarTopic, completenessTestedCarTopic;
 	private Queue finishedCarQueue;
 	private IFactoryData gui;
 	
@@ -89,12 +89,10 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 					}
 				}
 			} else {
-				// The only ICarPart object we can receive which is not a car, 
-				// is a painted body, in this case, we need to update the body in 
-				// the spaceDataTableModel.
-				Body body = (Body) part;
-				System.out.println("Body " + body.getId() + " was received, im going to tell the GUI...");
-				gui.updatePart(body);
+				System.out.println("Part" + part.getId() + " was received, im going to update the GUI...");
+				if(!gui.updatePart(part)) {
+					gui.addPart(part);
+				}
 			}
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -111,6 +109,12 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
+			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
+			MessageConsumer bodyConsumer = session.createConsumer(this.bodyTopic);
+			this.motorTopic = session.createTopic(QueueConstants.MOTORTOPIC);
+			MessageConsumer motorConsumer = session.createConsumer(this.motorTopic);
+			this.wheelTopic = session.createTopic(QueueConstants.WHEELTOPIC);
+			MessageConsumer wheelConsumer = session.createConsumer(this.wheelTopic);
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
 			MessageConsumer paintedBodyConsumer = session.createConsumer(this.paintedBodyTopic);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
@@ -127,6 +131,9 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			MessageConsumer finishedCarConsumer = session.createConsumer(this.finishedCarQueue);
 			System.out.println("[QueueListener] Queues connected");
 			try {
+				bodyConsumer.setMessageListener(this);
+				motorConsumer.setMessageListener(this);
+				wheelConsumer.setMessageListener(this);
 				paintedBodyConsumer.setMessageListener(this);
 				carConsumer.setMessageListener(this);
 				paintedCarConsumer.setMessageListener(this);

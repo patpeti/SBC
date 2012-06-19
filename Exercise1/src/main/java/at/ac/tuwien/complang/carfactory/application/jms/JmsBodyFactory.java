@@ -3,8 +3,8 @@ package at.ac.tuwien.complang.carfactory.application.jms;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -39,7 +39,6 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 			e.printStackTrace();
 		}
 	}
-	
 
 	public void produce() {
 		Body body = new Body(id);
@@ -56,14 +55,11 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 			if(session == null){
 				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			}
-//			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Queue queue = session.createQueue(QueueConstants.BODYQUEUE);
-			MessageProducer msgProducer = session.createProducer(queue);
-			//object message
-			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
+			Topic topic = session.createTopic(QueueConstants.BODYTOPIC);
+			MessageProducer msgProducer = session.createProducer(topic);
+			//notify the GUI first, because we need to make sure that the object is in the table model, before the GUI gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(body);
 			msgProducer.send(session.createObjectMessage(body));
-			
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

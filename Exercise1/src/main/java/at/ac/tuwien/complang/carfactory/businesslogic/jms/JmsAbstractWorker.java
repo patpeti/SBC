@@ -20,6 +20,7 @@ public abstract class JmsAbstractWorker implements Runnable {
 	
 	public void initialize() {
 		connectToQueues();
+		this.running = true;
 	}
 	
 	public void shutdown() {

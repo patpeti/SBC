@@ -22,8 +22,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 
 	//Fields
 	private Session session;
-	private Queue wheelQueue, motorQueue, bodyQueue;
-	private Topic carTopic, paintedBodyTopic, paintedCarTopic;
+	private Topic carTopic, paintedBodyTopic, paintedCarTopic, wheelTopic, motorTopic, bodyTopic;
 	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, paintedBodyConsumer;
 	
 	public JmsAssembler(long pid) {
@@ -32,15 +31,14 @@ public class JmsAssembler extends JmsAbstractWorker {
 		 * Workflow:
 		 * 1. Connect to all queues/topics
 		 * 2. receive a body (from bodyTopic)
-		 * 3. receive 4 wheels (from wheelQueue)
-		 * 4. receive a motor (from motorQueue)
+		 * 3. receive 4 wheels (from wheelTopic)
+		 * 4. receive a motor (from motorTopic)
 		 * 5. assemble them into a car object (create a new car object and set the parts)
 		 * 6. save the car object into the right queue (depending on whether it is painted or not)
 		 */
 	}
 
 	public void startWorkLoop() {
-		running = true;
 		while(running) {
 			//produce some cars
 			try {
@@ -85,12 +83,12 @@ public class JmsAssembler extends JmsAbstractWorker {
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
-			this.motorQueue = session.createQueue(QueueConstants.MOTORQUEUE);
-			this.motorConsumer = session.createConsumer(this.motorQueue);
-			this.wheelQueue = session.createQueue(QueueConstants.WHEELQUEUE);
-			this.wheelConsumer = session.createConsumer(this.wheelQueue);
-			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
-			this.bodyConsumer = session.createConsumer(this.bodyQueue);
+			this.motorTopic = session.createTopic(QueueConstants.MOTORTOPIC);
+			this.motorConsumer = session.createDurableSubscriber(this.motorTopic, "motorSubscriber");
+			this.wheelTopic = session.createTopic(QueueConstants.WHEELTOPIC);
+			this.wheelConsumer = session.createDurableSubscriber(this.wheelTopic, "wheelSubscriber");
+			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
+			this.bodyConsumer = session.createDurableSubscriber(this.bodyTopic, "bodySubscriber");
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
 			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "paintedBodySubscriber");
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC); //Write only

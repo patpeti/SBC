@@ -12,7 +12,10 @@ import javax.jms.Topic;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
+import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
+import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+import at.ac.tuwien.complang.carfactory.domain.Motor;
 
 public class JmsSupervisor extends JmsAbstractWorker {
 
@@ -46,20 +49,13 @@ public class JmsSupervisor extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
-		running = true;
 		while(running) {
 			try {
 				//retrieve a car
 				ObjectMessage objectMessage = (ObjectMessage) defectTestedCarConsumer.receive();
 				if(objectMessage == null) throw new IllegalStateException("Connection was closed.");
 				Car car = (Car) objectMessage.getObject();
-				System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");
-				//set car to complete
-				car.setFinished(pid, true);
-				//write car to completed queue
-				MessageProducer messageProducer = session.createProducer(finishedCarQueue);
-				messageProducer.send(session.createObjectMessage(car));
-				System.out.println("[Supervisor] Car " + car.getId() + " send to finishedCarQueue.");
+				handleCar(car);
 			} catch (JMSException e) {
 				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
@@ -70,6 +66,27 @@ public class JmsSupervisor extends JmsAbstractWorker {
 		shutdownComplete = true;
 		synchronized(runningMutex) {
 			runningMutex.notifyAll();
+		}
+	}
+
+	private void handleCar(Car car) throws JMSException {
+		if(!car.isComplete() || car.isDefect()) {
+			// 1a. If the car has any kind of error, then we need to disassemble it and write the parts back to the right queues
+			for(ICarPart part : car.getParts()) {
+				if(!part.isDefect()) {
+					//MessageProducer producer car = session.createProducer(null);
+				}
+			}
+			// 1b. Write the car to the defect cars queue
+		} else {
+			// 2. If the car is complete and without defects we can set it to finished and write it to the finished car queue
+			//set car state to finished
+			car.setFinished(pid, true);
+			System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");
+			//write car to completed queue
+			MessageProducer messageProducer = session.createProducer(finishedCarQueue);
+			messageProducer.send(session.createObjectMessage(car));
+			System.out.println("[Supervisor] Car " + car.getId() + " send to finishedCarQueue.");
 		}
 	}
 }

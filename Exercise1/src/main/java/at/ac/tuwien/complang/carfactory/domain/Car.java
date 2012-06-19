@@ -131,9 +131,9 @@ public class Car implements Serializable, ICarPart {
 		return new Object[] {
 				id,
 				pid, //Assembler
-				this.isComplete_pid, //Completeness Tester
-				this.isDefectTested_pid, //Defect Tester
-				this.isFinished_pid, //Supervisor
+				this.isComplete_pid == -1 ? "" : this.isComplete_pid, //Completeness Tester
+				this.isDefectTested_pid == -1 ? "" : this.isDefectTested_pid, //Defect Tester
+				this.isFinished_pid == -1 ? "" : this.isFinished_pid, //Supervisor
 				body.getId(), body.getPid(),
 				colorString, body.getPainterId(), //Painter
 				motor.getId(), motor.getPid(),

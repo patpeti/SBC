@@ -24,8 +24,7 @@ public class JmsPainter extends JmsAbstractWorker {
 
 	//Fields
 	private Session session;
-	private Topic carTopic, paintedBodyTopic, paintedCarTopic;
-	private Queue bodyQueue;
+	private Topic carTopic, paintedBodyTopic, paintedCarTopic, bodyTopic;
 	private MessageConsumer bodyConsumer, carConsumer;
 	private Color color;
 	
@@ -55,8 +54,8 @@ public class JmsPainter extends JmsAbstractWorker {
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
-			this.bodyQueue = session.createQueue(QueueConstants.BODYQUEUE);
-			this.bodyConsumer = session.createConsumer(bodyQueue);
+			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
+			this.bodyConsumer = session.createDurableSubscriber(bodyTopic, "bodySubscriber");
 			this.paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
@@ -68,7 +67,6 @@ public class JmsPainter extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
-		running = true;
 		loop:
 		while(running) {
 			try {
