@@ -184,6 +184,7 @@ public class Assembler{
 	{
 		//create the car
 		Car car = new Car(pid, body, motor, wheels);
+		car.setTaskId(t.getId());
 		//write car into space (which labels?, coordinators?)
 		//get ID from space, increase it and assign it to car, then write it back into the space
 		setGlobalCarId(tx1, car);
