@@ -1,5 +1,6 @@
 package at.ac.tuwien.complang.carfactory.businesslogic.jms;
 
+import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -20,8 +21,9 @@ import at.ac.tuwien.complang.carfactory.domain.TesterType;
  *
  */
 public class JmsTester extends JmsAbstractWorker {
-	private TesterType type;
 	
+	//Fields
+	private TesterType type;
 	private Topic defectTestedCarTopic, completenessTestedCarTopic, paintedCarTopic;
 	private MessageConsumer completenessTestedConsumer, paintedCarConsumer;
 	private Session session;
@@ -31,16 +33,11 @@ public class JmsTester extends JmsAbstractWorker {
 		this.type = type;
 	}
 
-	private void doDefectTest() {
+	private void doDefectTest() throws JMSException {
 		//1. Get a car from the completeness tested topic
 		Car car = null;
-		try {
-			ObjectMessage message = (ObjectMessage) completenessTestedConsumer.receive();
-			car = (Car) message.getObject();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ObjectMessage message = (ObjectMessage) completenessTestedConsumer.receive();
+		car = (Car) message.getObject();
 		//2. Test the car
 		boolean testOk = false;
 		if(car != null) {
@@ -48,28 +45,20 @@ public class JmsTester extends JmsAbstractWorker {
 			car.setDefect(this.pid, testOk);
 		}
 		//3. Write it to the topic for completnessTestedCars
-		ObjectMessage message;
-		try {
-			message = session.createObjectMessage();
-			message.setObject(car);
-			MessageProducer producer = session.createProducer(this.defectTestedCarTopic);
-			producer.send(message);
-			System.out.println("[Defect Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "DEFECT"));
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
+		ObjectMessage returnMessage;
+		returnMessage = session.createObjectMessage();
+		returnMessage.setObject(car);
+		MessageProducer producer = session.createProducer(this.defectTestedCarTopic);
+		producer.send(returnMessage);
+		System.out.println("[Defect Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "DEFECT"));
 	}
 
-	private void doCompletenessTest() {
+	private void doCompletenessTest() throws JMSException {
 		//1. Get a car from the paintedCarTopic
 		Car car = null;
-		try {
-			ObjectMessage message = (ObjectMessage) paintedCarConsumer.receive();
-			car = (Car) message.getObject();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ObjectMessage message = (ObjectMessage) paintedCarConsumer.receive();
+		if(message == null) throw new IllegalStateException("Connection was closed.");
+		car = (Car) message.getObject();
 		//2. Test the car
 		boolean testOk = false;
 		if(car != null) {
@@ -77,16 +66,12 @@ public class JmsTester extends JmsAbstractWorker {
 			car.setComplete(this.pid, testOk);
 		}
 		//3. Write it to the topic for completnessTestedCars
-		ObjectMessage message;
-		try {
-			message = session.createObjectMessage();
-			message.setObject(car);
-			MessageProducer producer = session.createProducer(this.completenessTestedCarTopic);
-			producer.send(message);
-			System.out.println("[Completeness Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "UNCOMPLETE"));
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
+		ObjectMessage returnMessage;
+		returnMessage = session.createObjectMessage();
+		returnMessage.setObject(car);
+		MessageProducer producer = session.createProducer(this.completenessTestedCarTopic);
+		producer.send(returnMessage);
+		System.out.println("[Completeness Tester] Tested car " + car.getId() + " status " + (testOk ? "OK" : "UNCOMPLETE"));
 	}
 
 	@Override
@@ -119,20 +104,30 @@ public class JmsTester extends JmsAbstractWorker {
 	void startWorkLoop() {
 		if(type == TesterType.COMPLETETESTER) {
 			// Test for completeness of the car (e.g. car has all parts and is painted)
-			while(true){
-				doCompletenessTest();
+			while(running) {
+				try {
+					doCompletenessTest();
+				} catch(JMSException e) {
+					if(e instanceof IllegalStateException) break;
+					e.printStackTrace();
+				}
 			}
 		} else if(type == TesterType.DEFECTTESTER) {
 			// Test for defects in the build in components
-			while(true){
-				doDefectTest();
+			while(running) {
+				try {
+					doDefectTest();
+				} catch(JMSException e) {
+					if(e instanceof IllegalStateException) break;
+					e.printStackTrace();
+				}
 			}
 		} else {
 			System.err.println("The specificed test type has not been implemented by this tester. Program will exit now.");
 			System.exit(1);
 		}
 	}
-	
+
 	private boolean testCompleteness(Car c) {
 		//all parts are set and body is painted
 		boolean testOk = true;
