@@ -43,6 +43,8 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 
 	//Static Fields
 	private static final long serialVersionUID = -6151830798597607052L;
+	private static final int initialBodyCount = 10, initialMotorCount = 10, initialWheelCount = 40;
+	private static final double initialErrorSpinnerValue = 0.2;
 
 	//Fields
 	private JSpinner bodyCountSpinner, bodyErrorRateSpinner,
@@ -261,7 +263,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		producerPanel.add(createBodyFactoryButton, gbc_createBodyFactoryButton);
 
 		bodyCountSpinner = new JSpinner();
-		bodyCountSpinner.setValue(40);
+		bodyCountSpinner.setValue(initialBodyCount);
 		GridBagConstraints gbc_bodyCountSpinner = new GridBagConstraints();
 		gbc_bodyCountSpinner.fill = GridBagConstraints.BOTH;
 		gbc_bodyCountSpinner.insets = new Insets(5, 5, 5, 5);
@@ -273,7 +275,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		createWheelFactoryButton.addActionListener(listener);
 
 		bodyErrorRateSpinner = new JSpinner();
-		bodyErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+		bodyErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(initialErrorSpinnerValue), new Double(0), new Double(1), new Double(0.1)));
 		GridBagConstraints gbc_bodyErrorRateSpinner = new GridBagConstraints();
 		gbc_bodyErrorRateSpinner.fill = GridBagConstraints.BOTH;
 		gbc_bodyErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
@@ -296,7 +298,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		gbc_createWheelFactoryButton.gridy = 1;
 		producerPanel.add(createWheelFactoryButton, gbc_createWheelFactoryButton);
 		wheelCountSpinner = new JSpinner();
-		wheelCountSpinner.setValue(100);
+		wheelCountSpinner.setValue(initialWheelCount);
 		GridBagConstraints gbc_wheelCountSpinner = new GridBagConstraints();
 		gbc_wheelCountSpinner.fill = GridBagConstraints.BOTH;
 		gbc_wheelCountSpinner.insets = new Insets(5, 5, 5, 5);
@@ -305,7 +307,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		producerPanel.add(wheelCountSpinner, gbc_wheelCountSpinner);
 
 		wheelErrorRateSpinner = new JSpinner();
-		wheelErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+		wheelErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(initialErrorSpinnerValue), new Double(0), new Double(1), new Double(0.1)));
 		GridBagConstraints gbc_wheelErrorRateSpinner = new GridBagConstraints();
 		gbc_wheelErrorRateSpinner.fill = GridBagConstraints.BOTH;
 		gbc_wheelErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
@@ -328,7 +330,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		gbc_createMotorFactoryButton.gridy = 2;
 		producerPanel.add(createMotorFactoryButton, gbc_createMotorFactoryButton);
 		motorCountSpinner = new JSpinner();
-		motorCountSpinner.setValue(40);
+		motorCountSpinner.setValue(initialMotorCount);
 		GridBagConstraints gbc_motorCountSpinner = new GridBagConstraints();
 		gbc_motorCountSpinner.insets = new Insets(5, 5, 5, 5);
 		gbc_motorCountSpinner.fill = GridBagConstraints.BOTH;
@@ -339,7 +341,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		container.add(producerPanel);
 
 		motorErrorRateSpinner = new JSpinner();
-		motorErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(0), new Double(0), new Double(1), new Double(0.1)));
+		motorErrorRateSpinner.setModel(new SpinnerNumberModel(new Double(initialErrorSpinnerValue), new Double(0), new Double(1), new Double(0.1)));
 		GridBagConstraints gbc_motorErrorRateSpinner = new GridBagConstraints();
 		gbc_motorErrorRateSpinner.insets = new Insets(5, 5, 5, 5);
 		gbc_motorErrorRateSpinner.fill = GridBagConstraints.BOTH;
@@ -379,6 +381,21 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	@Override
 	public boolean updateCar(Car car) {
 		return finishedGoodsTableModel.updateRow(car.getObjectData());
+	}
+	
+	@Override
+	public boolean addDefectCar(Car car) {
+		return defectCarsTableModel.addRow(car.getObjectData());
+	}
+
+	@Override
+	public boolean removeDefectCar(Car car) {
+		return defectCarsTableModel.removeRow(car.getObjectData());
+	}
+
+	@Override
+	public boolean updateDefectCar(Car car) {
+		return defectCarsTableModel.updateRow(car.getObjectData());
 	}
 
 	@Override

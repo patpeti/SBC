@@ -19,7 +19,7 @@ public class Car implements Serializable, ICarPart {
 	private long id;  //ID of the Car
 
 	private long isComplete_pid = -1; //ID of the completeness tester
-	private long isDefectTested_pid = -1; //ID of the defect tester
+	private long isDefectTested_pid = -1; //ID of the isDefect tester
 	private long isFinished_pid = -1; //ID of the supervisor
 	private long pid; //ID of the assembler which produced the car
 	private long taskId; //ID of the task for which this car was produced
@@ -28,7 +28,7 @@ public class Car implements Serializable, ICarPart {
 	private Wheel[] wheels = new Wheel[4];
 
 	private boolean isComplete = false; //Set by the completeness tester. True if all parts are there and the body is painted.
-	private boolean defect = false; //If any of the parts has a defect
+	private boolean isDefect = false; //If any of the parts has a isDefect
 	private boolean isFinished = false; //Set by the supervisor to indicate that the car is finished and can be delivered
 
 	//Constructors
@@ -134,17 +134,20 @@ public class Car implements Serializable, ICarPart {
 				this.isComplete_pid == -1 ? "" : this.isComplete_pid, //Completeness Tester
 				this.isDefectTested_pid == -1 ? "" : this.isDefectTested_pid, //Defect Tester
 				this.isFinished_pid == -1 ? "" : this.isFinished_pid, //Supervisor
-				body.getId(), body.getPid(),
-				colorString, body.getPainterId(), //Painter
-				motor.getId(), motor.getPid(),
-				wheels[0].getPid(),
-				wheels[0].getId(),
+				body != null ? body.getId() : "",
+				body != null ? body.getPid() : "",
+				colorString, //Color
+				body != null ? body.getPainterId() : "", //Painter
+				motor != null ? motor.getId() : "",
+				motor != null ? motor.getPid() : "",
+				wheels[0] != null ? wheels[0].getPid() : "",
+				wheels[0] != null ? wheels[0].getId() : "",
 				//wheels[1].getPid(), //Comment out the other three ids, because in our setup there is only one wheel producer.				
-				wheels[1].getId(),
+				wheels[1] != null ? wheels[1].getId() : "",
 				//wheels[2].getPid(),
-				wheels[2].getId(),
+				wheels[2] != null ? wheels[2].getId() : "",
 				//wheels[3].getPid(),
-				wheels[3].getId(),
+				wheels[3] != null ? wheels[3].getId() : "",
 		};
 	}
 
@@ -164,14 +167,14 @@ public class Car implements Serializable, ICarPart {
 		this.taskId = taskId;
 	}
 
-	//For the defect tester
+	//For the isDefect tester
 	public boolean isDefect() {
-		return defect;
+		return isDefect;
 	}
 
 	public void setDefect(long pid, boolean defect) {
 		this.isDefectTested_pid = pid;
-		this.defect = defect;
+		this.isDefect = defect;
 	}
 	
 	//For the completeness tester
@@ -196,11 +199,21 @@ public class Car implements Serializable, ICarPart {
 	
 	public List<ICarPart> getParts() {
 		List<ICarPart> parts = new ArrayList<ICarPart>();
-		if(body != null) parts.add(body);
-		if(motor != null) parts.add(motor);
-		for(Wheel wheel : wheels) {
+		if(this.getBody() != null) parts.add(body);
+		if(this.getBody() != null) parts.add(motor);
+		for(Wheel wheel : this.getWheels()) {
 			if(wheel != null) parts.add(wheel);
 		}
 		return parts;
+	}
+
+	public void removeGoodParts() {
+		if(!(this.getBody().isDefect())) this.body = null;
+		if(!(this.getMotor().isDefect())) this.motor = null;
+		for(int i=0; i < this.getWheels().length; i++) {
+			if(!(this.wheels[i].isDefect())) {
+				this.wheels[i] = null;
+			}
+		}
 	}
 }

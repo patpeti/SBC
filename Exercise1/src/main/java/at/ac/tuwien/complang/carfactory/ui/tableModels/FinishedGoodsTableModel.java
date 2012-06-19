@@ -45,7 +45,11 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 	}
 
 	public Object getValueAt(int row, int column) {
-		return data.get(row)[column];
+		try {
+			return data.get(row)[column];
+		} catch(IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	public Class<? extends Object> getColumnClass(int c) {

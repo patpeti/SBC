@@ -36,7 +36,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	private Session session;
 	private Connection connection;
 	private Topic motorTopic, bodyTopic, wheelTopic, paintedBodyTopic, carTopic, paintedCarTopic, defectTestedCarTopic, completenessTestedCarTopic;
-	private Queue finishedCarQueue;
+	private Queue finishedCarQueue, defectCarQueue;
 	private IFactoryData gui;
 	
 	public QueueListenerImpl() { }
@@ -66,27 +66,13 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 				Body body = car.getBody();
 				Wheel[] wheels = car.getWheels();
 				Motor motor = car.getMotor();
-				if(!car.hasColor()) {
-					gui.addCar(car);
-					gui.removePart(body);
-					gui.removePart(motor);
-					for(Wheel wheel : wheels) {
-						gui.removePart(wheel);
-					}
+				boolean isTested = (car.getCompletenessTesterId() != -1 || car.getDefectTesterId() != -1);
+				boolean hasProblem = (!car.isComplete() || car.isDefect());
+				if(isTested && hasProblem) {
+					handleDefectCar(car);
+					if(car.getSupervisorId() != -1) System.out.println("HAVE ID: " + car.getSupervisorId());
 				} else {
-					//We need to know here if the car is already in the data model of the ui. Because it could be,
-					//that we receive a car object here which was already in the data model (as unpainted car) or 
-					//it could also be that we receive a car that was build with a painted body part and is thus 
-					//already painted. In the later case, we still need to remove the parts from the data model,
-					//that were used by the car.
-					if(!gui.updateCar(car)) {
-						gui.addCar(car);
-						gui.removePart(body);
-						gui.removePart(motor);
-						for(Wheel wheel : wheels) {
-							gui.removePart(wheel);
-						}
-					}
+					handleSemiFinishedCar(car, body, wheels, motor);
 				}
 			} else {
 				System.out.println("Part" + part.getId() + " was received, im going to update the GUI...");
@@ -99,9 +85,43 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			e.printStackTrace();
 		}
 	}
+
+	private void handleDefectCar(Car car) {
+		gui.removeCar(car);
+		if(!gui.updateDefectCar(car)) {
+			gui.addDefectCar(car);
+		}
+	}
+
+	private void handleSemiFinishedCar(Car car, Body body, Wheel[] wheels,
+			Motor motor) {
+		if(!car.hasColor()) {
+			gui.addCar(car);
+			gui.removePart(body);
+			gui.removePart(motor);
+			for(Wheel wheel : wheels) {
+				gui.removePart(wheel);
+			}
+		} else {
+			//We need to know here if the car is already in the data model of the UI. Because it could be,
+			//that we receive a car object here which was already in the data model (as unpainted car) or 
+			//it could also be that we receive a car that was build with a painted body part and is thus 
+			//already painted. In the later case, we still need to remove the parts from the data model,
+			//that were used by the car.
+			if(!gui.updateCar(car)) {
+				gui.addCar(car);
+				gui.removePart(body);
+				gui.removePart(motor);
+				for(Wheel wheel : wheels) {
+					gui.removePart(wheel);
+				}
+			}
+		}
+	}
 	
 	@Override
 	public void connectToQueues() {
+		System.out.println("[QueueListener] Connecting to queues.");
 		//connect to queues
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
@@ -129,6 +149,9 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 			
 			this.finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
 			MessageConsumer finishedCarConsumer = session.createConsumer(this.finishedCarQueue);
+			
+			this.defectCarQueue = session.createQueue(QueueConstants.DEFECTCARQUEUE);
+			MessageConsumer defectCarConsumer = session.createConsumer(this.defectCarQueue);
 			System.out.println("[QueueListener] Queues connected");
 			try {
 				bodyConsumer.setMessageListener(this);
@@ -140,9 +163,8 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 				defectTestedCarConsumer.setMessageListener(this);
 				completenessTestedCarTopic.setMessageListener(this);
 				finishedCarConsumer.setMessageListener(this);
-				//session.setMessageListener(this);
+				defectCarConsumer.setMessageListener(this);
 			} catch (JMSException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.println("[QueueListener] Listener attached (listening for messages on all queues)");

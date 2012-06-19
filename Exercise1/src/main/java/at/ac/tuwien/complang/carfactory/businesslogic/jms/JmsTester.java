@@ -37,12 +37,13 @@ public class JmsTester extends JmsAbstractWorker {
 		//1. Get a car from the completeness tested topic
 		Car car = null;
 		ObjectMessage message = (ObjectMessage) completenessTestedConsumer.receive();
+		if(message == null) throw new IllegalStateException("Connection was closed.");
 		car = (Car) message.getObject();
 		//2. Test the car
 		boolean testOk = false;
 		if(car != null) {
 			testOk = testDefect(car);
-			car.setDefect(this.pid, testOk);
+			car.setDefect(this.pid, !testOk); //needs to reverse the testOk because the car is defect if the test returns false
 		}
 		//3. Write it to the topic for completnessTestedCars
 		ObjectMessage returnMessage;

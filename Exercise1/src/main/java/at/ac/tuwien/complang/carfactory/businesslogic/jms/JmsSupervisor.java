@@ -16,14 +16,16 @@ import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
 public class JmsSupervisor extends JmsAbstractWorker {
 
 	//Fields
 	private Session session;
-	private Topic defectTestedCarTopic;
-	private Queue finishedCarQueue;
+	private Topic defectTestedCarTopic, bodyTopic, paintedBodyTopic, motorTopic, wheelTopic;
+	private Queue finishedCarQueue, defectCarQueue;
 	private MessageConsumer defectTestedCarConsumer;
+	private MessageProducer bodyProducer, paintedBodyProducer, motorProducer, wheelProducer, finishedCarProducer, defectCarProducer;
 	
 	public JmsSupervisor(long pid) {
 		super(pid);
@@ -39,9 +41,22 @@ public class JmsSupervisor extends JmsAbstractWorker {
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
-			this.defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
-			this.defectTestedCarConsumer = session.createDurableSubscriber(this.defectTestedCarTopic, "defectTestedCars");
-			this.finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
+			//ICarPart Topics
+			bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
+			bodyProducer = session.createProducer(this.bodyTopic);
+			paintedBodyTopic = session.createTopic(QueueConstants.PAINTEDBODYTOPIC);
+			paintedBodyProducer = session.createProducer(this.paintedBodyTopic);
+			motorTopic = session.createTopic(QueueConstants.MOTORTOPIC);
+			motorProducer = session.createProducer(this.motorTopic);
+			wheelTopic = session.createTopic(QueueConstants.WHEELTOPIC);
+			wheelProducer = session.createProducer(this.wheelTopic);
+			//Car Topics/Queues
+			defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
+			defectTestedCarConsumer = session.createDurableSubscriber(this.defectTestedCarTopic, "defectTestedCars");
+			finishedCarQueue = session.createQueue(QueueConstants.FINISHEDCARQUEUE);
+			finishedCarProducer = session.createProducer(finishedCarQueue);
+			defectCarQueue = session.createQueue(QueueConstants.DEFECTCARQUEUE);
+			defectCarProducer = session.createProducer(defectCarQueue);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -70,23 +85,39 @@ public class JmsSupervisor extends JmsAbstractWorker {
 	}
 
 	private void handleCar(Car car) throws JMSException {
-		if(!car.isComplete() || car.isDefect()) {
+		boolean isTested = (car.getCompletenessTesterId() != -1 || car.getDefectTesterId() != -1);
+		boolean hasProblem = (!car.isComplete() || car.isDefect());
+		if(isTested && hasProblem) {
 			// 1a. If the car has any kind of error, then we need to disassemble it and write the parts back to the right queues
 			for(ICarPart part : car.getParts()) {
 				if(!part.isDefect()) {
-					//MessageProducer producer car = session.createProducer(null);
+					if(part instanceof Body) {
+						Body body = (Body) part;
+						if(body.hasColor()) {
+							paintedBodyProducer.send(session.createObjectMessage(part));
+						} else {
+							bodyProducer.send(session.createObjectMessage(part));
+						}
+					} else if(part instanceof Motor) {
+						motorProducer.send(session.createObjectMessage(part));
+					} else if(part instanceof Wheel) {
+						wheelProducer.send(session.createObjectMessage(part));
+					}
 				}
 			}
+			car.removeGoodParts();
+			//set car state to not finished
+			car.setFinished(pid, true);
 			// 1b. Write the car to the defect cars queue
+			defectCarProducer.send(session.createObjectMessage(car));
+			System.out.println("[Supervisor] Car " + car.getId() + " has defects and was disassembled. Defect remainders are send to the defectCarQueue.");
 		} else {
 			// 2. If the car is complete and without defects we can set it to finished and write it to the finished car queue
 			//set car state to finished
 			car.setFinished(pid, true);
-			System.out.println("[Supervisor] Received painted car " + car.getId() + ", check: OK.");
 			//write car to completed queue
-			MessageProducer messageProducer = session.createProducer(finishedCarQueue);
-			messageProducer.send(session.createObjectMessage(car));
-			System.out.println("[Supervisor] Car " + car.getId() + " send to finishedCarQueue.");
+			finishedCarProducer.send(session.createObjectMessage(car));
+			System.out.println("[Supervisor] Car " + car.getId() + " is complete and was send to finishedCarQueue.");
 		}
 	}
 }

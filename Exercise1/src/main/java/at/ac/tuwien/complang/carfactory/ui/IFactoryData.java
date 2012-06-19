@@ -15,6 +15,10 @@ public interface IFactoryData {
 	boolean addCar(Car car);
 	boolean removeCar(Car car);
 	boolean updateCar(Car car);
+	//DefectCars
+	boolean addDefectCar(Car car);
+	boolean removeDefectCar(Car car);
+	boolean updateDefectCar(Car car);
 	//Part Methods
 	boolean addPart(ICarPart carPart);
 	boolean removePart(ICarPart carPart);
