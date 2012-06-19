@@ -96,25 +96,45 @@ public class Assembler{
 		}
 	}
 
-	private void preferredLoop(Task task) {
-		while(task != null) {
-			try{
-				TransactionReference tx1 = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
-				Motor motor = getPreferredMotor(task.getMotortype(),tx1);
-				Body body = getPreferredBody(task.getColor(),tx1);
-				Wheel[] wheels =  getFourWheels(tx1);
-				assemblePreferredCar(motor, body, wheels, task, tx1); //assemble car and update Task
-				//if one element missing -> TransactionException is thrown
-			} catch(TransactionException e) {
-				//rollback - automatically?
-				task = readNextTask(task);
-			} catch(MzsCoreException e) {
-				System.err.println("Dear future me, in the past you hoped that you will never see this text coming");
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+	private void preferredLoop(Task t) {
+		
+		if(t == null) return; //leave loop if no other Task can be found
+		try{
+		TransactionReference tx1 = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
+		Motor m = getPreferredMotor(t.getMotortype(),tx1);
+		Body b = getPreferredBody(t.getColor(),tx1);
+		Wheel[] wheels =  getFourWheels(tx1);
+		assemblePreferredCar(m,b, wheels,t,tx1); //assemble car and update Task
+		//if one element missing -> TransactionException is thrown
+		}catch(TransactionException e){
+			//rollback - automatically?
+			preferredLoop(readNextTask(t));
+		}catch(MzsCoreException e){
+			System.err.println("Dear future me, in the past you hoped that you will never see this text coming");
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
+		
+		
+//		while(task != null) {
+//			try{
+//				TransactionReference tx1 = capi.createTransaction(SpaceTimeout.INFINITE, new URI(SpaceConstants.CONTAINER_URI));
+//				Motor motor = getPreferredMotor(task.getMotortype(),tx1);
+//				Body body = getPreferredBody(task.getColor(),tx1);
+//				Wheel[] wheels =  getFourWheels(tx1);
+//				assemblePreferredCar(motor, body, wheels, task, tx1); //assemble car and update Task
+//				//if one element missing -> TransactionException is thrown
+//			} catch(TransactionException e) {
+//				//rollback - automatically?
+//				task = readNextTask(task);
+//			} catch(MzsCoreException e) {
+//				System.err.println("Dear future me, in the past you hoped that you will never see this text coming");
+//				e.printStackTrace();
+//			} catch (URISyntaxException e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	/**
@@ -126,6 +146,7 @@ public class Assembler{
 	 * @return The next task for the given task object
 	 */
 	private Task readNextTask(Task task) {
+		System.out.println("readNextTask method");
 		List<Selector> taskSelectors = new ArrayList<Selector>();
 		taskSelectors.add(AnyCoordinator.newSelector());
 		List<Task> tListe = new ArrayList<Task>();
@@ -140,13 +161,17 @@ public class Assembler{
 		try {
 			tListe = capi.read(taskContainer, taskSelectors, SpaceTimeout.TENSEC, tx2);
 		} catch (MzsCoreException e) {
+			System.out.println("readNextTask method MzsCoreException");
 			return null;
 		}
-
+		System.out.println("taskListe emptyness :"+ tListe.isEmpty());
 		if(!tListe.isEmpty()) {
 			//assume elements are in FIFO order in the beginning old Tasks with low ids /in the end young Tasks with high ids
 			for(Task iTask : tListe){
-				if(iTask.getId()>task.getId()) return iTask;
+				if(iTask.getId()>task.getId()) {
+					System.out.println("readNextTask method return task with id: "+ iTask.getId());
+					return iTask;
+				}
 			}
 			return null;
 		} else {
@@ -158,13 +183,10 @@ public class Assembler{
 		throws MzsCoreException, TransactionException
 	{
 		//create the car
-		System.out.println("Creating car...");
 		Car car = new Car(pid, body, motor, wheels);
 		//write car into space (which labels?, coordinators?)
-
 		//get ID from space, increase it and assign it to car, then write it back into the space
 		setGlobalCarId(tx1, car);
-
 		List<CoordinationData> coordinators = new ArrayList<CoordinationData>();
 		String label =  CarPartType.CAR.toString();
 		if(body.getColor() != null) label = SpaceLabels.PAINTEDCAR;
@@ -175,19 +197,26 @@ public class Assembler{
 		System.out.println("[PreferredAssembler]*Car " + car.getId() + " created");
 
 		//update task
-
+		
 		//take task
 		List<Selector> sel = new ArrayList<Selector>();
 		sel.add(KeyCoordinator.newSelector(""+t.getId()));
 		Task takenTask = (Task) capi.take(taskContainer, sel, SpaceTimeout.TENSEC, tx1).get(0);
 		takenTask.increaseCarAmount(1);
-
+		System.out.println("[PreferredAssembler]*Task taken");
+		
+		if(takenTask.isFinished()){
+			System.out.println("[PreferredAssembler]*Task finshed...do not write back");
+			capi.commitTransaction(tx1);
+			return;
+		}
 		//write task
 		List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
 		taskCoords.add(KeyCoordinator.newCoordinationData(""+car.getId()));
 		taskCoords.add(FifoCoordinator.newCoordinationData());
 		taskCoords.add(LabelCoordinator.newCoordinationData(takenTask.getColor().toString()));
 		capi.write(taskContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask, taskCoords));
+		System.out.println("[PreferredAssembler]*Write Task");
 		capi.commitTransaction(tx1);
 	}
 
@@ -201,13 +230,15 @@ public class Assembler{
 		if(spaceId.size() != 0) {
 			carId = spaceId.get(0).getCarID() + 1; //increase ID
 		}
+		System.out.println("[PreferredAssembler]*CarID taken");
 		car.setId(carId);
 		//write increase ID back into space
 		List<CoordinationData> idcoords = new ArrayList<CoordinationData>();
 		idcoords.add(LifoCoordinator.newCoordinationData());
 		CarId id = new CarId();
 		id.setCarID(carId);
-		capi.write(new Entry(id,idcoords), carIdContainer, SpaceTimeout.INFINITE, tx);
+		capi.write(new Entry(id,idcoords), carIdContainer, SpaceTimeout.INFINITE, tx1);
+		System.out.println("[PreferredAssembler]*CarID increased");
 	}
 
 	private void defaultWork() {
@@ -250,6 +281,19 @@ public class Assembler{
 		} catch (MzsCoreException e) {
 			return null;
 		}
+		
+		//if assembler finished with the Task but painter not yet read the next task... and this task should be closed by painter
+		if(task.getAmount() <= task.getCarAmount()) {
+			System.out.println("Assembler is finished with this task, reading the next one if any");
+			Task t = readNextTask(task);
+			if(t != null)
+				System.out.println(t.getId()); 
+			else
+				System.out.println("Task is null");
+//			return readNextTask(task);
+			return t;
+		}
+		
 		return task;
 	}
 
@@ -354,6 +398,7 @@ public class Assembler{
 			tempWheels[i] = wheel;
 			i++;
 		}
+		System.out.println("[PreferredAssembler] *4Wheel taken");
 		return tempWheels;
 	}
 

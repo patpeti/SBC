@@ -57,7 +57,7 @@ public class Task implements Serializable {
 	 * is equal or greater than the required amount. 
 	 */
 	public boolean isFinished() {
-		if(amount >= paintAmount && amount >= carAmount) {
+		if(amount <= paintAmount && amount <= carAmount) {
 			return true;
 		} else {
 			return false;
