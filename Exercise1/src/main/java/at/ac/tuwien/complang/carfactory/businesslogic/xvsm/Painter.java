@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.taskdefs.Sleep;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.Coordinator;
@@ -13,6 +14,11 @@ import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
+import org.mozartspaces.capi3.Matchmaker;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
@@ -55,7 +61,7 @@ public class Painter {
 
 	private Capi capi;
 	private TransactionReference tx;
-	private ContainerReference carContainer, bodyContainer, taskContainer;
+	private ContainerReference carContainer, bodyContainer, taskContainer, finishedTasksContainer;
 	
 	public Painter(long id, Color color) {
 		super(); //1
@@ -74,38 +80,86 @@ public class Painter {
 		try {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 			//1. Take the Task object from the space
-			//Task task = getTask();
-			Task task = null;
+			Task task = getTask();
 			//2a. Take a car from the space
-			List<ICarPart> carparts =  takeCarPart(CarPartType.CAR.toString(), SpaceTimeout.ZERO, null);
-			if(carparts != null ) {
-				//paint car body and write it to space
+			
+			if(task == null){
+				//normal paintloop
+				//paint  a car which has taskId -1
+				//or paint a body
+				
+				List<Selector> selectors = new ArrayList<Selector>();
+				selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
+				Query query = null;
+				Property prop = null;
+				prop = Property.forName("taskId");
+				query = new Query().filter(prop.equalTo(new Long(-1)));
+				selectors.add(QueryCoordinator.newSelector(query));
+
+				List<ICarPart> parts = null;
 				try {
-					Thread.sleep(TIME_TO_PAINT/2);
-				} catch (InterruptedException e) { }
-				Car car = (Car) carparts.get(0);
-				car.getBody().setColor(pid, this.color);
-				writeCarIntoSpace(car);
-				if(task != null) {
-					task.increasePaintAmount(1);
+						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
+				} catch (CountNotMetException ex) {
+					parts = null;
 				}
-			} else {
-				//2b. if it is still null take a body from space
-				List<ICarPart> parts = takeCarPart(CarPartType.BODY.toString(), SpaceTimeout.ZERO, null);
-				//get body paint it write it
-				if(parts != null) {
+				
+				
+				if(parts != null){
+					Car car = (Car) parts.get(0);
+					car.getBody().setColor(pid, this.color);
+					writeCarIntoSpace(car); //commits tx
+				}else{
+					//take body which is not painted
+					
+					List<Selector> selectors2 = new ArrayList<Selector>();
+					selectors2.add(LabelCoordinator.newSelector(CarPartType.BODY.toString(), 1)); //select one object
+					parts = null;
 					try {
-						Thread.sleep(TIME_TO_PAINT/2);
-					} catch (InterruptedException e) { }
-					Body b = (Body) parts.get(0);
-					b.setColor(pid, this.color);
-					writeBodyIntoSpace(b);
-					if(task != null) {
-						task.increasePaintAmount(1);
+							parts = capi.take(bodyContainer, selectors2, SpaceTimeout.ZERO, tx);
+					}catch (CountNotMetException e) {
+						capi.rollbackTransaction(tx);
+						return;
 					}
+					
+					if(parts == null) {
+						capi.rollbackTransaction(tx);
+						return;
+					}else{
+						Body b = (Body) parts.get(0);
+						b.setColor(pid, this.color);
+						writeBodyIntoSpace(b); //commits
+					}
+					
 				}
+				
+			}else{
+				//select car from space where taskId = Task.id
+				//if it is not painted paint it
+				
+				List<Selector> selectors = new ArrayList<Selector>();
+				selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
+				Query query = null;
+				Property prop = null;
+				prop = Property.forName("taskId");
+				query = new Query().filter(prop.equalTo(new Long(task.getId())));
+				selectors.add(QueryCoordinator.newSelector(query));
+
+				List<ICarPart> parts = null;
+				try {
+						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
+				} catch (CountNotMetException ex) {
+					
+				}
+				
+				if(parts != null){
+					Car car = (Car) parts.get(0);
+					car.getBody().setColor(pid, this.color);
+					this.updateTask(task); //own tx
+					writeCarIntoSpace(car); //commits tx
+				}
+				
 			}
-//			capi.commitTransaction(tx);
+			
 		} catch (MzsCoreException e1) {
 			try {
 				capi.rollbackTransaction(tx);
@@ -118,13 +172,61 @@ public class Painter {
 		}
 	}
 
+	private void updateTask(Task task) {
+		TransactionReference tx2 = null;
+		try {
+			tx2 =  capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+		
+			//take the same task
+			//update
+			//write back
+			List<Selector> selectors = new ArrayList<Selector>();
+			Query query = null;
+			Property prop = null;
+			prop = Property.forName("id");
+			query = new Query().filter(prop.equalTo(new Long(task.getId())));
+			selectors.add(QueryCoordinator.newSelector(query));
+
+			List<Task> takenTaskList = null;
+			takenTaskList = capi.take(taskContainer, selectors, SpaceTimeout.TENSEC, tx2);
+
+			Task  takenTask = takenTaskList.get(0);
+			takenTask.increasePaintAmount(1);
+
+			if(takenTask.isFinished()){
+				System.out.println("[Painter]*Task finshed...write in finishedtasks");
+				List<CoordinationData> ftaskCoords = new ArrayList<CoordinationData>();
+				ftaskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
+				ftaskCoords.add(FifoCoordinator.newCoordinationData());
+				capi.write(finishedTasksContainer, SpaceTimeout.TENSEC, tx2, new Entry(takenTask,ftaskCoords));
+				capi.commitTransaction(tx2);
+				return;
+			}else{
+				List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
+				taskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
+				taskCoords.add(FifoCoordinator.newCoordinationData());
+				taskCoords.add(LabelCoordinator.newCoordinationData(takenTask.getColor().toString()));
+				capi.write(taskContainer, SpaceTimeout.TENSEC, tx2, new Entry(takenTask, taskCoords));
+				System.out.println("[Painter]*Write Task");
+				capi.commitTransaction(tx2);
+			}
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	
+	
+		
+	}
+
 	private Task getTask() {
 		List<Selector> selectors = new ArrayList<Selector>();
 		selectors.add(LabelCoordinator.newSelector(color.toString()));
 		selectors.add(FifoCoordinator.newSelector(1));
 		List<ICarPart> entities = null;
 		try {
-			entities = capi.take(taskContainer, selectors, 0, tx);
+			entities = capi.read(taskContainer, selectors, 0, tx);
 			if(entities != null) return (Task) entities.get(0);
 		} catch (CountNotMetException ex) {
 			return null;
@@ -142,6 +244,8 @@ public class Painter {
 		}
 		return null;
 	}
+	
+	
 
 	public List<ICarPart> takeCarPart(String selectorLabel, long timeout, TransactionReference tx) {
 		List<Selector> selectors = new ArrayList<Selector>();
@@ -182,14 +286,19 @@ public class Painter {
 			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
+			coords.add(new QueryCoordinator());
 			List<Coordinator> taskCoordinators = new ArrayList<Coordinator>();
 			taskCoordinators.add(new AnyCoordinator());
 			taskCoordinators.add(new KeyCoordinator());
 			taskCoordinators.add(new FifoCoordinator());
+			List<Coordinator> c = new ArrayList<Coordinator>();
+			c.add(new KeyCoordinator());
+			c.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.finishedTasksContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.FINISHEDTASKS, new URI(SpaceConstants.CONTAINER_URI), c, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();

@@ -58,6 +58,7 @@ public class Assembler{
 	private ContainerReference bodyContainer;
 	private ContainerReference carIdContainer;
 	private ContainerReference taskContainer;
+	private ContainerReference finisedTasksContainer;
 
 	public static long pid = 0;
 
@@ -204,16 +205,21 @@ public class Assembler{
 		sel.add(KeyCoordinator.newSelector(""+t.getId()));
 		Task takenTask = (Task) capi.take(taskContainer, sel, SpaceTimeout.TENSEC, tx1).get(0);
 		takenTask.increaseCarAmount(1);
+		if(car.getBody().hasColor()) takenTask.increasePaintAmount(1);
 		System.out.println("[PreferredAssembler]*Task taken");
 		
 		if(takenTask.isFinished()){
-			System.out.println("[PreferredAssembler]*Task finshed...do not write back");
+			System.out.println("[PreferredAssembler]*Task finshed...write in finishedtasks");
+			List<CoordinationData> ftaskCoords = new ArrayList<CoordinationData>();
+			ftaskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
+			ftaskCoords.add(FifoCoordinator.newCoordinationData());
+			capi.write(this.finisedTasksContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask,ftaskCoords));
 			capi.commitTransaction(tx1);
 			return;
 		}
 		//write task
 		List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
-		taskCoords.add(KeyCoordinator.newCoordinationData(""+car.getId()));
+		taskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
 		taskCoords.add(FifoCoordinator.newCoordinationData());
 		taskCoords.add(LabelCoordinator.newCoordinationData(takenTask.getColor().toString()));
 		capi.write(taskContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask, taskCoords));
@@ -465,6 +471,9 @@ public class Assembler{
 			taskCoords.add(new FifoCoordinator());
 			taskCoords.add(new QueryCoordinator());
 			taskCoords.add(new LabelCoordinator());
+			List<Coordinator> c = new ArrayList<Coordinator>();
+			c.add(new KeyCoordinator());
+			c.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
@@ -472,6 +481,7 @@ public class Assembler{
 				this.wheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.carIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), taskCoords, null, capi);
+				this.finisedTasksContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.FINISHEDTASKS, new URI(SpaceConstants.CONTAINER_URI), c, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();

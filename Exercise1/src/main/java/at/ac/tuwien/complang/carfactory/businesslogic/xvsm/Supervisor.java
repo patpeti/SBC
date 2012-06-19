@@ -116,7 +116,7 @@ public class Supervisor{
 		if(parts != null){
 			Car c = (Car) parts.get(0);
 			c.setFinished(pid, true);
-			if(c.isDefect() || !c.isComplete()){
+			if(c.isDefect()){
 				writeDefectedCar(c);
 				recycleCar(c);
 				System.out.println("Car defected and recycled " + c.getId());
