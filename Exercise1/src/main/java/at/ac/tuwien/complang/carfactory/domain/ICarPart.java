@@ -9,5 +9,5 @@ public interface ICarPart extends Serializable{
 	long getPid();
 	Object[] getObjectData();
 	CarPartType getType();
-	
+	boolean isDefect();
 }

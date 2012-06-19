@@ -49,6 +49,7 @@ public class Motor implements Serializable, ICarPart {
 		this.power = power;
 	}
 
+	@Override
 	public boolean isDefect() {
 		return isDefect;
 	}

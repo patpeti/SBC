@@ -38,6 +38,7 @@ public class Wheel implements Serializable, ICarPart {
 		return Wheel.type;
 	}
 
+	@Override
 	public boolean isDefect() {
 		return isDefect;
 	}

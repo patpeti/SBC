@@ -72,6 +72,7 @@ public class Body implements Serializable, ICarPart {
 		this.paintState = paintState;
 	}
 
+	@Override
 	public boolean isDefect() {
 		return isDefect;
 	}

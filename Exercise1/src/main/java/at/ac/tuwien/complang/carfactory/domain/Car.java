@@ -2,6 +2,8 @@ package at.ac.tuwien.complang.carfactory.domain;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
@@ -190,5 +192,15 @@ public class Car implements Serializable, ICarPart {
 	public void setFinished(long pid, boolean isFinished) {
 		this.isFinished_pid = pid;
 		this.isFinished = isFinished;
+	}
+	
+	public List<ICarPart> getParts() {
+		List<ICarPart> parts = new ArrayList<ICarPart>();
+		if(body != null) parts.add(body);
+		if(motor != null) parts.add(motor);
+		for(Wheel wheel : wheels) {
+			if(wheel != null) parts.add(wheel);
+		}
+		return parts;
 	}
 }
