@@ -154,6 +154,7 @@ public class Painter {
 						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
 				} catch (CountNotMetException ex) {
 					//TODO read and paint body
+					doPaintCarOrBody();
 				}
 				
 				if(parts != null){
@@ -176,6 +177,53 @@ public class Painter {
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	private void doPaintCarOrBody() throws MzsCoreException {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("taskId");
+		query = new Query().filter(prop.equalTo(new Long(-1)));
+		selectors.add(QueryCoordinator.newSelector(query));
+
+		List<ICarPart> parts = null;
+		try {
+				parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
+		} catch (CountNotMetException ex) {
+			parts = null;
+		}
+		
+		
+		if(parts != null){
+			Car car = (Car) parts.get(0);
+			car.getBody().setColor(pid, this.color);
+			writeCarIntoSpace(car); //commits tx
+		}else{
+			//take body which is not painted
+			
+			List<Selector> selectors2 = new ArrayList<Selector>();
+			selectors2.add(LabelCoordinator.newSelector(CarPartType.BODY.toString(), 1)); //select one object
+			parts = null;
+			try {
+					parts = capi.take(bodyContainer, selectors2, SpaceTimeout.ZERO, tx);
+			}catch (CountNotMetException e) {
+				capi.rollbackTransaction(tx);
+				return;
+			}
+			
+			if(parts == null) {
+				capi.rollbackTransaction(tx);
+				return;
+			}else{
+				Body b = (Body) parts.get(0);
+				b.setColor(pid, this.color);
+				writeBodyIntoSpace(b); //commits
+			}
+			
+		}
+		
 	}
 
 	private void updateTask(Task task) {

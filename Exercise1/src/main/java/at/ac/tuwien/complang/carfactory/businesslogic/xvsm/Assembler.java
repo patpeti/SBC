@@ -172,6 +172,8 @@ public class Assembler{
 					return iTask;
 				}
 			}
+			//TODO before return do one normaloop because the task is blocked and there is no other task to do
+			defaultWork();
 			return null;
 		} else {
 			return null;
