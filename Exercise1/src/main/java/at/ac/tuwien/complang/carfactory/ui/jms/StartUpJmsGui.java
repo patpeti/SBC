@@ -21,7 +21,7 @@ public class StartUpJmsGui {
 		//instantiate global Listener
 		final IQueueListener listener = new QueueListenerImpl();
 		//1. Start the User interface
-		ITaskController taskController = new JmsTaskController(listener);
+		final ITaskController taskController = new JmsTaskController(listener);
 		ProductionUI gui = new ProductionUI(JmsFactoryFacade.getInstance(listener), taskController);
 		listener.setQueueObserver(gui);
 		listener.connectToQueues();
@@ -30,6 +30,7 @@ public class StartUpJmsGui {
 			public void run() {
 				System.out.println("Shutting down gracefully, please wait.");
 				listener.disconnect();
+				taskController.disconnect();
 			}
 		});
 	}
