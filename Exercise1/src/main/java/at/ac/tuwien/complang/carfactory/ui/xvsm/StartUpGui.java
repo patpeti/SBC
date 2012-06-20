@@ -46,7 +46,6 @@ public class StartUpGui {
 		ContainerReference taskContainer = null;
 		ContainerReference carIdContainer = null;
 		ContainerReference defectContainer = null;
-		ContainerReference finishedTaskContainer = null;
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());
@@ -74,7 +73,6 @@ public class StartUpGui {
 				taskContainer = capi.createContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  taskCoordinators, null, null);
 				carIdContainer = capi.createContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,carIdCoords, null, null);
 				defectContainer = capi.createContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,defectCoords, null, null);
-				finishedTaskContainer = capi.createContainer(SpaceConstants.FINISHEDTASKS, new URI(SpaceConstants.CONTAINER_URI), Container.UNBOUNDED,defectCoords, null, null);
 				//init first id
 				CarId firstId = new CarId();
 				firstId.setCarID(100000);
@@ -110,7 +108,6 @@ public class StartUpGui {
 			notificationManager.createNotification(taskContainer, listener, operations, null, null);
 			notificationManager.createNotification(carIdContainer, listener, operations, null, null);
 			notificationManager.createNotification(defectContainer, listener, operations, null, null);
-			notificationManager.createNotification(finishedTaskContainer, listener, operations, null, null);
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

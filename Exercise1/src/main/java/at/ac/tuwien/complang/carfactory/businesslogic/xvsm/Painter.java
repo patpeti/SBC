@@ -61,7 +61,7 @@ public class Painter {
 
 	private Capi capi;
 	private TransactionReference tx;
-	private ContainerReference carContainer, bodyContainer, taskContainer, finishedTasksContainer;
+	private ContainerReference carContainer, bodyContainer, taskContainer;
 	
 	public Painter(long id, Color color) {
 		super(); //1
@@ -354,14 +354,10 @@ public class Painter {
 			taskCoordinators.add(new AnyCoordinator());
 			taskCoordinators.add(new KeyCoordinator());
 			taskCoordinators.add(new FifoCoordinator());
-			List<Coordinator> c = new ArrayList<Coordinator>();
-			c.add(new KeyCoordinator());
-			c.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				this.finishedTasksContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.FINISHEDTASKS, new URI(SpaceConstants.CONTAINER_URI), c, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();

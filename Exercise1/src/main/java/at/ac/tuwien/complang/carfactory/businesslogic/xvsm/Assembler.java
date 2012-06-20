@@ -55,7 +55,6 @@ public class Assembler{
 	private ContainerReference bodyContainer;
 	private ContainerReference carIdContainer;
 	private ContainerReference taskContainer;
-	private ContainerReference finisedTasksContainer;
 
 	public static long pid = 0;
 
@@ -262,7 +261,7 @@ public class Assembler{
 
 	private void defaultWork() {
 		try {
-			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
+			tx = capi.createTransaction(SpaceTimeout.ONESEC, new URI(SpaceConstants.CONTAINER_URI));
 			if(this.motor == null){
 				//System.out.println("[Assembler] motor was null");
 				getOneMotor();
@@ -488,9 +487,6 @@ public class Assembler{
 			taskCoords.add(new FifoCoordinator());
 			taskCoords.add(new QueryCoordinator());
 			taskCoords.add(new LabelCoordinator());
-			List<Coordinator> c = new ArrayList<Coordinator>();
-			c.add(new KeyCoordinator());
-			c.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
@@ -498,7 +494,6 @@ public class Assembler{
 				this.wheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.carIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), taskCoords, null, capi);
-				this.finisedTasksContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.FINISHEDTASKS, new URI(SpaceConstants.CONTAINER_URI), c, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
