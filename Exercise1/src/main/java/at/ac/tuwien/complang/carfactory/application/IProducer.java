@@ -1,4 +1,4 @@
-package at.ac.tuwien.complang.carfactory.application.xvsm;
+package at.ac.tuwien.complang.carfactory.application;
 
 public interface IProducer {
 	void produce();

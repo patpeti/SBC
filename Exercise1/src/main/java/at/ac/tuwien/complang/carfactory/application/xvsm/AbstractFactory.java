@@ -6,6 +6,7 @@ import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 
 import at.ac.tuwien.complang.carfactory.application.IFactory;
+import at.ac.tuwien.complang.carfactory.application.IProducer;
 
 public abstract class AbstractFactory extends Observable implements IProducer, IFactory {
 

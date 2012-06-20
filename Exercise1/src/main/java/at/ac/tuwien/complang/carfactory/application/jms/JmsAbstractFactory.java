@@ -3,7 +3,7 @@ package at.ac.tuwien.complang.carfactory.application.jms;
 import java.util.Observable;
 
 import at.ac.tuwien.complang.carfactory.application.IFactory;
-import at.ac.tuwien.complang.carfactory.application.xvsm.IProducer;
+import at.ac.tuwien.complang.carfactory.application.IProducer;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
 public abstract class JmsAbstractFactory extends Observable implements IFactory, IProducer {
