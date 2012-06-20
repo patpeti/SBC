@@ -21,6 +21,8 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private Topic topic;
+	private MessageProducer messageProducer;
 	private ActiveMQConnectionFactory connectionFactory;
 
 	
@@ -32,9 +34,13 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	}
 	
 	private void connect() {
+		System.out.println("[MotorFactory] Connecting to Queues");
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			topic = session.createTopic(QueueConstants.MOTORTOPIC);
+			messageProducer = session.createProducer(topic);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -49,25 +55,16 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 		if(random < errorRate) {
 			motor.setDefect(true);
 		}
-		System.out.println("Produced a motor with id: " + motor.getId());
-		
-		System.out.println("writing Motor into jms...");
-		ActiveMQConnectionFactory conFac = new ActiveMQConnectionFactory();
 		try {
 			if(connection == null) {
 				connect();
 			}
-			if(session == null){
-				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			}
-			connection = conFac.createConnection();
-			connection.start();
-			
-			Topic topic = session.createTopic(QueueConstants.MOTORTOPIC);
-			MessageProducer msgProducer = session.createProducer(topic);
 			getListener().onObjectWrittenInQueue(motor);
-			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
-			msgProducer.send(session.createObjectMessage(motor));
+			//notify the GUI first, because we need to make sure that the object is in the table model, before the GUI gets a notification to remove it again.
+			topic = session.createTopic(QueueConstants.MOTORTOPIC);
+			messageProducer = session.createProducer(topic);
+			messageProducer.send(session.createObjectMessage(motor));
+			System.out.println("Produced a motor with id: " + motor.getId());
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -88,14 +85,17 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 		setChanged();
 		notifyObservers("MOTOR");
 		try {
-			connection.close();
+			messageProducer.close();
 			session.close();
+			connection.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			session = null;
 			connection = null;
+			topic = null;
+			messageProducer = null;
 		}
 	}
 }

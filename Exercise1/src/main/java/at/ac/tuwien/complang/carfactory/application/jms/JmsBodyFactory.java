@@ -20,6 +20,8 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private Topic topic;
+	private MessageProducer messageProducer;
 	private ActiveMQConnectionFactory connectionFactory;
 
 	public JmsBodyFactory(long id, IQueueListener listener) {
@@ -27,15 +29,17 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		this.id = id;
 		setListener(listener);
 		connectionFactory = new ActiveMQConnectionFactory();
-		
 	}
 	
 	private void connect() {
+		System.out.println("[BodyFactory] Connecting to Queues");
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			topic = session.createTopic(QueueConstants.BODYTOPIC);
+			messageProducer = session.createProducer(topic);
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -46,20 +50,14 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		if(random < errorRate) {
 			body.setDefect(true);
 		}
-		System.out.println("Produced a body with ID: " + body.getId());
-		System.out.println("writing Body into jms...");
 		try {
 			if(connection == null) {
 				connect();
 			}
-			if(session == null){
-				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			}
-			Topic topic = session.createTopic(QueueConstants.BODYTOPIC);
-			MessageProducer msgProducer = session.createProducer(topic);
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the GUI gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(body);
-			msgProducer.send(session.createObjectMessage(body));
+			messageProducer.send(session.createObjectMessage(body));
+			System.out.println("Produced a body with ID: " + body.getId());
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -79,14 +77,16 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 		setChanged();
 		notifyObservers("BODY");
 		try {
-			connection.close();
+			messageProducer.close();
 			session.close();
+			connection.close();
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			connection = null;
 			session = null;
+			topic = null;
+			messageProducer = null;
 		}
 	}
 }

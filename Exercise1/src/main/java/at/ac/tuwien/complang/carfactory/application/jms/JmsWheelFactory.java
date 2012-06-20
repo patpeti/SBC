@@ -20,6 +20,8 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 	private long id; //The ID of this producer
 	private Connection connection = null;
 	private Session session;
+	private Topic topic;
+	private MessageProducer messageProducer;
 	private ActiveMQConnectionFactory connectionFactory;
 
 	public JmsWheelFactory(long id, IQueueListener listener) {
@@ -30,9 +32,13 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 	}
 
 	private void connect() {
+		System.out.println("[BodyFactory] Connecting to Queues");
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			topic = session.createTopic(QueueConstants.WHEELTOPIC);
+			messageProducer = session.createProducer(topic);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -44,26 +50,14 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 		if(random < errorRate) {
 			wheel.setDefect(true);
 		}
-		System.out.println("Produced a wheel with ID: " + wheel.getId());
-		
-		System.out.println("writing wheel into jms...");
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		try {
 			if(connection == null) {
 				connect();
 			}
-			if(session == null){
-				session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			}
-			connection = connectionFactory.createConnection();
-			connection.start();
-		
-			Topic topic = session.createTopic(QueueConstants.WHEELTOPIC);
-			MessageProducer msgProducer = session.createProducer(topic);
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the gui gets a notification to remove it again.
 			getListener().onObjectWrittenInQueue(wheel);
-			msgProducer.send(session.createObjectMessage(wheel));
-//			connection.close();
+			messageProducer.send(session.createObjectMessage(wheel));
+			System.out.println("Produced a wheel with ID: " + wheel.getId());
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -83,14 +77,17 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 		setChanged();
 		notifyObservers("WHEEL");
 		try {
-			connection.close();
+			messageProducer.close();
 			session.close();
+			connection.close();
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			session = null;
 			connection = null;
+			topic = null;
+			messageProducer = null;
 		}
 	}
 }
