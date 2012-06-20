@@ -134,20 +134,20 @@ public class Car implements Serializable, ICarPart {
 				this.isComplete_pid == -1 ? "" : this.isComplete_pid, //Completeness Tester
 				this.isDefectTested_pid == -1 ? "" : this.isDefectTested_pid, //Defect Tester
 				this.isFinished_pid == -1 ? "" : this.isFinished_pid, //Supervisor
-				body != null ? body.getId() : "",
+				body != null ? body : "",
 				body != null ? body.getPid() : "",
 				colorString, //Color
 				body != null ? body.getPainterId() : "", //Painter
-				motor != null ? motor.getId() : "",
+				motor != null ? motor : "",
 				motor != null ? motor.getPid() : "",
 				wheels[0] != null ? wheels[0].getPid() : "",
-				wheels[0] != null ? wheels[0].getId() : "",
+				wheels[0] != null ? wheels[0] : "",
 				//wheels[1].getPid(), //Comment out the other three ids, because in our setup there is only one wheel producer.				
-				wheels[1] != null ? wheels[1].getId() : "",
+				wheels[1] != null ? wheels[1] : "",
 				//wheels[2].getPid(),
-				wheels[2] != null ? wheels[2].getId() : "",
+				wheels[2] != null ? wheels[2] : "",
 				//wheels[3].getPid(),
-				wheels[3] != null ? wheels[3].getId() : "",
+				wheels[3] != null ? wheels[3] : ""
 		};
 	}
 

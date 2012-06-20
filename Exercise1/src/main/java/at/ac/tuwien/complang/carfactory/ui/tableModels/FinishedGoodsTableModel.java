@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import at.ac.tuwien.complang.carfactory.domain.ICarPart;
+
 public class FinishedGoodsTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 2551634081569657375L;
 	private static final String[] SPACE_CONTENT_COLUMNS = {
@@ -57,7 +59,11 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		if(object == null) {
 			return Object.class;
 		} else {
-			return getValueAt(0, c).getClass();
+			if(getValueAt(0, c) instanceof ICarPart) {
+				return ICarPart.class;
+			} else {
+				return getValueAt(0, c).getClass();
+			}
 		}
 	}
 
@@ -81,7 +87,6 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 				return true;
 			}
 		}
-		System.out.println("Could not remove object from finished products");
 		return false;
 	}
 	

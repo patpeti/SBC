@@ -105,7 +105,6 @@ public class JmsSupervisor extends JmsAbstractWorker {
 					}
 				}
 			}
-			car.removeGoodParts();
 			//set car state to not finished
 			car.setFinished(pid, true);
 			// 1b. Write the car to the defect cars queue

@@ -46,4 +46,9 @@ public class Wheel implements Serializable, ICarPart {
 	public void setDefect(boolean isDefect) {
 		this.isDefect = isDefect;
 	}
+	
+	@Override
+	public String toString() {
+		return this.id + "";
+	}
 }

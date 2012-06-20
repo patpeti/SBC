@@ -35,6 +35,7 @@ import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.MotorType;
 import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.ui.panels.StatusLight;
+import at.ac.tuwien.complang.carfactory.ui.tableModels.DefectPartsRenderer;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.FinishedGoodsTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.SpaceDataTableModel;
 import at.ac.tuwien.complang.carfactory.ui.tableModels.TaskDataTableModel;
@@ -182,6 +183,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		label.setAlignmentX(CENTER_ALIGNMENT);
 		finishedGoodsTableModel = new FinishedGoodsTableModel();
 		JTable finishedGoodsTable = new JTable(finishedGoodsTableModel);
+		finishedGoodsTable.setDefaultRenderer(ICarPart.class, new DefectPartsRenderer(false));
 		finishedGoodsTable.setAutoResizeMode(HEIGHT);
 		JScrollPane scrollPane = new JScrollPane(finishedGoodsTable);
 		finishedGoodsTable.setFillsViewportHeight(true);
@@ -197,6 +199,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		label.setAlignmentX(CENTER_ALIGNMENT);
 		defectCarsTableModel = new FinishedGoodsTableModel();
 		JTable defectCarsTable = new JTable(defectCarsTableModel);
+		defectCarsTable.setDefaultRenderer(ICarPart.class, new DefectPartsRenderer(true));
 		defectCarsTable.setAutoResizeMode(HEIGHT);
 		JScrollPane scrollPane = new JScrollPane(defectCarsTable);
 		defectCarsTable.setFillsViewportHeight(true);

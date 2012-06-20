@@ -57,4 +57,9 @@ public class Motor implements Serializable, ICarPart {
 	public void setDefect(boolean isDefect) {
 		this.isDefect = isDefect;
 	}
+	
+	@Override
+	public String toString() {
+		return this.id + "";
+	}
 }
