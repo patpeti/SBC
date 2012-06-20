@@ -57,6 +57,7 @@ public class StartUpGui {
 			taskCoordinators.add(new KeyCoordinator());
 			taskCoordinators.add(new LabelCoordinator());
 			taskCoordinators.add(new FifoCoordinator());
+			taskCoordinators.add(new QueryCoordinator());
 			List<Coordinator> optionalCoords = new ArrayList<Coordinator>();
 			optionalCoords.add(new FifoCoordinator());
 			List<Coordinator> carIdCoords = new ArrayList<Coordinator>();
@@ -107,7 +108,6 @@ public class StartUpGui {
 			notificationManager.createNotification(taskContainer, listener, operations, null, null);
 			notificationManager.createNotification(carIdContainer, listener, operations, null, null);
 			notificationManager.createNotification(defectContainer, listener, operations, null, null);
-		
 		} catch (MzsCoreException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

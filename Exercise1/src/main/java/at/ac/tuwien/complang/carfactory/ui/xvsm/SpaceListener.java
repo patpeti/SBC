@@ -52,6 +52,10 @@ public class SpaceListener implements NotificationListener {
 					data.removePart(part);
 				}
 			}
+		}else if(operation.name().equals("DELETE")) {
+			for(Task t: (List<Task>) entries) {
+					data.removeTask(t);
+			}
 		}
 	}
 }

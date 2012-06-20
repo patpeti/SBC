@@ -10,4 +10,6 @@ public class SpaceLabels {
 	public static final String PAINTEDBODY = CarPartType.BODY + "PAINTED";
 	//
 	public static final String FINISHEDCAR = CarPartType.CAR + "FINISHED";
+	public static final String FINISHEDTASK = "FINISHEDTASK";
+	public static final String ACTIVETASK = "ACTIVETASK";
 }

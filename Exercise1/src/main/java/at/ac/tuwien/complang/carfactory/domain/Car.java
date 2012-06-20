@@ -22,7 +22,7 @@ public class Car implements Serializable, ICarPart {
 	private long isDefectTested_pid = -1; //ID of the isDefect tester
 	private long isFinished_pid = -1; //ID of the supervisor
 	private long pid; //ID of the assembler which produced the car
-	private long taskId; //ID of the task for which this car was produced
+	private long taskId = -1; //ID of the task for which this car was produced
 	private Motor motor;
 	private Body body;
 	private Wheel[] wheels = new Wheel[4];

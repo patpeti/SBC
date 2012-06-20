@@ -14,7 +14,7 @@ public class Task implements Serializable {
 	/**
 	 * The completed members
 	 */
-	private int amountCompleted; //written by supervisor
+	private int amountCompleted = 0; //written by supervisor
 	private int carAmount; //written by assembler, indicates how many cars have been assembled with the required motor type.
 	private int paintAmount; //written by painter, indicates how many cars/bodies have been painted.
 	private Color color;
@@ -119,4 +119,13 @@ public class Task implements Serializable {
 	public void increasePaintAmount(int amount) {
 		this.paintAmount += amount;
 	}
+
+	public int getAmountCompleted() {
+		return amountCompleted;
+	}
+
+	public void setAmountCompleted(int amountCompleted) {
+		this.amountCompleted = amountCompleted;
+	}
+	
 }
