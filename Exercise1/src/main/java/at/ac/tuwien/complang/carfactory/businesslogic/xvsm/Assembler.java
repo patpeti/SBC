@@ -210,13 +210,22 @@ public class Assembler{
 		System.out.println("[PreferredAssembler]*Task taken");
 		
 		if(takenTask.isFinished()){
-			System.out.println("[PreferredAssembler]*Task finshed...write in finishedtasks");
+			System.out.println("[PreferredAssembler]*Task finshed...delete task");
 			List<CoordinationData> ftaskCoords = new ArrayList<CoordinationData>();
 			ftaskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
 			ftaskCoords.add(FifoCoordinator.newCoordinationData());
-			capi.write(this.finisedTasksContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask,ftaskCoords));
+			ftaskCoords.add(LabelCoordinator.newCoordinationData("finishedTask"));
+			capi.write(taskContainer, SpaceTimeout.TENSEC, tx1, new Entry(takenTask,ftaskCoords));
+			
+			List<Selector> fSelList = new ArrayList<Selector>();
+			fSelList.add(KeyCoordinator.newSelector(""+takenTask.getId()));
+			capi.delete(taskContainer, fSelList, SpaceTimeout.TENSEC, tx1);
+			
+			System.out.println("[PreferredAssembler]*Task deleted");
 			capi.commitTransaction(tx1);
 			return;
+			
+		
 		}
 		//write task
 		List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
@@ -314,7 +323,7 @@ public class Assembler{
 	private void createCar() {
 		Car car = new Car(pid,this.body,this.motor,this.fourWheels);
 		long carId = 0;
-		//TODO read next car ID
+		// read next car ID
 		List<Selector> idselectors = new ArrayList<Selector>();
 		idselectors.add(LifoCoordinator.newSelector());
 		try {

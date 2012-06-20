@@ -153,7 +153,7 @@ public class Painter {
 				try {
 						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
 				} catch (CountNotMetException ex) {
-					
+					//TODO read and paint body
 				}
 				
 				if(parts != null){
@@ -205,7 +205,15 @@ public class Painter {
 				List<CoordinationData> ftaskCoords = new ArrayList<CoordinationData>();
 				ftaskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
 				ftaskCoords.add(FifoCoordinator.newCoordinationData());
-				capi.write(finishedTasksContainer, SpaceTimeout.TENSEC, tx2, new Entry(takenTask,ftaskCoords));
+				ftaskCoords.add(LabelCoordinator.newCoordinationData("finishedTask"));
+				capi.write(taskContainer, SpaceTimeout.TENSEC, tx2, new Entry(takenTask,ftaskCoords));
+				
+				List<Selector> fSelList = new ArrayList<Selector>();
+				fSelList.add(KeyCoordinator.newSelector(""+takenTask.getId()));
+				capi.delete(taskContainer, fSelList, SpaceTimeout.TENSEC, tx2);
+				
+				System.out.println("[PreferredAssembler]*Task deleted");
+				
 				capi.commitTransaction(tx2);
 				return;
 			}else{
