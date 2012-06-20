@@ -33,8 +33,17 @@ public class SpaceListener implements NotificationListener {
 				if (entry.getValue() instanceof Car) {
 					System.out.println("[GUI_Notification] New Car written");
 					Car car = (Car) entry.getValue();
-					if(!data.updateCar(car)) {
-						data.addCar(car); //we add the car only if we could not update it, because that means its not in the data set yet.
+					boolean isTested = (car.getCompletenessTesterId() != -1 || car.getDefectTesterId() != -1);
+					boolean hasProblem = (!car.isComplete() || car.isDefect());
+					if(isTested && hasProblem) {
+						data.removeCar(car);
+						if(!data.updateDefectCar(car)) {
+							data.addDefectCar(car);
+						}
+					} else {
+						if(!data.updateCar(car)) {
+							data.addCar(car); //we add the car only if we could not update it, because that means its not in the data set yet.
+						}
 					}
 				} else if (entry.getValue() instanceof ICarPart) { //its not a car but still a carpart
 					ICarPart part = (ICarPart) entry.getValue();
