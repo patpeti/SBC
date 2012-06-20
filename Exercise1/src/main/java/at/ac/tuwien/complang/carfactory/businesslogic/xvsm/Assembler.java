@@ -203,7 +203,10 @@ public class Assembler{
 		sel.add(KeyCoordinator.newSelector(""+t.getId()));
 		Task takenTask = (Task) capi.take(taskContainer, sel, SpaceTimeout.TENSEC, tx1).get(0);
 		takenTask.increaseCarAmount(1);
-		if(car.getBody().hasColor()) takenTask.increasePaintAmount(1);
+		if(car.getBody().hasColor()){
+			takenTask.increasePaintAmount(1);
+			takenTask.setAmountCompleted(takenTask.getAmountCompleted()+1);
+		}
 		System.out.println("[PreferredAssembler]*Task taken");
 		
 		if(takenTask.isFinished()){

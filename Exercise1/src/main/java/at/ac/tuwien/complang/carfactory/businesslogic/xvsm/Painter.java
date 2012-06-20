@@ -198,7 +198,8 @@ public class Painter {
 
 			Task  takenTask = takenTaskList.get(0);
 			takenTask.increasePaintAmount(1);
-
+			takenTask.setAmountCompleted(takenTask.getAmountCompleted()+1);
+			
 			if(takenTask.isFinished()){
 				System.out.println("[Painter]*Task finshed...write in finishedtasks");
 				List<CoordinationData> ftaskCoords = new ArrayList<CoordinationData>();
