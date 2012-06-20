@@ -61,7 +61,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 		try {
 			ICarPart part = (ICarPart) objectMessage.getObject();
 			if(part instanceof Car) {
-				System.out.println("Car (" + part.getId() + ") was received, im going to update the GUI.");
+				System.out.println("[QueueListener] Received car (" + part.getId() + ")");
 				Car car = (Car) part;
 				Body body = car.getBody();
 				Wheel[] wheels = car.getWheels();
@@ -75,13 +75,12 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 					handleSemiFinishedCar(car, body, wheels, motor);
 				}
 			} else {
-				System.out.println("Part" + part.getId() + " was received, im going to update the GUI...");
+				System.out.println("[QueueListener] Received part (" + part.getId() + ")");
 				if(!gui.updatePart(part)) {
 					gui.addPart(part);
 				}
 			}
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -176,6 +175,7 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 	@Override
 	public void disconnect() {
 		try {
+			session.close();
 			connection.close();
 			System.out.println("Shutdown complete.");
 		} catch (JMSException e) {
