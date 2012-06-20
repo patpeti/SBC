@@ -10,5 +10,6 @@ public class SpaceTimeout {
     public final static long ZERO_WITHEXCEPTION = -2;
     
     public final static long TENSEC = 10000;
+    public final static long ONESEC = 1000;
 	
 }

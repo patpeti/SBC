@@ -81,6 +81,11 @@ public class Painter {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 			//1. Take the Task object from the space
 			Task task = getTask();
+			if(task == null){
+				System.out.println("Task is null");
+			}else{
+				System.out.println("Taskid: "+task.getId());
+			}
 			//2a. Take a car from the space
 			
 			if(task == null){
@@ -143,7 +148,7 @@ public class Painter {
 				prop = Property.forName("taskId");
 				query = new Query().filter(prop.equalTo(new Long(task.getId())));
 				selectors.add(QueryCoordinator.newSelector(query));
-
+				System.out.println("[Painter] Getting car:");
 				List<ICarPart> parts = null;
 				try {
 						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
@@ -152,6 +157,7 @@ public class Painter {
 				}
 				
 				if(parts != null){
+					System.out.println("[Painter] Painting Ordered car:");
 					Car car = (Car) parts.get(0);
 					car.getBody().setColor(pid, this.color);
 					this.updateTask(task); //own tx
@@ -226,7 +232,7 @@ public class Painter {
 		selectors.add(FifoCoordinator.newSelector(1));
 		List<ICarPart> entities = null;
 		try {
-			entities = capi.read(taskContainer, selectors, 0, tx);
+			entities = capi.read(taskContainer, selectors, MzsConstants.RequestTimeout.TRY_ONCE, null);
 			if(entities != null) return (Task) entities.get(0);
 		} catch (CountNotMetException ex) {
 			return null;
