@@ -6,4 +6,5 @@ import at.ac.tuwien.complang.carfactory.domain.MotorType;
 
 public interface ITaskController {
 	void createTask(MotorType type, Color color, int amount);
+	void disconnect();
 }

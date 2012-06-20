@@ -47,4 +47,9 @@ public class TaskController implements ITaskController {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void disconnect() {
+		//nothing todo
+	}
 }

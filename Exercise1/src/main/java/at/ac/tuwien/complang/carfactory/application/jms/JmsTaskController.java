@@ -57,4 +57,16 @@ public class JmsTaskController implements ITaskController {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void disconnect() {
+		try {
+			session.close();
+			connection.close();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }
