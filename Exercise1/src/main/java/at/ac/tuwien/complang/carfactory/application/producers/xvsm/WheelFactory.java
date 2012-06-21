@@ -11,13 +11,12 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
 public class WheelFactory extends AbstractFactory {
 
-	//Static Fields
-	private static final int TIME_IN_SEC = 2;
 	//Fields
 	private long id; //The ID of this producer
 
@@ -52,7 +51,7 @@ public class WheelFactory extends AbstractFactory {
 	
 	@Override
 	public int timeInSec() {
-		return TIME_IN_SEC;
+		return TimeConstants.WHEEL_TIME_IN_SEC;
 	}
 	
 	@Override

@@ -8,14 +8,13 @@ import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.producers.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
 
 public class JmsBodyFactory extends JmsAbstractFactory {
 
-	//Static Fields
-	private static final int TIME_IN_SEC = 3;
 	//Fields
 	private long id; //The ID of this producer
 	private Connection connection = null;
@@ -69,7 +68,7 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 	
 	@Override
 	public int timeInSec() {
-		return TIME_IN_SEC;
+		return TimeConstants.BODY_TIME_IN_SEC;
 	}
 	
 	@Override

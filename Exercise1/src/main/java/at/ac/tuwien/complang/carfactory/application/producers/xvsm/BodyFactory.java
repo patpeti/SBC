@@ -11,13 +11,12 @@ import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 
 public class BodyFactory extends AbstractFactory {
 
-	//Static Fields
-	private static final int TIME_IN_SEC = 3;
 	//Fields
 	private long id; //The ID of this producer
 
@@ -32,10 +31,7 @@ public class BodyFactory extends AbstractFactory {
 		if(random < errorRate) {
 			body.setDefect(true);
 		}
-		System.out.println("Produced a body with ID: " + body.getId());
-		
-		System.out.println("writing Body into space...");
-		
+		System.out.println("Produced a body with ID: " + body.getId());		
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
 		cordinator.add(KeyCoordinator.newCoordinationData(""+body.getId()));
@@ -53,7 +49,7 @@ public class BodyFactory extends AbstractFactory {
 	
 	@Override
 	public int timeInSec() {
-		return TIME_IN_SEC;
+		return TimeConstants.BODY_TIME_IN_SEC;
 	}
 	
 	@Override
