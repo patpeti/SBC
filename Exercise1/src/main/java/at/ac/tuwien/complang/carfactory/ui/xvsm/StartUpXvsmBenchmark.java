@@ -121,6 +121,12 @@ public class StartUpXvsmBenchmark {
 		bodyFactory.start();
 		while(bodyFactory.isRunning() || motorFactory.isRunning() || wheelFactory.isRunning()) { 
 			//busyloop to wait until the factories are finished
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		System.out.println("Production is finished. Press ENTER to send signal to workers.");
 		Scanner scanner = new Scanner(System.in);
