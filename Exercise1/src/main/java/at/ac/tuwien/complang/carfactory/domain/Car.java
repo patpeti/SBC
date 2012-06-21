@@ -134,11 +134,13 @@ public class Car implements Serializable, ICarPart {
 				this.isComplete_pid == -1 ? "" : this.isComplete_pid, //Completeness Tester
 				this.isDefectTested_pid == -1 ? "" : this.isDefectTested_pid, //Defect Tester
 				this.isFinished_pid == -1 ? "" : this.isFinished_pid, //Supervisor
+				taskId == -1 ? "" : taskId,
 				body != null ? body : "",
 				body != null ? body.getPid() : "",
 				colorString, //Color
 				body != null ? body.getPainterId() : "", //Painter
 				motor != null ? motor : "",
+				motor != null ? motor.getPower().toString() : "",
 				motor != null ? motor.getPid() : "",
 				wheels[0] != null ? wheels[0].getPid() : "",
 				wheels[0] != null ? wheels[0] : "",

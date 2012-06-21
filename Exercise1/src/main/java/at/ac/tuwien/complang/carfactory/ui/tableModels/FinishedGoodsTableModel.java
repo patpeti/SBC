@@ -15,10 +15,11 @@ public class FinishedGoodsTableModel extends AbstractTableModel {
 		"Completeness T",
 		"Defect T",
 		"SupervisorID",
+		"TaskID",
 		"BodyID","BodyPID", //Body ID + PID
 		"BodyColor", "PainterID", //Color + Painter
-		"MotorID", "MotorPID", //Motor ID + PID
-		"WHEEL PID", "WHEEL1ID", "WHEEL2ID", "WHEEL3ID", "WHEEL4ID" // Wheel PID + ID 1-4
+		"MotorID", "PowerType", "MotorPID", //Motor ID + Power Type + Producer ID
+		"WHEEL PID", "W1ID", "W2ID", "W3ID", "W4ID" // Wheel PID + ID 1-4
 	};
 	private List<Object[]> data = new ArrayList<Object[]>();
 
