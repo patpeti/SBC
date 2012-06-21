@@ -48,7 +48,7 @@ public class BodyFactory extends AbstractFactory {
 	}
 	
 	@Override
-	public int timeInSec() {
+	public double timeInSec() {
 		return TimeConstants.BODY_TIME_IN_SEC;
 	}
 	

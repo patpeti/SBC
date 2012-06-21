@@ -5,6 +5,7 @@ import java.util.Observable;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.producers.IFactory;
 import at.ac.tuwien.complang.carfactory.application.producers.IProducer;
 
@@ -71,7 +72,7 @@ public abstract class AbstractFactory extends Observable implements IProducer, I
 			int total = 0;
 			while(count > 0) {
 				//The producer sleeps for a random period between 1 and 3 seconds
-				delay = (int) (Math.random() * timeInSec()) + 1;
+				delay = (int) (Math.random() * timeInSec()) + TimeConstants.BASE_DELAY;
 				total += delay;
 				int millisecondsPerSecond = 1000;
 				try {

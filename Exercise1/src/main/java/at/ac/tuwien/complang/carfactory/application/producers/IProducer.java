@@ -6,5 +6,5 @@ public interface IProducer {
 	 * The time to produce in seconds
 	 * @return The number of seconds it takes to produce the part 
 	 */
-	int timeInSec();
+	double timeInSec();
 }

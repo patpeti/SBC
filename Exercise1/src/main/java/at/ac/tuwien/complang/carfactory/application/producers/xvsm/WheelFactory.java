@@ -50,7 +50,7 @@ public class WheelFactory extends AbstractFactory {
 	}
 	
 	@Override
-	public int timeInSec() {
+	public double timeInSec() {
 		return TimeConstants.WHEEL_TIME_IN_SEC;
 	}
 	

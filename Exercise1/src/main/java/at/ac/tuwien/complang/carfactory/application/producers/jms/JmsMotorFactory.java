@@ -74,7 +74,7 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 	}
 	
 	@Override
-	public int timeInSec() {
+	public double timeInSec() {
 		return TimeConstants.MOTOR_TIME_IN_SEC;
 	}
 	

@@ -67,7 +67,7 @@ public class JmsBodyFactory extends JmsAbstractFactory {
 	}
 	
 	@Override
-	public int timeInSec() {
+	public double timeInSec() {
 		return TimeConstants.BODY_TIME_IN_SEC;
 	}
 	
