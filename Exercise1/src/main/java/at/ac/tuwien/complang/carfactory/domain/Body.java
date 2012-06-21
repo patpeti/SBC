@@ -18,7 +18,7 @@ public class Body implements Serializable, ICarPart {
 	private long id;
 	private long pid = -1; //ID of the producer    
     private Color color;
-    private long color_pid;
+    private long color_pid = -1;
     private PaintState paintState;
     private boolean isDefect;
 
