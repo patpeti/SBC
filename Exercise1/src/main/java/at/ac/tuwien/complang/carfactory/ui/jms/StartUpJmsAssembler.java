@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import java.io.IOException;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsAssembler;
+import at.ac.tuwien.complang.carfactory.application.workers.jms.JmsAssembler;
 
 public class StartUpJmsAssembler {
 

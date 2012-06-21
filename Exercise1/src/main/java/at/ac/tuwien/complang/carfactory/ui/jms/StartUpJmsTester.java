@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui.jms;
 
 import java.io.IOException;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsTester;
+import at.ac.tuwien.complang.carfactory.application.workers.jms.JmsTester;
 import at.ac.tuwien.complang.carfactory.domain.TesterType;
 import at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpSupervisor;
 

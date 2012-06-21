@@ -24,8 +24,8 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
-import at.ac.tuwien.complang.carfactory.application.xvsm.FactoryFacade;
-import at.ac.tuwien.complang.carfactory.application.xvsm.TaskController;
+import at.ac.tuwien.complang.carfactory.application.producers.xvsm.FactoryFacade;
+import at.ac.tuwien.complang.carfactory.application.producers.xvsm.TaskController;
 import at.ac.tuwien.complang.carfactory.domain.CarId;
 import at.ac.tuwien.complang.carfactory.ui.ProductionUI;
 import at.ac.tuwien.complang.carfactory.ui.constants.SpaceConstants;

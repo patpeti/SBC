@@ -2,7 +2,7 @@ package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
 import java.awt.Color;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.xvsm.Painter;
+import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Painter;
 import at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsAssembler;
 
 public class StartUpPainter {

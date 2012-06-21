@@ -1,6 +1,6 @@
 package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.xvsm.Tester;
+import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Tester;
 import at.ac.tuwien.complang.carfactory.domain.TesterType;
 
 public class StartUpTester {

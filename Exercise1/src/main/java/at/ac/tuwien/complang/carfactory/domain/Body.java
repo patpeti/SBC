@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
-import at.ac.tuwien.complang.carfactory.application.xvsm.AbstractFactory;
+import at.ac.tuwien.complang.carfactory.application.producers.xvsm.AbstractFactory;
 
 public class Body implements Serializable, ICarPart {
 

@@ -26,10 +26,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import at.ac.tuwien.complang.carfactory.application.IFacade;
-import at.ac.tuwien.complang.carfactory.application.IFactory;
-import at.ac.tuwien.complang.carfactory.application.ITaskController;
 import at.ac.tuwien.complang.carfactory.application.enums.ProducerType;
+import at.ac.tuwien.complang.carfactory.application.producers.IFacade;
+import at.ac.tuwien.complang.carfactory.application.producers.IFactory;
+import at.ac.tuwien.complang.carfactory.application.producers.ITaskController;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
 import at.ac.tuwien.complang.carfactory.domain.MotorType;

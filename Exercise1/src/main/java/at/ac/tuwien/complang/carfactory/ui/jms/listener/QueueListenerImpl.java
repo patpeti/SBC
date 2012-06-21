@@ -13,7 +13,7 @@ import javax.jms.Topic;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ConnectionClosedException;
 
-import at.ac.tuwien.complang.carfactory.application.jms.constants.QueueConstants;
+import at.ac.tuwien.complang.carfactory.application.producers.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;

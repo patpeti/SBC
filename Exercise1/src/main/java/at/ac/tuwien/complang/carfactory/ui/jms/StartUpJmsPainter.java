@@ -3,7 +3,7 @@ package at.ac.tuwien.complang.carfactory.ui.jms;
 import java.awt.Color;
 import java.io.IOException;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.jms.JmsPainter;
+import at.ac.tuwien.complang.carfactory.application.workers.jms.JmsPainter;
 
 public class StartUpJmsPainter {
 	private static int id;

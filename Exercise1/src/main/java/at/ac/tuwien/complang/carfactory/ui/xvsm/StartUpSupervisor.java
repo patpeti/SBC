@@ -1,6 +1,6 @@
 package at.ac.tuwien.complang.carfactory.ui.xvsm;
 
-import at.ac.tuwien.complang.carfactory.businesslogic.xvsm.Supervisor;
+import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Supervisor;
 
 public class StartUpSupervisor {
 	
