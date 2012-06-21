@@ -39,6 +39,7 @@ import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Tester.SignalContainerListener;
 import at.ac.tuwien.complang.carfactory.domain.Body;
@@ -59,11 +60,6 @@ public class Painter {
 	 * 3. Paint the Body or the Body associated with the car object
 	 * 4. Save the painted part back into the space 
 	 */
-	
-	/** Half the time is used to take a part and the other half is used to paint it.
-	 * We use this to relax the update intervals of the UI, so that there is no
-	 * flickering, which happens, when a part is taken and written back immediately. */
-	public static final long TIME_TO_PAINT = 1400L; //time in milliseconds
 	private boolean running = false;
 	private long pid = 0;
 	private Color color; //the color which this painter uses to paint an object. It is set on creation of the painter.
@@ -89,7 +85,9 @@ public class Painter {
 
 	private void doPaint() {
 		try {
-			Thread.sleep(TIME_TO_PAINT/2);
+			if(TimeConstants.TIME_TO_PAINT != 0) {
+				Thread.sleep(TimeConstants.TIME_TO_PAINT/2);
+			}
 		} catch (InterruptedException e) { }
 		try {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
