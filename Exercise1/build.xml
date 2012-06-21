@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="SpaceBasedCarFactory">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../../../../../../opt/eclipse_3.7"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="Maven Dependencies.libraryclasspath">
+        <pathelement location="../../../../../../.m2/repository/junit/junit/4.10/junit-4.10.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-runtime/2.1-SNAPSHOT/mozartspaces-runtime-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-core-common/2.1-SNAPSHOT/mozartspaces-core-common-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-capi3-api/2.1-SNAPSHOT/mozartspaces-capi3-api-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-capi3-javanative/2.1-SNAPSHOT/mozartspaces-capi3-javanative-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-core-api/2.1-SNAPSHOT/mozartspaces-core-api-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-digester/commons-digester/1.8/commons-digester-1.8.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/slf4j/slf4j-api/1.6.2/slf4j-api-1.6.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/ch/qos/logback/logback-classic/0.9.29/logback-classic-0.9.29.jar"/>
+        <pathelement location="../../../../../../.m2/repository/ch/qos/logback/logback-core/0.9.29/logback-core-0.9.29.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mozartspaces/mozartspaces-notifications/2.1-SNAPSHOT/mozartspaces-notifications-2.1-SNAPSHOT.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/activemq/activemq-core/5.6.0/activemq-core-5.6.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/geronimo/specs/geronimo-jms_1.1_spec/1.1.1/geronimo-jms_1.1_spec-1.1.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/activemq/kahadb/5.6.0/kahadb-5.6.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/activemq/protobuf/activemq-protobuf/1.1/activemq-protobuf-1.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/fuse-extra/fusemq-leveldb/1.1/fusemq-leveldb-1.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtbuf/hawtbuf-proto/1.9/hawtbuf-proto-1.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtdispatch/hawtdispatch-scala/1.9/hawtdispatch-scala-1.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtdispatch/hawtdispatch/1.9/hawtdispatch-1.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/iq80/leveldb/leveldb/0.2/leveldb-0.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/iq80/leveldb/leveldb-api/0.2/leveldb-api-0.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/com/google/inject/guice/3.0/guice-3.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/com/google/inject/extensions/guice-multibindings/3.0/guice-multibindings-3.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/com/google/guava/guava/10.0.1/guava-10.0.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/leveldbjni/leveldbjni-osx/1.2/leveldbjni-osx-1.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/leveldbjni/leveldbjni/1.2/leveldbjni-1.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtjni/hawtjni-runtime/1.5/hawtjni-runtime-1.5.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/leveldbjni/leveldbjni-linux32/1.2/leveldbjni-linux32-1.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/leveldbjni/leveldbjni-linux64/1.2/leveldbjni-linux64-1.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/xerial/snappy/snappy-java/1.0.3/snappy-java-1.0.3.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.2/jackson-core-asl-1.9.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.2/jackson-mapper-asl-1.9.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/hadoop/hadoop-core/1.0.0/hadoop-core-1.0.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/servlet-api/2.5-20081211/servlet-api-2.5-20081211.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/jsp-api-2.1/6.1.14/jsp-api-2.1-6.1.14.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/servlet-api-2.5/6.1.14/servlet-api-2.5-6.1.14.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/mortbay/jetty/jsp-2.1/6.1.14/jsp-2.1-6.1.14.jar"/>
+        <pathelement location="../../../../../../.m2/repository/ant/ant/1.6.5/ant-1.6.5.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/mqtt-client/mqtt-client/1.0/mqtt-client-1.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtdispatch/hawtdispatch-transport/1.9/hawtdispatch-transport-1.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/fusesource/hawtbuf/hawtbuf/1.9/hawtbuf-1.9.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/osgi/org.osgi.core/4.1.0/org.osgi.core-4.1.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/apache/geronimo/specs/geronimo-j2ee-management_1.1_spec/1.0.1/geronimo-j2ee-management_1.1_spec-1.0.1.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-context/3.0.6.RELEASE/spring-context-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-aop/3.0.6.RELEASE/spring-aop-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-beans/3.0.6.RELEASE/spring-beans-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-core/3.0.6.RELEASE/spring-core-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-expression/3.0.6.RELEASE/spring-expression-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/springframework/spring-asm/3.0.6.RELEASE/spring-asm-3.0.6.RELEASE.jar"/>
+        <pathelement location="../../../../../../.m2/repository/commons-net/commons-net/2.2/commons-net-2.2.jar"/>
+        <pathelement location="../../../../../../.m2/repository/org/jasypt/jasypt/1.8/jasypt-1.8.jar"/>
+    </path>
+    <path id="SpaceBasedCarFactory.classpath">
+        <pathelement location="target/classes"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpSupervisor.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsSupervisor.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsGui.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsAssembler.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsPainter.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpGui.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpPainter.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpAssembler.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsTester Completeness.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpJmsTester Defect.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpTester Defect.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpTester Completeness.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <path id="run.StartUpXvsmBenchmark.classpath">
+        <path refid="SpaceBasedCarFactory.classpath"/>
+        <path refid="Maven Dependencies.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="target/classes"/>
+        <copy includeemptydirs="false" todir="target/classes">
+            <fileset dir="src/main/java">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="target/classes"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="target/classes" source="${source}" target="${target}">
+            <src path="src/main/java"/>
+            <classpath refid="SpaceBasedCarFactory.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="StartUpSupervisor">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpSupervisor" failonerror="true" fork="yes">
+            <arg line="--id=3"/>
+            <classpath refid="run.StartUpSupervisor.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsSupervisor">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsSupervisor" failonerror="true" fork="yes">
+            <arg line="--id=3"/>
+            <classpath refid="run.StartUpJmsSupervisor.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsGui">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsGui" failonerror="true" fork="yes">
+            <classpath refid="run.StartUpJmsGui.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsAssembler">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsAssembler" failonerror="true" fork="yes">
+            <arg line="--id=1"/>
+            <classpath refid="run.StartUpJmsAssembler.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsPainter">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsPainter" failonerror="true" fork="yes">
+            <arg line="--id=2 --color=RED"/>
+            <classpath refid="run.StartUpJmsPainter.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpGui">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpGui" failonerror="true" fork="yes">
+            <classpath refid="run.StartUpGui.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpPainter">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpPainter" failonerror="true" fork="yes">
+            <arg line="--id=2 --color=RED"/>
+            <classpath refid="run.StartUpPainter.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpAssembler">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpAssembler" failonerror="true" fork="yes">
+            <arg line="--id=1"/>
+            <classpath refid="run.StartUpAssembler.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsTester Completeness">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsTester" failonerror="true" fork="yes">
+            <arg line="--id=5 --type=completenessTester"/>
+            <classpath refid="run.StartUpJmsTester Completeness.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpJmsTester Defect">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.jms.StartUpJmsTester" failonerror="true" fork="yes">
+            <arg line="--id=4 --type=defectTester"/>
+            <classpath refid="run.StartUpJmsTester Defect.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpTester Defect">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpTester" failonerror="true" fork="yes">
+            <arg line="--id=4 --type=defectTester"/>
+            <classpath refid="run.StartUpTester Defect.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpTester Completeness">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpTester" failonerror="true" fork="yes">
+            <arg line="--id=4 --type=completenessTester"/>
+            <classpath refid="run.StartUpTester Completeness.classpath"/>
+        </java>
+    </target>
+    <target name="StartUpXvsmBenchmark">
+        <java classname="at.ac.tuwien.complang.carfactory.ui.xvsm.StartUpXvsmBenchmark" failonerror="true" fork="yes">
+            <classpath refid="run.StartUpXvsmBenchmark.classpath"/>
+        </java>
+    </target>
+</project>

@@ -56,6 +56,7 @@ public class WheelFactory extends AbstractFactory {
 	
 	@Override
 	public void finished() {
+		super.finished();
 		setChanged();
 		notifyObservers("WHEEL");
 	}

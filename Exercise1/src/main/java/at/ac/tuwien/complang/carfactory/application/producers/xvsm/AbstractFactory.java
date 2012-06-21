@@ -101,7 +101,7 @@ public abstract class AbstractFactory extends Observable implements IProducer, I
 	 * but this method can be overridden, to perform implementation
 	 * specific task (such as cleaning up or disconnecting resources).
 	 */
-	public void finished() { }
+	public void finished() { this.running = false; }
 
 	@Override
 	protected synchronized void clearChanged() {
