@@ -41,6 +41,7 @@ public class SpaceListener implements NotificationListener {
 							data.addDefectCar(car);
 						}
 					} else {
+						data.removeDefectCar(car);
 						if(!data.updateCar(car)) {
 							data.addCar(car); //we add the car only if we could not update it, because that means its not in the data set yet.
 						}
