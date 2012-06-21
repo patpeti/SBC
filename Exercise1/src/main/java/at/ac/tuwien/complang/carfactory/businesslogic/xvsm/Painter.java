@@ -81,101 +81,93 @@ public class Painter {
 			tx = capi.createTransaction(SpaceTimeout.TENSEC, new URI(SpaceConstants.CONTAINER_URI));
 			//1. Take the Task object from the space
 			Task task = getTask();
-			if(task == null){
-				System.out.println("Task is null");
-			}else{
-				System.out.println("Taskid: "+task.getId());
-			}
-			//2a. Take a car from the space
-			
-			if(task == null){
-				//normal paintloop
-				//paint  a car which has taskId -1
+			if(task == null) {
+				//normal paint loop
+				//paint a car which has taskId -1
 				//or paint a body
-				
-				List<Selector> selectors = new ArrayList<Selector>();
-				selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
-				Query query = null;
-				Property prop = null;
-				prop = Property.forName("taskId");
-				query = new Query().filter(prop.equalTo(new Long(-1)));
-				selectors.add(QueryCoordinator.newSelector(query));
-
-				List<ICarPart> parts = null;
-				try {
-						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
-				} catch (CountNotMetException ex) {
-					parts = null;
-				}
-				
-				
-				if(parts != null){
-					Car car = (Car) parts.get(0);
-					car.getBody().setColor(pid, this.color);
-					writeCarIntoSpace(car); //commits tx
-				}else{
-					//take body which is not painted
-					
-					List<Selector> selectors2 = new ArrayList<Selector>();
-					selectors2.add(LabelCoordinator.newSelector(CarPartType.BODY.toString(), 1)); //select one object
-					parts = null;
-					try {
-							parts = capi.take(bodyContainer, selectors2, SpaceTimeout.ZERO, tx);
-					}catch (CountNotMetException e) {
-						capi.rollbackTransaction(tx);
-						return;
-					}
-					
-					if(parts == null) {
-						capi.rollbackTransaction(tx);
-						return;
-					}else{
-						Body b = (Body) parts.get(0);
-						b.setColor(pid, this.color);
-						writeBodyIntoSpace(b); //commits
-					}
-					
-				}
-				
-			}else{
+				doNormalPaintLoop();
+			} else {
+				System.out.println("[Painter] Task ID: " + task.getId());
 				//select car from space where taskId = Task.id
 				//if it is not painted paint it
-				
-				List<Selector> selectors = new ArrayList<Selector>();
-				selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
-				Query query = null;
-				Property prop = null;
-				prop = Property.forName("taskId");
-				query = new Query().filter(prop.equalTo(new Long(task.getId())));
-				selectors.add(QueryCoordinator.newSelector(query));
-				System.out.println("[Painter] Getting car:");
-				List<ICarPart> parts = null;
-				try {
-						parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
-				} catch (CountNotMetException ex) {
-					//TODO read and paint body
-					doPaintCarOrBody();
-				}
-				
-				if(parts != null){
-					System.out.println("[Painter] Painting Ordered car:");
-					Car car = (Car) parts.get(0);
-					car.getBody().setColor(pid, this.color);
-					this.updateTask(task); //own tx
-					writeCarIntoSpace(car); //commits tx
-				}
-				
+				doTaskPaintLoop(task);
 			}
-			
+		} catch (MzsTimeoutException e) { //do nothing, rollback is automatic
 		} catch (MzsCoreException e1) {
 			try {
 				capi.rollbackTransaction(tx);
-			} catch (MzsCoreException e) {
-				e.printStackTrace();
-			}
-			e1.printStackTrace();
+			} catch (MzsCoreException e) { }
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
+		}
+	}
+
+	private void doTaskPaintLoop(Task task) throws MzsCoreException {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("taskId");
+		query = new Query().filter(prop.equalTo(new Long(task.getId())));
+		selectors.add(QueryCoordinator.newSelector(query));
+		System.out.println("[Painter] Getting car:");
+		List<ICarPart> parts = null;
+		try {
+				parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
+		} catch (CountNotMetException ex) {
+			//TODO read and paint body
+			doPaintCarOrBody();
+		}
+		if(parts != null){
+			System.out.println("[Painter] Painting Ordered car:");
+			Car car = (Car) parts.get(0);
+			car.getBody().setColor(pid, this.color);
+			this.updateTask(task); //own tx
+			writeCarIntoSpace(car); //commits tx
+		}
+	}
+
+	private void doNormalPaintLoop() throws MzsCoreException {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(LabelCoordinator.newSelector(CarPartType.CAR.toString(), 1)); //select one object
+		Query query = null;
+		Property prop = null;
+		prop = Property.forName("taskId");
+		query = new Query().filter(prop.equalTo(new Long(-1)));
+		selectors.add(QueryCoordinator.newSelector(query));
+
+		List<ICarPart> parts = null;
+		try {
+				parts = capi.take(carContainer, selectors, SpaceTimeout.ZERO, tx);
+		} catch (CountNotMetException ex) {
+			parts = null;
+		}
+		if(parts != null){
+			Car car = (Car) parts.get(0);
+			car.getBody().setColor(pid, this.color);
+			writeCarIntoSpace(car); //commits tx
+		}else{
+			//take body which is not painted
+			
+			List<Selector> selectors2 = new ArrayList<Selector>();
+			selectors2.add(LabelCoordinator.newSelector(CarPartType.BODY.toString(), 1)); //select one object
+			parts = null;
+			try {
+					parts = capi.take(bodyContainer, selectors2, SpaceTimeout.ZERO, tx);
+			}catch (CountNotMetException e) {
+				capi.rollbackTransaction(tx);
+				return;
+			}
+			
+			if(parts == null) {
+				capi.rollbackTransaction(tx);
+				return;
+			}else{
+				Body b = (Body) parts.get(0);
+				b.setColor(pid, this.color);
+				writeBodyIntoSpace(b); //commits
+			}
+			
 		}
 	}
 
@@ -264,7 +256,7 @@ public class Painter {
 				
 				capi.commitTransaction(tx2);
 				return;
-			}else{
+			} else {
 				List<CoordinationData> taskCoords = new ArrayList<CoordinationData>();
 				taskCoords.add(KeyCoordinator.newCoordinationData(""+takenTask.getId()));
 				taskCoords.add(FifoCoordinator.newCoordinationData());
@@ -278,9 +270,6 @@ public class Painter {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-	
-	
-		
 	}
 
 	private Task getTask() {
@@ -300,10 +289,7 @@ public class Painter {
 		} catch (MzsCoreException e) {
 			try {
 				capi.rollbackTransaction(tx);
-			} catch (MzsCoreException e1) {
-				e1.printStackTrace();
-			}
-			e.printStackTrace();
+			} catch (MzsCoreException e1) { }
 		}
 		return null;
 	}
@@ -327,12 +313,7 @@ public class Painter {
 		} catch (TransactionException e) {
 			return null;
 		} catch (MzsCoreException e) {
-//			try {
-//				capi.rollbackTransaction(tx);
-//			} catch (MzsCoreException e1) {
-//				e1.printStackTrace();
-//			}
-//			e.printStackTrace();
+			return null;
 		}
 		if (parts != null && !parts.isEmpty()) {
 			return parts;
@@ -341,7 +322,7 @@ public class Painter {
 		}
 	}
 
-	private void initSpace(){
+	private void initSpace() {
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
 		try {

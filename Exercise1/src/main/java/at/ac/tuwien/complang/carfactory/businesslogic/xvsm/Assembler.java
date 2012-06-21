@@ -151,8 +151,7 @@ public class Assembler{
 		TransactionReference tx2 = null;
 		try {
 			tx2 = capi.createTransaction(SpaceTimeout.ONESEC, new URI(SpaceConstants.CONTAINER_URI));
-	
-			tListe = capi.read(taskContainer, taskSelectors, SpaceTimeout.TENSEC, tx2);
+			tListe = capi.read(taskContainer, taskSelectors, SpaceTimeout.ZERO, tx2);
 		}catch(MzsTimeoutException e){
 			return null;
 		}catch (MzsCoreException e) {
@@ -162,7 +161,7 @@ public class Assembler{
 			e.printStackTrace();
 			return null;
 		}
-		System.out.println("taskListe emptyness :"+ tListe.isEmpty());
+		System.out.println("[Assembler] Task list is empty:" + (tListe.isEmpty() ? "YES" : "NO"));
 		if(!tListe.isEmpty()) {
 			//assume elements are in FIFO order in the beginning old Tasks with low ids /in the end young Tasks with high ids
 			for(Task iTask : tListe){
@@ -300,7 +299,8 @@ public class Assembler{
 		selectors.add(FifoCoordinator.newSelector(1));
 		Task task = null;
 		try {
-			task = (Task) capi.read(taskContainer, selectors, SpaceTimeout.TENSEC, null).get(0);
+			//Reading a task must be instantaneous
+			task = (Task) capi.read(taskContainer, selectors, SpaceTimeout.ZERO, null).get(0);
 		} catch (MzsCoreException e) {
 			return null;
 		}
@@ -308,13 +308,12 @@ public class Assembler{
 		//if assembler finished with the Task but painter not yet read the next task... and this task should be closed by painter
 		if(task.getAmount() <= task.getCarAmount()) {
 			System.out.println("Assembler is finished with this task, reading the next one if any");
-			Task t = readNextTask(task);
-			if(t != null)
-				System.out.println(t.getId()); 
+			Task nextTask = readNextTask(task);
+			if(nextTask != null)
+				System.out.println(nextTask.getId()); 
 			else
 				System.out.println("Task is null");
-//			return readNextTask(task);
-			return t;
+			return nextTask;
 		}
 		
 		return task;
@@ -449,7 +448,7 @@ public class Assembler{
 			matchmakers.add(prop.equalTo(PaintState.UNPAINTED));
 			query = new Query().filter(
 				Matchmakers.and(
-					Matchmakers.or(matchmakers.toArray(array)), 
+					Matchmakers.or(matchmakers.toArray(array)),
 					Property.forName("type").equalTo(CarPartType.BODY)
 				)
 			);
@@ -463,6 +462,7 @@ public class Assembler{
 				this.body = null;
 			}
 			System.out.println("[Assembler] *Body taken");
+		} catch (MzsTimeoutException e) { //do nothing, roll back is automatic
 		} catch (MzsCoreException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {
@@ -473,8 +473,6 @@ public class Assembler{
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-		//notifMgr = new NotificationManager(core);		
-
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
 			coords.add(new AnyCoordinator());

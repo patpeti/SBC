@@ -174,11 +174,11 @@ public class Supervisor{
 
 
 	private void writePartBackInSpace(ICarPart part, TransactionReference tx2) {
-		ContainerReference c = null;
+		ContainerReference container = null;
 		List<CoordinationData> cordinator = new ArrayList<CoordinationData>();
 		cordinator.add(KeyCoordinator.newCoordinationData(""+part.getId()));
 		if(part instanceof Body){
-			c = bodyContainer;
+			container = bodyContainer;
 			if(((Body)part).getColor() == null){
 				cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.BODY.toString()));
 			}
@@ -188,17 +188,17 @@ public class Supervisor{
 			
 		}else if(part instanceof Motor){
 			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.MOTOR.toString()));
-			c = motorContainer;
+			container = motorContainer;
 		}else if(part instanceof Wheel){
 			cordinator.add(LabelCoordinator.newCoordinationData(CarPartType.WHEEL.toString()));
-			c = wheelContainer;
+			container = wheelContainer;
 		}
 		try {
-			capi.write(c,SpaceTimeout.TENSEC,tx2,new Entry(part, cordinator));
-		} catch (MzsCoreException e) {
+			capi.write(container,SpaceTimeout.TENSEC,tx2,new Entry(part, cordinator));
+		} catch(MzsTimeoutException e) { //do nothing, rollback is automatic
+		} catch(MzsCoreException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 
