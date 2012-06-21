@@ -158,7 +158,7 @@ public class Tester {
 		//all parts are set and body is painted
 		boolean testOk = true;
 		if(c.getBody() == null) testOk = false;
-		else if(c.getBody().getColor() == null) testOk = false;
+		else if(c.getBody().getColor() == null && c.getBody().getId() != -1) testOk = false;
 		if(c.getMotor() == null) testOk = false;
 		if(c.getWheels()[0] == null) testOk = false;
 		if(c.getWheels()[1] == null) testOk = false;
