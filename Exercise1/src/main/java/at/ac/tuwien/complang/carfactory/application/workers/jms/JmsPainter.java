@@ -8,7 +8,6 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -19,6 +18,7 @@ import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
 import at.ac.tuwien.complang.carfactory.application.producers.jms.constants.QueueConstants;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 
 public class JmsPainter extends JmsAbstractWorker {
 
@@ -60,6 +60,7 @@ public class JmsPainter extends JmsAbstractWorker {
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
 			this.carConsumer = session.createDurableSubscriber(this.carTopic, "carSubscriber");
+			//TODO connect to tasktopic
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -67,55 +68,35 @@ public class JmsPainter extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
-		loop:
+		
 		while(running) {
 			try {
-				ObjectMessage objectMessage = null;
-				while(objectMessage == null) {
-					if(!running) break loop;
-					//Try to get a car from the car Queue (one which is not yet painted)
-					objectMessage = (ObjectMessage) carConsumer.receive(1);
-					if(objectMessage == null) {
-						objectMessage = (ObjectMessage) bodyConsumer.receive(1);
+				//get task where task.color = this.color
+				Task task = readFirstTask();
+				
+				if(task == null){
+					normalLoop();
+				}else{
+					//try to get auto where taskid = task.id
+					Car car = null;
+					
+					if(car == null){
+						normalLoop(); //get any other car o a body to paint
+						//in this case the task is updated by the assembler
+					}else{
+						car.setColor(pid, color);
+						//write car
+						//update task
+						task.increasePaintAmount(1);
+						//writetask
 					}
-					if(objectMessage == null) {
-						//Sleep 500ms if both message queues are empty
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) { }
-					}
+					
 				}
-				Serializable object = (Serializable) objectMessage.getObject();
-				if(object instanceof Car) {
-					Car car = (Car) object;
-					if(car.getPaintState() == PaintState.PAINTED) {
-						throw new RuntimeException("PAINTED cars should only be in the painted car queue");
-					}
-					car.setColor(pid, color);
-					MessageProducer messageProducer;
-					try {
-						messageProducer = session.createProducer(paintedCarTopic);
-						messageProducer.send(session.createObjectMessage(object));
-						System.out.println("[Painter] Painted car " + car.getId() + " send to paintedCarTopic");
-					} catch(JMSException e) {
-						e.printStackTrace();
-					}
-				} else if (object instanceof Body) {
-					Body body = (Body) object;
-					if(body.getPaintState() == PaintState.PAINTED) {
-						throw new RuntimeException("PAINTED bodies should only be in the painted bodies queue");
-					}
-					body.setPaintState(PaintState.PAINTED);
-					body.setColor(pid, color);
-					MessageProducer messageProducer;
-					try {
-						messageProducer = session.createProducer(paintedBodyTopic);
-						messageProducer.send(session.createObjectMessage(object));
-						System.out.println("[Painter] Painted body " + body.getId() + " send to paintedBodyTopic");
-					} catch(JMSException e) {
-						e.printStackTrace();
-					}
-				}
+				
+				
+				
+				
+				
 			} catch (JMSException e) {
 				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
@@ -128,4 +109,62 @@ public class JmsPainter extends JmsAbstractWorker {
 			runningMutex.notifyAll();
 		}
 	}
+	
+	private Task readFirstTask() {
+		//TODO get task where task.color = this.color
+		return null;
+	}
+
+	private void normalLoop() throws JMSException{
+		
+		ObjectMessage objectMessage = null;
+		while(objectMessage == null) {
+			if(!running) return;
+			//Try to get a car from the car Queue (one which is not yet painted)
+			objectMessage = (ObjectMessage) carConsumer.receive(1);
+			if(objectMessage == null) {
+				objectMessage = (ObjectMessage) bodyConsumer.receive(1);
+			}
+			if(objectMessage == null) {
+				//Sleep 500ms if both message queues are empty
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) { }
+			}
+		}
+		Serializable object = (Serializable) objectMessage.getObject();
+		if(object instanceof Car) {
+			Car car = (Car) object;
+			if(car.getPaintState() == PaintState.PAINTED) {
+				throw new RuntimeException("PAINTED cars should only be in the painted car queue");
+			}
+			car.setColor(pid, color);
+			MessageProducer messageProducer;
+			try {
+				messageProducer = session.createProducer(paintedCarTopic);
+				messageProducer.send(session.createObjectMessage(object));
+				System.out.println("[Painter] Painted car " + car.getId() + " send to paintedCarTopic");
+			} catch(JMSException e) {
+				e.printStackTrace();
+			}
+		} else if (object instanceof Body) {
+			Body body = (Body) object;
+			if(body.getPaintState() == PaintState.PAINTED) {
+				throw new RuntimeException("PAINTED bodies should only be in the painted bodies queue");
+			}
+			body.setPaintState(PaintState.PAINTED);
+			body.setColor(pid, color);
+			MessageProducer messageProducer;
+			try {
+				messageProducer = session.createProducer(paintedBodyTopic);
+				messageProducer.send(session.createObjectMessage(object));
+				System.out.println("[Painter] Painted body " + body.getId() + " send to paintedBodyTopic");
+			} catch(JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	
 }

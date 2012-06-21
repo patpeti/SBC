@@ -1,11 +1,12 @@
 package at.ac.tuwien.complang.carfactory.application.workers.jms;
 
+import java.awt.Color;
+
 import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -16,6 +17,8 @@ import at.ac.tuwien.complang.carfactory.application.producers.jms.constants.Queu
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.Motor;
+import at.ac.tuwien.complang.carfactory.domain.MotorType;
+import at.ac.tuwien.complang.carfactory.domain.Task;
 import at.ac.tuwien.complang.carfactory.domain.Wheel;
 
 public class JmsAssembler extends JmsAbstractWorker {
@@ -37,14 +40,54 @@ public class JmsAssembler extends JmsAbstractWorker {
 		 * 6. save the car object into the right queue (depending on whether it is painted or not)
 		 */
 	}
+	
+	
+	
 
 	public void startWorkLoop() {
 		while(running) {
 			//produce some cars
 			try {
-				Body body = getOneBody();
-				Motor motor = getOneMotor();
-				Wheel[] wheels = getFourWheels();
+				Task task = readFirstTask();
+				if(task == null){
+					normalLoop();
+				}else{
+					preferredLoop(task);
+				}
+				
+			} catch (JMSException e) {
+				if(e instanceof IllegalStateException) break;
+				e.printStackTrace();
+			}
+		}
+		//disconnect from queue
+		disconnect();
+		shutdownComplete = true;
+		synchronized(runningMutex) {
+			runningMutex.notifyAll();
+		}
+	}
+	
+	private Task readFirstTask() {
+		//TODO read first task from topic
+			return null;
+	}
+
+
+
+
+	private void preferredLoop(Task task) throws JMSException{
+		
+			Body body = getOnePreferredBody(task.getColor());
+			Motor motor = getOnePreferredMotor(task.getMotortype());
+			Wheel[] wheels = getPreferredFourWheels();
+			
+			if(body == null || motor == null || wheels[0] == null || wheels[1] == null || wheels[2] == null || wheels[3] == null){
+				//read next task
+				readNextTask(task);
+			}else{
+				//Everything Found -- creating auto:
+				
 				Car car = new Car(pid, body, motor, wheels);
 				//write the car to the queue
 				MessageProducer messageProducer;
@@ -57,17 +100,47 @@ public class JmsAssembler extends JmsAbstractWorker {
 					messageProducer.send(session.createObjectMessage(car));
 					System.out.println("One unpainted car produced with id: " + car.getId());
 				}
-			} catch (JMSException e) {
-				if(e instanceof IllegalStateException) break;
-				e.printStackTrace();
+				
+				//TODO update Task
+				//TODO write task in the queue
 			}
+	}
+
+
+	private void readNextTask(Task task) throws JMSException {
+		//TODO try to read next Task
+		Task t = null;
+		
+		
+		if(t == null){
+			normalLoop();
+			return;
+		}else{
+			preferredLoop(t);
 		}
-		//disconnect from queue
-		disconnect();
-		shutdownComplete = true;
-		synchronized(runningMutex) {
-			runningMutex.notifyAll();
-		}
+		
+		
+	}
+
+
+	private void normalLoop() throws JMSException{
+		
+			Body body = getOneBody();
+			Motor motor = getOneMotor();
+			Wheel[] wheels = getFourWheels();
+			Car car = new Car(pid, body, motor, wheels);
+			//write the car to the queue
+			MessageProducer messageProducer;
+			if(car.hasColor()) {
+				messageProducer = session.createProducer(paintedCarTopic);
+				messageProducer.send(session.createObjectMessage(car));
+				System.out.println("One painted car produced with id: " + car.getId());
+			} else {
+				messageProducer = session.createProducer(carTopic);
+				messageProducer.send(session.createObjectMessage(car));
+				System.out.println("One unpainted car produced with id: " + car.getId());
+			}
+		
 	}
 
 	@Override
@@ -93,6 +166,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "paintedBodySubscriber");
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC); //Write only
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC); //Write only
+			//TODO connect to TaskTopic
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -129,6 +203,48 @@ public class JmsAssembler extends JmsAbstractWorker {
 		ObjectMessage message;
 		message = (ObjectMessage) motorConsumer.receive();
 		if(message == null) throw new IllegalStateException("Connection was closed.");
+		Motor motor = (Motor) message.getObject();
+		System.out.println("Received Motor: " + motor.getId());
+		return motor;
+	}
+	
+	private Wheel[] getPreferredFourWheels() throws JMSException {
+		ObjectMessage message;
+		Wheel[] wheels = new Wheel[4];
+		for(int i=0; i<4; i++) {
+			message = (ObjectMessage) wheelConsumer.receive();
+			if(message == null) return null;
+			Wheel wheel = (Wheel) message.getObject();
+			System.out.println("Received Wheel: " + wheel.getId());
+			wheels[i] = wheel;
+		}
+		return wheels;
+	}
+
+
+
+
+	private Body getOnePreferredBody(Color color) throws JMSException {
+		ObjectMessage message = null;
+		while(message == null) {
+			message = (ObjectMessage) bodyConsumer.receive(10);
+			if(message == null) {
+				message = (ObjectMessage) paintedBodyConsumer.receive(10);
+			}
+		}
+		Body body = (Body) message.getObject();
+		System.out.println("Received Body: " + body.getId());
+		return body;
+	}
+
+
+
+
+	private Motor getOnePreferredMotor(MotorType motortype) throws JMSException {
+		//TODO add filter
+		ObjectMessage message;
+		message = (ObjectMessage) motorConsumer.receive(10);
+		if(message == null) return null;
 		Motor motor = (Motor) message.getObject();
 		System.out.println("Received Motor: " + motor.getId());
 		return motor;
