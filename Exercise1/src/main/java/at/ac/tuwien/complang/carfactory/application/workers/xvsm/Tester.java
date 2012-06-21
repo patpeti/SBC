@@ -1,9 +1,12 @@
 package at.ac.tuwien.complang.carfactory.application.workers.xvsm;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.CoordinationData;
@@ -25,6 +28,10 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.domain.Car;
@@ -37,29 +44,35 @@ import at.ac.tuwien.complang.carfactory.ui.constants.SpaceTimeout;
 public class Tester {
 	
 	private Capi capi;
-	private ContainerReference container;
+	private ContainerReference container, signalContainer;
 	//private ContainerReference defectContainer;
 	private TransactionReference tx;
 	private TesterType type;
 	private long tid;
+	private boolean running = false;
 
 	public Tester(TesterType type, long id) {
 		initSpace();
 		this.type = type;
 		this.tid = id;
+	}
+	
+	public void start() {
+		waitForStartSignal();
 		if(type == TesterType.COMPLETETESTER) {
-			//do completetestloop
-			while(true) {
+			//do completetest loop
+			while(running) {
 				doCompletenessTest();
 			}
 		}else if(type == TesterType.DEFECTTESTER) {
-			while(true){
+			while(running){
 				doDefectTest();
 			}
 		}else{
-			System.err.println("Better programmer needed");
+			System.err.println("This type of tester is not implemented");
 			System.exit(1);
 		}
+		System.out.println("[Tester] Received a stop signal and is terminating...");
 	}
 
 	private void doDefectTest() {
@@ -102,12 +115,7 @@ public class Tester {
 			car.setDefect(tid, true);
 		}
 		writeCarIntoSpace(car);
-		
-		
 	}
-
-
-	
 
 	private void doCompletenessTest() {
 		try {
@@ -203,25 +211,32 @@ public class Tester {
 	private void initSpace(){
 		MzsCore core = DefaultMzsCore.newInstance(0);
 		this.capi = new Capi(core);
-	
 		this.container = null;
+		NotificationManager notificationManager = new NotificationManager(core);
 		try {
 			List<Coordinator> coords = new ArrayList<Coordinator>();
-//			coords.add(new AnyCoordinator());
 			coords.add(new LabelCoordinator());
 			coords.add(new KeyCoordinator());
 			coords.add(new FifoCoordinator());	
 			coords.add(new QueryCoordinator());
-//			List<Coordinator> defcoords = new ArrayList<Coordinator>();
-//			defcoords.add(new FifoCoordinator());	
-//			defcoords.add(new KeyCoordinator());
+			List<Coordinator> signalCoordinators = new ArrayList<Coordinator>();
+			signalCoordinators.add(new AnyCoordinator());
+			signalCoordinators.add(new FifoCoordinator());
 			try {
 				this.container = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
-				//this.defectContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.DEFECTCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), defcoords, null, capi);
+				this.signalContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.SIGNALCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), signalCoordinators, null, capi);
+				
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
 			}
+			
+			Set<Operation> operations = new HashSet<Operation>();
+			operations.add(Operation.WRITE);
+			
+			notificationManager.createNotification(signalContainer, new SignalContainerListener(), operations, null, null);
+			
+			
 		} catch (MzsCoreException e) {
 			System.out.println("Error: Could not initialize Space");
 			e.printStackTrace();
@@ -232,4 +247,36 @@ public class Tester {
 		
 	}
 	
+	private void waitForStartSignal() {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(FifoCoordinator.newSelector(1));
+		selectors.add(LabelCoordinator.newSelector("START"));
+		List<String> entries;
+		try {
+			entries = capi.read(signalContainer, selectors, SpaceTimeout.INFINITE, null);
+			String signal = (String) entries.get(0);
+			if(signal.equalsIgnoreCase("START")) {
+				running = true;
+			}
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class SignalContainerListener implements NotificationListener {
+		@Override
+		public void entryOperationFinished(Notification source,
+			Operation operation, List<? extends Serializable> entries)
+		{
+			System.out.println("IM STOPPING");
+			if(operation.name().equals("WRITE")) {
+				for(Entry entry : (List<Entry>) entries) {
+					String signal = (String) entry.getValue();
+					if(signal.equalsIgnoreCase("STOP")) {
+						Tester.this.running = false;
+					}
+				}
+			}
+		}
+	}
 }

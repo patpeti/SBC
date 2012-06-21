@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
@@ -81,6 +82,8 @@ public class StartUpXvsmBenchmark {
 			
 			List<Coordinator> signalCoordinators = new ArrayList<Coordinator>();
 			signalCoordinators.add(new AnyCoordinator());
+			signalCoordinators.add(new FifoCoordinator());
+			signalCoordinators.add(new LabelCoordinator());
 			try {
 				motorContainer = capi.createContainer(SpaceConstants.MOTORCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
 				wheelContainer = capi.createContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI),Container.UNBOUNDED,  coords, optionalCoords, null);
@@ -115,10 +118,10 @@ public class StartUpXvsmBenchmark {
 		bodyFactory.start();
 		IFactory motorFactory = factoryFacade.getInstance(ProducerType.MOTOR);
 		motorFactory.init(2000, 0.0);
-		bodyFactory.start();
+		motorFactory.start();
 		IFactory wheelFactory = factoryFacade.getInstance(ProducerType.WHEEL);
 		wheelFactory.init(8000, 0.0);
-		bodyFactory.start();
+		wheelFactory.start();
 		while(bodyFactory.isRunning() || motorFactory.isRunning() || wheelFactory.isRunning()) { 
 			//busyloop to wait until the factories are finished
 			try {
@@ -133,17 +136,22 @@ public class StartUpXvsmBenchmark {
 		scanner.nextLine();
 		scanner.close();
 		try {
-			capi.write(signalContainer, new Entry(new String("START")));
+			List<CoordinationData> coordinators = new ArrayList<CoordinationData>();
+			coordinators.add(FifoCoordinator.newCoordinationData());
+			coordinators.add(LabelCoordinator.newCoordinationData("START"));
+			capi.write(signalContainer, new Entry(new String("START"), coordinators));
 		} catch (MzsCoreException e) {
+			e.printStackTrace();
 		}
 		System.out.println("Workers are starting...");
-		Timer timer = new Timer();
+		final Timer timer = new Timer();
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					stop();
 					System.out.println("Workers are stopping...");
+					timer.cancel();
 				} catch (MzsCoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -154,6 +162,9 @@ public class StartUpXvsmBenchmark {
 	}
 	
 	public void stop() throws MzsCoreException {
-		capi.write(signalContainer, new Entry(new String("STOP")));
+		List<CoordinationData> coordinators = new ArrayList<CoordinationData>();
+		coordinators.add(FifoCoordinator.newCoordinationData());
+		coordinators.add(LabelCoordinator.newCoordinationData("STOP"));
+		capi.write(signalContainer, new Entry(new String("STOP"), coordinators));
 	}
 }

@@ -1,10 +1,13 @@
 package at.ac.tuwien.complang.carfactory.application.workers.xvsm;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.CoordinationData;
@@ -20,21 +23,28 @@ import org.mozartspaces.capi3.Property;
 import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.Selector;
+import org.mozartspaces.capi3.LabelCoordinator.LabelSelector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.CapiUtil;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants;
+import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
 import at.ac.tuwien.complang.carfactory.application.enums.PaintState;
+import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Tester.SignalContainerListener;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.CarId;
@@ -55,9 +65,11 @@ public class Assembler{
 	private ContainerReference bodyContainer;
 	private ContainerReference carIdContainer;
 	private ContainerReference taskContainer;
+	private ContainerReference signalContainer;
 
 	public static long pid = 0;
 
+	private boolean running = false;
 	private Body body;
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
@@ -79,18 +91,22 @@ public class Assembler{
 		System.out.println("Space initialized");
 	}
 
-	public void doAssemble(){
-		System.out.println("[Assembler] New loop");
-		//read Task
-		Task task = getTaskFromSpace();
-		if(task != null){
-			//if there is a task set preferences (body, motor)
-			preferredLoop(task);
-			//if preferation is set and car written -> update Task counters (write task into space)
-		}else{
-			//if no task set ..do normal loop:
-			defaultWork();
+	public void start() {
+		waitForStartSignal();
+		while(running) {
+			System.out.println("[Assembler] New loop");
+			//read Task
+			Task task = getTaskFromSpace();
+			if(task != null){
+				//if there is a task set preferences (body, motor)
+				preferredLoop(task);
+				//if preferation is set and car written -> update Task counters (write task into space)
+			}else{
+				//if no task set ..do normal loop:
+				defaultWork();
+			}
 		}
+		System.out.println("[Assembler] Received a stop signal and is terminating...");
 	}
 
 	private void preferredLoop(Task t) {
@@ -439,20 +455,7 @@ public class Assembler{
 	public void getOneBody() {
 		try {
 			List<Selector> selectors = new ArrayList<Selector>();
-			Query query = null;
-			Property prop = null;
-			List<Matchmaker> matchmakers = new ArrayList<Matchmaker>();
-			Matchmaker[] array = new Matchmaker[2];
-			prop = Property.forName("*", "paintState");
-			matchmakers.add(prop.equalTo(PaintState.PAINTED));
-			matchmakers.add(prop.equalTo(PaintState.UNPAINTED));
-			query = new Query().filter(
-				Matchmakers.and(
-					Matchmakers.or(matchmakers.toArray(array)),
-					Property.forName("type").equalTo(CarPartType.BODY)
-				)
-			);
-			selectors.add(QueryCoordinator.newSelector(query));
+			selectors.add(AnyCoordinator.newSelector(1));
 			List<ICarPart> bodies = null;
 			bodies = capi.take(bodyContainer, selectors, RequestTimeout.INFINITE, tx);
 			//set body
@@ -485,6 +488,10 @@ public class Assembler{
 			taskCoords.add(new FifoCoordinator());
 			taskCoords.add(new QueryCoordinator());
 			taskCoords.add(new LabelCoordinator());
+			
+			List<Coordinator> signalCoordinators = new ArrayList<Coordinator>();
+			signalCoordinators.add(new AnyCoordinator());
+			signalCoordinators.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
@@ -492,15 +499,56 @@ public class Assembler{
 				this.wheelContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.WHEELCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.carIdContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARIDCAONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), carIdCoords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), taskCoords, null, capi);
+				this.signalContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.SIGNALCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), signalCoordinators, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
 			}
+			NotificationManager notificationManager = new NotificationManager(core);			
+			Set<Operation> operations = new HashSet<Operation>();
+			operations.add(Operation.WRITE);
+			
+			notificationManager.createNotification(signalContainer, new SignalContainerListener(), operations, null, null);
+			
+
 		} catch (MzsCoreException e) {
 			System.out.println("Error: Could not initialize Space");
 			e.printStackTrace();
 		} catch (Exception e){
 			e.printStackTrace();
+		}
+	}
+	
+	private void waitForStartSignal() {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(FifoCoordinator.newSelector(1));
+		selectors.add(LabelCoordinator.newSelector("START"));
+		List<String> entries;
+		try {
+			entries = capi.read(signalContainer, selectors, SpaceTimeout.INFINITE, null);
+			String signal = (String) entries.get(0);
+			if(signal.equalsIgnoreCase("START")) {
+				running = true;
+			}
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class SignalContainerListener implements NotificationListener {
+		@Override
+		public void entryOperationFinished(Notification source,
+			Operation operation, List<? extends Serializable> entries)
+		{
+			System.out.println("IM STOPPING");
+			if(operation.name().equals("WRITE")) {
+				for(Entry entry : (List<Entry>) entries) {
+					String signal = (String) entry.getValue();
+					if(signal.equalsIgnoreCase("STOP")) {
+						Assembler.this.running = false;
+					}
+				}
+			}
 		}
 	}
 }

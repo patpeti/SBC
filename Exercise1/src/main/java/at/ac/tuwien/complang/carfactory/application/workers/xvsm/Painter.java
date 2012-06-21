@@ -1,10 +1,13 @@
 package at.ac.tuwien.complang.carfactory.application.workers.xvsm;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tools.ant.taskdefs.Sleep;
 import org.mozartspaces.capi3.AnyCoordinator;
@@ -31,8 +34,13 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsTimeoutException;
 import org.mozartspaces.core.TransactionException;
 import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
+import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Tester.SignalContainerListener;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
@@ -56,21 +64,27 @@ public class Painter {
 	 * We use this to relax the update intervals of the UI, so that there is no
 	 * flickering, which happens, when a part is taken and written back immediately. */
 	public static final long TIME_TO_PAINT = 1400L; //time in milliseconds
+	private boolean running = false;
 	private long pid = 0;
 	private Color color; //the color which this painter uses to paint an object. It is set on creation of the painter.
 
 	private Capi capi;
 	private TransactionReference tx;
-	private ContainerReference carContainer, bodyContainer, taskContainer;
+	private ContainerReference carContainer, bodyContainer, taskContainer, signalContainer;
 	
 	public Painter(long id, Color color) {
-		super(); //1
+		super();
 		pid = id;
 		this.color = color;
 		initSpace();
-		while(true){
+	}
+	
+	public void start() {
+		waitForStartSignal();
+		while(running){
 			doPaint();
 		}
+		System.out.println("[Painter] Received a stop signal and is terminating...");
 	}
 
 	private void doPaint() {
@@ -335,14 +349,27 @@ public class Painter {
 			taskCoordinators.add(new AnyCoordinator());
 			taskCoordinators.add(new KeyCoordinator());
 			taskCoordinators.add(new FifoCoordinator());
+			
+			List<Coordinator> signalCoordinators = new ArrayList<Coordinator>();
+			signalCoordinators.add(new AnyCoordinator());
+			signalCoordinators.add(new FifoCoordinator());
 			try {
 				this.carContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.CARCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.bodyContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.BODYCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
 				this.taskContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.TASKCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), coords, null, capi);
+				this.signalContainer = CapiUtil.lookupOrCreateContainer(SpaceConstants.SIGNALCONTAINER_NAME, new URI(SpaceConstants.CONTAINER_URI), signalCoordinators, null, capi);
 			} catch (URISyntaxException e) {
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
 			}
+			NotificationManager notificationManager = new NotificationManager(core);			
+			Set<Operation> operations = new HashSet<Operation>();
+			operations.add(Operation.WRITE);
+			
+			notificationManager.createNotification(signalContainer, new SignalContainerListener(), operations, null, null);
+			
+
+			
 		} catch (MzsCoreException e) {
 			System.out.println("Error: Could not initialize Space");
 			e.printStackTrace();
@@ -369,5 +396,38 @@ public class Painter {
 		capi.write( new Entry(car,cordinator), carContainer, SpaceTimeout.TENSEC, tx);
 		capi.commitTransaction(tx);
 		System.out.println("[Painter] Car " + car.getId() + " painted and written in space");
+	}
+
+	private void waitForStartSignal() {
+		List<Selector> selectors = new ArrayList<Selector>();
+		selectors.add(FifoCoordinator.newSelector(1));
+		selectors.add(LabelCoordinator.newSelector("START"));
+		List<String> entries;
+		try {
+			entries = capi.read(signalContainer, selectors, SpaceTimeout.INFINITE, null);
+			String signal = (String) entries.get(0);
+			if(signal.equalsIgnoreCase("START")) {
+				running = true;
+			}
+		} catch (MzsCoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class SignalContainerListener implements NotificationListener {
+		@Override
+		public void entryOperationFinished(Notification source,
+			Operation operation, List<? extends Serializable> entries)
+		{
+			System.out.println("IM STOPPING");
+			if(operation.name().equals("WRITE")) {
+				for(Entry entry : (List<Entry>) entries) {
+					String signal = (String) entry.getValue();
+					if(signal.equalsIgnoreCase("STOP")) {
+						Painter.this.running = false;
+					}
+				}
+			}
+		}
 	}
 }

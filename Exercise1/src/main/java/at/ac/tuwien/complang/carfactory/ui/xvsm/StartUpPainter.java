@@ -22,7 +22,8 @@ public class StartUpPainter {
 		 */
 
 		parseArguments(args);
-		new Painter(id, color);
+		Painter painter = new Painter(id, color);
+		painter.start();
 	}
 
 	private static void parseArguments(String[] args) {

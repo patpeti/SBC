@@ -16,7 +16,8 @@ public class StartUpSupervisor {
 		 * 4. write it back into the space 		
 		 */
 		parseArguments(args);
-		new Supervisor(id);
+		Supervisor supervisor = new Supervisor(id);
+		supervisor.start();
 	}
 	
 	private static void parseArguments(String[] args) {
