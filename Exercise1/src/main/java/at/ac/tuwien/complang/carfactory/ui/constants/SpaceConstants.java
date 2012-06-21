@@ -13,5 +13,5 @@ public class SpaceConstants {
 	public static final String CARIDCAONTAINER_NAME = "caridcontainer";
 	public static final String DEFECTCONTAINER_NAME = "defectcontainer";
 	public static final String FINISHEDTASKS = "finishedtaskscontainer";
-
+	public static final String SIGNALCONTAINER_NAME = "signalcontainer";
 }
