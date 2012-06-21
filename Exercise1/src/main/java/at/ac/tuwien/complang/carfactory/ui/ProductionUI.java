@@ -46,6 +46,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 	private static final long serialVersionUID = -6151830798597607052L;
 	private static final int initialBodyCount = 10, initialMotorCount = 10, initialWheelCount = 40;
 	private static final double initialErrorSpinnerValue = 0.2;
+	private static final int initialTaskAmount = 10;
 
 	//Fields
 	private JSpinner bodyCountSpinner, bodyErrorRateSpinner,
@@ -119,7 +120,7 @@ public class ProductionUI extends JFrame implements IFactoryData, Observer {
 		taskPanel.add(colorCombo, gbc_colorCombo);
 
 		amountSpinner = new JSpinner();
-		amountSpinner.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		amountSpinner.setModel(new SpinnerNumberModel(new Integer(initialTaskAmount), new Integer(0), null, new Integer(1)));
 		GridBagConstraints gbc_countSpinner = new GridBagConstraints();
 		gbc_countSpinner.fill = GridBagConstraints.BOTH;
 		gbc_countSpinner.insets = new Insets(0, 0, 0, 5);
