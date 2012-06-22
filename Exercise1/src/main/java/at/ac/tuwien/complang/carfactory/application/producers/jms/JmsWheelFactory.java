@@ -31,7 +31,7 @@ public class JmsWheelFactory extends JmsAbstractFactory {
 	}
 
 	private void connect() {
-		System.out.println("[BodyFactory] Connecting to Queues");
+		System.out.println("[WheelFactory] Connecting to Queues");
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
