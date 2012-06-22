@@ -6,10 +6,12 @@ Names:
 
 Group: 2
 
-The source has an attached Maven pom.xml, that can be used to import 
-the project into Eclipse and to download the necessary dependencies.
-Additionally there is also a build.xml available, but it has been created
-with Eclipse, therefore it is probably not platform independent.
+* The whole source is tracked with Git.
+
+* The source has an attached Maven pom.xml, that can be used to import 
+  the project into Eclipse and to download the necessary dependencies.
+  Additionally there is also a build.xml available, but it has been created
+  with Eclipse, therefore it is probably not platform independent.
 
 There are two possible options to start the programs:
 
