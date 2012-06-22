@@ -2,6 +2,7 @@ package at.ac.tuwien.complang.carfactory.application.producers.jms;
 
 import java.util.Observable;
 
+import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.producers.IFactory;
 import at.ac.tuwien.complang.carfactory.application.producers.IProducer;
 import at.ac.tuwien.complang.carfactory.ui.jms.listener.IQueueListener;
@@ -60,7 +61,7 @@ public abstract class JmsAbstractFactory extends Observable implements IFactory,
 			int total = 0;
 			while(count > 0) {
 				//The producer sleeps for a random period between 1 and 3 seconds
-				delay = (int) (Math.random() * timeInSec()) + 1;
+				delay = (int) ((Math.random() * timeInSec()) + TimeConstants.BASE_DELAY);
 				total += delay;
 				int millisecondsPerSecond = 1000;
 				try {
