@@ -6,6 +6,7 @@ public class StartUpSupervisor {
 	
 	//Static Fields
 	private static long id;
+	private static boolean waitForSignal;
 	
 	public static void main(String[] args) {
 		/**
@@ -16,13 +17,13 @@ public class StartUpSupervisor {
 		 * 4. write it back into the space 		
 		 */
 		parseArguments(args);
-		Supervisor supervisor = new Supervisor(id);
+		Supervisor supervisor = new Supervisor(id, waitForSignal);
 		supervisor.start();
 	}
 	
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id>";
-		if(args.length != 1) {
+		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id> [--signal]";
+		if(args.length != 1 && args.length != 2) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -36,6 +37,11 @@ public class StartUpSupervisor {
 		} catch(NumberFormatException e) {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 2) {
+			if(args[1].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 }

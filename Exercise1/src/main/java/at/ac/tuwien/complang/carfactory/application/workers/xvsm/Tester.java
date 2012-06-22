@@ -50,15 +50,19 @@ public class Tester {
 	private TesterType type;
 	private long tid;
 	private boolean running = false;
+	private boolean waitForSignal = false;
 
-	public Tester(TesterType type, long id) {
+	public Tester(TesterType type, long id, boolean waitForSignal) {
 		initSpace();
 		this.type = type;
 		this.tid = id;
+		this.waitForSignal = waitForSignal;
 	}
 	
 	public void start() {
-		waitForStartSignal();
+		if(waitForSignal) {
+			waitForStartSignal();
+		}
 		if(type == TesterType.COMPLETETESTER) {
 			//do completetest loop
 			while(running) {

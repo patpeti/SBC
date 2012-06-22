@@ -9,6 +9,7 @@ public class StartUpPainter {
 	
 	//Static Fields
 	private static long id;
+	private static boolean waitForSignal;
 	private static Color color;
 	
 	public static void main(String[] args) {
@@ -22,13 +23,13 @@ public class StartUpPainter {
 		 */
 
 		parseArguments(args);
-		Painter painter = new Painter(id, color);
+		Painter painter = new Painter(id, color, waitForSignal);
 		painter.start();
 	}
 
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> --color=<color>\nValid colors are: [RED, GREEN, BLUE]";
-		if(args.length != 2) {
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> --color=<color> [--signal]\nValid colors are: [RED, GREEN, BLUE]";
+		if(args.length != 2 && args.length != 3) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -57,6 +58,11 @@ public class StartUpPainter {
 		} else {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 3) {
+			if(args[2].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 }

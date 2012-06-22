@@ -68,15 +68,18 @@ public class Supervisor{
 	private TransactionReference tx;
 	private long pid = 0;
 	private boolean running = false;
+	private boolean waitForSignal = false;
 	
-	
-	public Supervisor(long id) {
+	public Supervisor(long id, boolean waitForSignal) {
 		this.pid = id;
+		this.waitForSignal = waitForSignal;
 		initSpace();
 	}
 	
 	public void start() {
-		waitForStartSignal();
+		if(waitForSignal) {
+			waitForStartSignal();
+		}
 		Date start = new Date();
 		System.out.println("Start: " + new Date().toString());
 		while(running){

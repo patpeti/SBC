@@ -7,6 +7,7 @@ public class StartUpTester {
 	
 	//Static Fields
 	private static long id;
+	private static boolean waitForSignal;
 	private static TesterType type;
 	
 	public static void main(String[] args) {
@@ -19,13 +20,13 @@ public class StartUpTester {
 		 */
 		parseArguments(args);
 		//Initialize tester: 
-		Tester tester = new Tester(type, id);
+		Tester tester = new Tester(type, id, waitForSignal);
 		tester.start();
 	}
 
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id> --type=<String> [defectTester, completenessTester])";
-		if(args.length != 2) {
+		String usage = "[Usage] " + StartUpSupervisor.class.getName() + " --id=<id> --type=<String> [--signal]\nValid string values are: [defectTester, completenessTester])";
+		if(args.length != 2 && args.length != 3) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -52,6 +53,11 @@ public class StartUpTester {
 		} catch(NumberFormatException e) {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 3) {
+			if(args[2].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 }

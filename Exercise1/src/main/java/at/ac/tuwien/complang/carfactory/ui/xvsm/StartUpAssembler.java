@@ -7,6 +7,7 @@ public class StartUpAssembler {
 	
 	//Static Fields 
 	private static long id;
+	private static boolean waitForSignal;
 	
 	public static void main(String[] args) {
 		/**
@@ -20,13 +21,13 @@ public class StartUpAssembler {
 		 */
 
 		parseArguments(args);
-		Assembler assembler = new Assembler(id);
+		Assembler assembler = new Assembler(id, waitForSignal);
 		assembler.start();
 	}
 
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id>";
-		if(args.length != 1) {
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> [--signal]";
+		if(args.length != 1 && args.length != 2) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -40,6 +41,11 @@ public class StartUpAssembler {
 		} catch(NumberFormatException e) {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 2) {
+			if(args[1].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 	

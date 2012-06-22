@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.tools.ant.taskdefs.Sleep;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.CoordinationData;
 import org.mozartspaces.capi3.Coordinator;
@@ -17,8 +16,6 @@ import org.mozartspaces.capi3.CountNotMetException;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.LabelCoordinator;
-import org.mozartspaces.capi3.Matchmaker;
-import org.mozartspaces.capi3.Matchmakers;
 import org.mozartspaces.capi3.Property;
 import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
@@ -41,7 +38,6 @@ import org.mozartspaces.notifications.Operation;
 
 import at.ac.tuwien.complang.carfactory.application.TimeConstants;
 import at.ac.tuwien.complang.carfactory.application.enums.CarPartType;
-import at.ac.tuwien.complang.carfactory.application.workers.xvsm.Tester.SignalContainerListener;
 import at.ac.tuwien.complang.carfactory.domain.Body;
 import at.ac.tuwien.complang.carfactory.domain.Car;
 import at.ac.tuwien.complang.carfactory.domain.ICarPart;
@@ -61,6 +57,7 @@ public class Painter {
 	 * 4. Save the painted part back into the space 
 	 */
 	private boolean running = false;
+	private boolean waitForSignal = false;
 	private long pid = 0;
 	private Color color; //the color which this painter uses to paint an object. It is set on creation of the painter.
 
@@ -68,15 +65,18 @@ public class Painter {
 	private TransactionReference tx;
 	private ContainerReference carContainer, bodyContainer, taskContainer, signalContainer;
 	
-	public Painter(long id, Color color) {
+	public Painter(long pid, Color color, boolean waitForSignal) {
 		super();
-		pid = id;
+		this.pid = pid;
 		this.color = color;
+		this.waitForSignal = waitForSignal;
 		initSpace();
 	}
 	
 	public void start() {
-		waitForStartSignal();
+		if(waitForSignal) {
+			waitForStartSignal();
+		}
 		while(running){
 			doPaint();
 		}

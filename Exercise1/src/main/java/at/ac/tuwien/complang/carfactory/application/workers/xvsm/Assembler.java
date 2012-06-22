@@ -67,15 +67,15 @@ public class Assembler{
 	private ContainerReference taskContainer;
 	private ContainerReference signalContainer;
 
-	public static long pid = 0;
-
+	public long pid = 0;
 	private boolean running = false;
+	private boolean waitForSignal = false;
 	private Body body;
 	private Wheel[] fourWheels = new Wheel[4];
 	private Motor motor;
 	private TransactionReference tx;
 
-	public Assembler(long id){
+	public Assembler(long id, boolean waitForSignal){
 		/**
 		 * Workflow:
 		 * 1. Connect to the space
@@ -86,13 +86,16 @@ public class Assembler{
 		 * 6. save the car object back into the space
 		 */
 
-		pid = id;
+		this.pid = id;
+		this.waitForSignal = waitForSignal;
 		initSpace();
 		System.out.println("Space initialized");
 	}
 
 	public void start() {
-		waitForStartSignal();
+		if(waitForSignal) {
+			waitForStartSignal();
+		}
 		while(running) {
 			System.out.println("[Assembler] New loop");
 			//read Task
