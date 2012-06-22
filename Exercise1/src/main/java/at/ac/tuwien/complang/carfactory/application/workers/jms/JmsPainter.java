@@ -68,7 +68,6 @@ public class JmsPainter extends JmsAbstractWorker {
 			this.taskConsumer = session.createDurableSubscriber(taskTopic, "taskSubscriber");
 			this.taskProducer = session.createProducer(taskTopic);
 			this.paintedCarProducer = session.createProducer(paintedCarTopic);
-			//TODO connect to tasktopic
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
