@@ -76,6 +76,8 @@ public class Painter {
 	public void start() {
 		if(waitForSignal) {
 			waitForStartSignal();
+		} else {
+			running = true;
 		}
 		while(running){
 			doPaint();

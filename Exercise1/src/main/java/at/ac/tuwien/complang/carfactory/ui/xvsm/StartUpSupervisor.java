@@ -6,7 +6,7 @@ public class StartUpSupervisor {
 	
 	//Static Fields
 	private static long id;
-	private static boolean waitForSignal;
+	private static boolean waitForSignal = false;
 	
 	public static void main(String[] args) {
 		/**

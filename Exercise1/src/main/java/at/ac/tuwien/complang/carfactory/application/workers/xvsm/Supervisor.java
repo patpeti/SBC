@@ -79,6 +79,8 @@ public class Supervisor{
 	public void start() {
 		if(waitForSignal) {
 			waitForStartSignal();
+		} else {
+			running = true;
 		}
 		Date start = new Date();
 		System.out.println("Start: " + new Date().toString());

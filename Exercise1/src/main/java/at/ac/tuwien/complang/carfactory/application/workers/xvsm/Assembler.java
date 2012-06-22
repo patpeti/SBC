@@ -95,6 +95,8 @@ public class Assembler{
 	public void start() {
 		if(waitForSignal) {
 			waitForStartSignal();
+		} else {
+			running = true;
 		}
 		while(running) {
 			System.out.println("[Assembler] New loop");
@@ -507,7 +509,7 @@ public class Assembler{
 				System.out.println("Error: Invalid container name");
 				e.printStackTrace();
 			}
-			NotificationManager notificationManager = new NotificationManager(core);			
+			NotificationManager notificationManager = new NotificationManager(core);
 			Set<Operation> operations = new HashSet<Operation>();
 			operations.add(Operation.WRITE);
 			

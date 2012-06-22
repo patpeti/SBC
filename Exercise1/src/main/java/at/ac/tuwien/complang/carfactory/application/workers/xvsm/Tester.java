@@ -62,6 +62,8 @@ public class Tester {
 	public void start() {
 		if(waitForSignal) {
 			waitForStartSignal();
+		} else {
+			running = true;
 		}
 		if(type == TesterType.COMPLETETESTER) {
 			//do completetest loop
