@@ -7,11 +7,12 @@ import at.ac.tuwien.complang.carfactory.application.workers.jms.JmsAssembler;
 public class StartUpJmsAssembler {
 
 	private static int id;
+	private static boolean waitForSignal;
 	private static JmsAssembler assembler; 
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		assembler = new JmsAssembler(id);
+		assembler = new JmsAssembler(id, waitForSignal);
 		Thread worker = new Thread(assembler);
 		assembler.initialize();
 		worker.start();
@@ -35,8 +36,8 @@ public class StartUpJmsAssembler {
 	}
 
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id>";
-		if(args.length != 1) {
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> [-signal]";
+		if(args.length != 1 && args.length != 2) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -50,6 +51,11 @@ public class StartUpJmsAssembler {
 		} catch(NumberFormatException e) {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 2) {
+			if(args[1].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 }

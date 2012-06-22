@@ -5,7 +5,6 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -21,12 +20,12 @@ import at.ac.tuwien.complang.carfactory.domain.Wheel;
 public class JmsAssembler extends JmsAbstractWorker {
 
 	//Fields
-	private Session session;
-	private Topic carTopic, paintedBodyTopic, paintedCarTopic, wheelTopic, motorTopic, bodyTopic;
+	private Session session, signalSession;
+	private Topic carTopic, paintedBodyTopic, paintedCarTopic, wheelTopic, motorTopic, bodyTopic, signalTopic;
 	private MessageConsumer bodyConsumer, wheelConsumer, motorConsumer, paintedBodyConsumer;
 	
-	public JmsAssembler(long pid) {
-		super(pid);
+	public JmsAssembler(long pid, boolean waitForSignal) {
+		super(pid, waitForSignal);
 		/**
 		 * Workflow:
 		 * 1. Connect to all queues/topics
@@ -39,6 +38,10 @@ public class JmsAssembler extends JmsAbstractWorker {
 	}
 
 	public void startWorkLoop() {
+		if(getWaitForSignal()) {
+			waitForStartSignal();
+		}
+		System.out.println("Starting Assembler loop...");
 		while(running) {
 			//produce some cars
 			try {
@@ -82,6 +85,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			connection.setClientID("assembler_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			signalSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			this.motorTopic = session.createTopic(QueueConstants.MOTORTOPIC);
 			this.motorConsumer = session.createDurableSubscriber(this.motorTopic, "motorSubscriber");
@@ -93,6 +97,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.paintedBodyConsumer = session.createDurableSubscriber(this.paintedBodyTopic, "paintedBodySubscriber");
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC); //Write only
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC); //Write only
+			this.signalTopic = signalSession.createTopic(QueueConstants.SIGNALTOPIC); //For the Start and Stop Signals
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();

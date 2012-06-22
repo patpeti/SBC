@@ -24,12 +24,12 @@ public class JmsTester extends JmsAbstractWorker {
 	
 	//Fields
 	private TesterType type;
-	private Topic defectTestedCarTopic, completenessTestedCarTopic, paintedCarTopic;
+	private Topic defectTestedCarTopic, completenessTestedCarTopic, paintedCarTopic, signalTopic;
 	private MessageConsumer completenessTestedConsumer, paintedCarConsumer;
-	private Session session;
+	private Session session, signalSession;
 
-	public JmsTester(long pid, TesterType type) {
-		super(pid);
+	public JmsTester(long pid, TesterType type, boolean waitForSignal) {
+		super(pid, waitForSignal);
 		this.type = type;
 	}
 
@@ -86,6 +86,7 @@ public class JmsTester extends JmsAbstractWorker {
 			connection.setClientID("tester_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			signalSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			//Read by the completeness tester
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
@@ -95,6 +96,7 @@ public class JmsTester extends JmsAbstractWorker {
 			this.completenessTestedConsumer = session.createDurableSubscriber(this.completenessTestedCarTopic, "completenessTestedSubscriber");
 			//Written to by the defect tester
 			this.defectTestedCarTopic = session.createTopic(QueueConstants.DEFECT_TESTED_TOPIC);
+			this.signalTopic = signalSession.createTopic(QueueConstants.SIGNALTOPIC); //For the Start and Stop Signals
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -103,6 +105,9 @@ public class JmsTester extends JmsAbstractWorker {
 
 	@Override
 	void startWorkLoop() {
+		if(getWaitForSignal()) {
+			waitForStartSignal();
+		}
 		if(type == TesterType.COMPLETETESTER) {
 			// Test for completeness of the car (e.g. car has all parts and is painted)
 			while(running) {

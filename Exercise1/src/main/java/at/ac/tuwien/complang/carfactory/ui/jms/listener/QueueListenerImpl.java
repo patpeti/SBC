@@ -43,12 +43,16 @@ public class QueueListenerImpl implements IQueueListener, MessageListener {
 
 	@Override
 	public void onObjectWrittenInQueue(ICarPart carPart) {
-		gui.addPart(carPart);
+		if(gui != null) {
+			gui.addPart(carPart);
+		}
 	}
 	
 	@Override
 	public void onTaskWrittenInQueue(Task task) {
-		gui.addTask(task);
+		if(gui != null) {
+			gui.addTask(task);
+		}
 	}
 
 	public void setQueueObserver(IFactoryData gui) {

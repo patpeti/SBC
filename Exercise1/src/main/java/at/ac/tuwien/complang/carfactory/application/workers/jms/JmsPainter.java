@@ -23,13 +23,19 @@ import at.ac.tuwien.complang.carfactory.domain.Car;
 public class JmsPainter extends JmsAbstractWorker {
 
 	//Fields
-	private Session session;
-	private Topic carTopic, paintedBodyTopic, paintedCarTopic, bodyTopic;
+	private Session session, signalSession;
+	private Topic carTopic, paintedBodyTopic, paintedCarTopic, bodyTopic, signalTopic;
 	private MessageConsumer bodyConsumer, carConsumer;
 	private Color color;
 	
-	public JmsPainter(long id, Color color) {
-		super(id);
+	/**
+	 * Creates a worker object that paints tasks. The worker must be given a globally unique id in your application setup.
+	 * @param id A unique ID in the whole Message Queue system
+	 * @param color The color in which this Painter paints parts
+	 * @param waitForSignal This decides whether to wait for a special "START" signal before starting with the work loop.
+	 */
+	public JmsPainter(long id, Color color, boolean waitForSignal) {
+		super(id, waitForSignal);
 		this.color = color;
 		/**
 		 * Workflow:
@@ -53,6 +59,7 @@ public class JmsPainter extends JmsAbstractWorker {
 			connection.setClientID("painter_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			signalSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			this.bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
 			this.bodyConsumer = session.createDurableSubscriber(bodyTopic, "bodySubscriber");
@@ -60,6 +67,7 @@ public class JmsPainter extends JmsAbstractWorker {
 			this.carTopic = session.createTopic(QueueConstants.CARTOPIC);
 			this.paintedCarTopic = session.createTopic(QueueConstants.PAINTEDCARTOPIC);
 			this.carConsumer = session.createDurableSubscriber(this.carTopic, "carSubscriber");
+			this.signalTopic = signalSession.createTopic(QueueConstants.SIGNALTOPIC); //For the Start and Stop Signals
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -67,6 +75,9 @@ public class JmsPainter extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
+		if(getWaitForSignal()) {
+			waitForStartSignal();
+		}
 		loop:
 		while(running) {
 			try {

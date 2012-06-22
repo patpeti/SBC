@@ -21,4 +21,5 @@ public class QueueConstants {
 	//Tester Topics
 	public static final String COMPLETENESS_TESTED_TOPIC = "COMPLETENESS_TESTED_TOPIC"; //Subscribers are GUI and DefectTester
 	public static final String DEFECT_TESTED_TOPIC = "DEFECT_TESTED_TOPIC"; //Subscribers are GUI and Supervisor
+	public static final String SIGNALTOPIC = "SIGNAL_TOPIC";
 }

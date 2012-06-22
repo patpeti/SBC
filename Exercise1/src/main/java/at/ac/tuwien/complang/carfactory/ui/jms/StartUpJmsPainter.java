@@ -7,12 +7,13 @@ import at.ac.tuwien.complang.carfactory.application.workers.jms.JmsPainter;
 
 public class StartUpJmsPainter {
 	private static int id;
+	private static boolean waitForSignal;
 	private static Color color;
 	private static JmsPainter painter; 
 	
 	public static void main(String[] args) {
 		parseArguments(args);
-		painter = new JmsPainter(id, color);
+		painter = new JmsPainter(id, color, waitForSignal);
 		Thread worker = new Thread(painter);
 		painter.initialize();
 		worker.start();
@@ -36,8 +37,8 @@ public class StartUpJmsPainter {
 	}
 	
 	private static void parseArguments(String[] args) {
-		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> --color=<color>\nValid colors are: [RED, GREEN, BLUE]";
-		if(args.length != 2) {
+		String usage = "[Usage] " + StartUpJmsAssembler.class.getName() + " --id=<id> --color=<color> [--signal]\nValid colors are: [RED, GREEN, BLUE]";
+		if(args.length != 2 && args.length != 3) {
 			System.out.println(usage);
 			System.exit(1);
 		}
@@ -66,6 +67,11 @@ public class StartUpJmsPainter {
 		} else {
 			System.out.println(usage);
 			System.exit(1);
+		}
+		if(args.length == 3) {
+			if(args[2].equals("--signal")) {
+				waitForSignal = true;
+			}
 		}
 	}
 }

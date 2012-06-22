@@ -1,5 +1,7 @@
 package at.ac.tuwien.complang.carfactory.application.workers.jms;
 
+import java.util.Date;
+
 import javax.jms.IllegalStateException;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -21,14 +23,14 @@ import at.ac.tuwien.complang.carfactory.domain.Wheel;
 public class JmsSupervisor extends JmsAbstractWorker {
 
 	//Fields
-	private Session session;
-	private Topic defectTestedCarTopic, bodyTopic, paintedBodyTopic, motorTopic, wheelTopic;
+	private Session session, signalSession;
+	private Topic defectTestedCarTopic, bodyTopic, paintedBodyTopic, motorTopic, wheelTopic, signalTopic;
 	private Queue finishedCarQueue, defectCarQueue;
 	private MessageConsumer defectTestedCarConsumer;
 	private MessageProducer bodyProducer, paintedBodyProducer, motorProducer, wheelProducer, finishedCarProducer, defectCarProducer;
 	
-	public JmsSupervisor(long pid) {
-		super(pid);
+	public JmsSupervisor(long pid, boolean waitForSignal) {
+		super(pid, waitForSignal);
 	}
 	
 	@Override
@@ -40,6 +42,7 @@ public class JmsSupervisor extends JmsAbstractWorker {
 			connection.setClientID("supervisor_" + this.pid);
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			signalSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			//createQueue connects to a queue if it exists otherwise creates it
 			//ICarPart Topics
 			bodyTopic = session.createTopic(QueueConstants.BODYTOPIC);
@@ -57,6 +60,7 @@ public class JmsSupervisor extends JmsAbstractWorker {
 			finishedCarProducer = session.createProducer(finishedCarQueue);
 			defectCarQueue = session.createQueue(QueueConstants.DEFECTCARQUEUE);
 			defectCarProducer = session.createProducer(defectCarQueue);
+			this.signalTopic = signalSession.createTopic(QueueConstants.SIGNALTOPIC); //For the Start and Stop Signals
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -64,18 +68,33 @@ public class JmsSupervisor extends JmsAbstractWorker {
 	}
 	
 	public void startWorkLoop() {
+		if(getWaitForSignal()) {
+			waitForStartSignal();
+		}
+		Date start = new Date();
+		System.out.println("Start: " + new Date().toString());
 		while(running) {
 			try {
 				//retrieve a car
 				ObjectMessage objectMessage = (ObjectMessage) defectTestedCarConsumer.receive();
 				if(objectMessage == null) throw new IllegalStateException("Connection was closed.");
 				Car car = (Car) objectMessage.getObject();
+				 /*
+				  * break the loop after 2000 cars have been produced and wait for signal is activated,
+				  * so we can measure the time properly if all cars have been produced before the time is up
+				  */
+				if(getWaitForSignal() && car.getId() == 2000) {
+					break;
+				}
 				handleCar(car);
 			} catch (JMSException e) {
 				if(e instanceof IllegalStateException) break;
 				e.printStackTrace();
 			}
 		}
+		Date finish = new Date();
+		System.out.println("End: " + new Date().toString());
+		System.out.println("Working Time [SECONDS]: " + (finish.getTime() - start.getTime())/1000);
 		//disconnect from queue
 		disconnect();
 		shutdownComplete = true;
