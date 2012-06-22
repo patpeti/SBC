@@ -3,6 +3,7 @@ package at.ac.tuwien.complang.carfactory.application.producers.jms;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
 
@@ -62,7 +63,9 @@ public class JmsMotorFactory extends JmsAbstractFactory {
 			//notify the GUI first, because we need to make sure that the object is in the table model, before the GUI gets a notification to remove it again.
 			topic = session.createTopic(QueueConstants.MOTORTOPIC);
 			messageProducer = session.createProducer(topic);
-			messageProducer.send(session.createObjectMessage(motor));
+			ObjectMessage message = session.createObjectMessage(motor);
+			message.setStringProperty("motorType", motor.getPower().toString().split(" ")[0]);
+			messageProducer.send(message);
 			System.out.println("Produced a motor with id: " + motor.getId());
 		} catch (JMSException e) {
 			e.printStackTrace();

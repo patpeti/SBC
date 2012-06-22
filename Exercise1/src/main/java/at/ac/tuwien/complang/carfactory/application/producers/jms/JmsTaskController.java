@@ -5,9 +5,9 @@ import java.awt.Color;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -26,7 +26,7 @@ public class JmsTaskController implements ITaskController {
 	private Session session;
 	private ActiveMQConnectionFactory connectionFactory;
 	private IQueueListener listener;
-	private Queue taskQueue;
+	private Topic taskTopic;
 	
 	public JmsTaskController(IQueueListener listener) {
 		this.listener = listener;
@@ -34,7 +34,7 @@ public class JmsTaskController implements ITaskController {
 		try {
 			connection = connectionFactory.createConnection();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			taskQueue = session.createQueue(QueueConstants.TASKQUEUE);
+			taskTopic = session.createTopic(QueueConstants.TASKQUEUE);
 			connection.start();
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -51,8 +51,11 @@ public class JmsTaskController implements ITaskController {
 		listener.onTaskWrittenInQueue(task);
 		MessageProducer messageProducer;
 		try {
-			messageProducer = session.createProducer(taskQueue);
-			messageProducer.send(session.createObjectMessage(task));
+			messageProducer = session.createProducer(taskTopic);
+			ObjectMessage message = session.createObjectMessage(task);
+			message.setStringProperty("motorType", type.toString().split(" ")[0]);
+			message.setStringProperty("color", color.toString());
+			messageProducer.send(message);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
