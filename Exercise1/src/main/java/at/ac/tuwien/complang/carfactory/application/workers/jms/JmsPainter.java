@@ -161,7 +161,7 @@ public class JmsPainter extends JmsAbstractWorker {
 
 	private Task readFirstTask() {
 		try {
-			ObjectMessage object =  (ObjectMessage) taskConsumer.receive(0);
+			ObjectMessage object =  (ObjectMessage) taskConsumer.receive(1);
 			if(object != null) return (Task) object.getObject();
 			
 		} catch (JMSException e) {

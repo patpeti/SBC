@@ -73,7 +73,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 
 	private Task readFirstTask() {
 		try {
-			ObjectMessage object =  (ObjectMessage) taskConsumer.receive(0);
+			ObjectMessage object =  (ObjectMessage) taskConsumer.receive(1);
 			if(object != null) return (Task) object.getObject();
 			
 		} catch (JMSException e) {
@@ -209,12 +209,12 @@ public class JmsAssembler extends JmsAbstractWorker {
 					this.motorTopic, "motorSubscriber");
 			this.motorConsumer80 = session
 					.createDurableSubscriber(this.motorTopic,
-							"motorSubscriber", "motorType='80'", false);
+							"motorSubscriber80", "motorType='80'", false);
 			this.motorConsumer100 = session.createDurableSubscriber(
-					this.motorTopic, "motorSubscriber", "motorType='100'",
+					this.motorTopic, "motorSubscriber100", "motorType='100'",
 					false);
 			this.motorConsumer160 = session.createDurableSubscriber(
-					this.motorTopic, "motorSubscriber", "motorType='160'",
+					this.motorTopic, "motorSubscriber160", "motorType='160'",
 					false);
 			this.wheelTopic = session.createTopic(QueueConstants.WHEELTOPIC);
 			this.wheelConsumer = session.createDurableSubscriber(
@@ -231,7 +231,7 @@ public class JmsAssembler extends JmsAbstractWorker {
 			this.paintedCarTopic = session
 					.createTopic(QueueConstants.PAINTEDCARTOPIC); // Write only
 			this.taskTopic = session.createTopic(QueueConstants.TASKQUEUE);
-			this.taskConsumer = session.createConsumer(taskTopic);
+			this.taskConsumer = session.createDurableSubscriber(taskTopic,"taskSubscriber");
 			this.taskProducer = session.createProducer(taskTopic);
 			System.out.println("Queues connected");
 		} catch (JMSException e) {
